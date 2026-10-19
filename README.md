@@ -89,6 +89,18 @@ Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have ano
 
 For a recipe problem, it helps to include the item and mod involved, what JEC or JEI shows, and the relevant lines from `/jectags` or `config/JustEnoughCalculation-TagReport.txt`.
 
+Copy this into your comment and fill in what applies:
+
+```
+Problem:   (recipe won't chain / wrong or missing JEI page / items invisible / idea / other)
+Item, mod: (e.g. Uranium Fuel Rod, IndustrialCraft 2)
+What happens:
+What you expected:
+/jectags lines: (for recipe problems)
+AoE-QoL version: (e.g. 1.0.0)
+Pack: (Age of Engineering version, plus any mods you added or updated)
+```
+
 ## Building
 
 Needs **Java 8**. The first build downloads and decompiles Minecraft (several minutes).
