@@ -9,6 +9,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 | [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, lists every output of multi-output recipes in the step list, and fixes items going invisible in your inventory after using JEC |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 | [IC2 Reinforced Stone in JEI](#ic2-reinforced-stone-in-jei) | IC2 2.6.252-ex110 + JEI | Shows how Reinforced Stone is made (scaffold + construction foam), which has no crafting recipe |
+| [RFTools crafting grid fix](#rftools-crafting-grid-fix) | RFTools 1.1x-5.92 | The Storage Scanner's and Modular Storage's crafting grid now finds charged IC2 batteries and energy crystals (e.g. for an MFE) |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
@@ -16,7 +17,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 
 ## Just Enough Calculation fixes
 
-JEC is patched **in memory while it loads** (a small coremod). The official JEC jar on disk is never modified, and if JEC isn't installed the patch simply never runs. If a different JEC version doesn't have a method the patch expects, that one change is skipped and logged instead of crashing.
+JEC is patched **in memory while it loads** (a small coremod, which also carries the RFTools fix). The official JEC jar on disk is never modified, and if JEC isn't installed the patch simply never runs. If a different JEC version doesn't have a method the patch expects, that one change is skipped and logged instead of crashing.
 
 ### 1. Items that only differ in condition now match
 
@@ -95,9 +96,17 @@ Hovering over the arrow explains the hardening: about 10 minutes in full light a
 
 ---
 
+## RFTools crafting grid fix
+
+The crafting grid in RFTools' Storage Scanner and Modular Storage looks for each ingredient in two passes. The first pass wants the same item **and the same damage value** as the recipe in the grid. IC2 batteries and energy crystals keep their charge in the damage value, so a charged crystal never matched. The second pass then accepts any item of the same kind regardless of its variant, which for IC2 grabs the wrong cable or machine casing; the recipe check fails, and the grid reported the crystals as missing (for example when crafting an MFE).
+
+AoE-QoL patches the first pass (in memory, like the JEC fix) so a damage difference is accepted for items whose damage value is only wear or charge: the item must be able to take damage (so it has no variants) and be on the same `ListIgnoredDamage` list the JEC fix uses (default `ic2:*`). Without JEC installed, the default applies. Everything else, including the second pass, works exactly as before, and variants such as cable types or machine casings are still told apart.
+
+---
+
 ## Issues and requests
 
-Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Post it in the **Comments** on the mod's CurseForge page, or send itstwoam a message on CurseForge. Every report gets reviewed.
+Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Post it in the **Comments** on the mod's CurseForge page, or send Itstwoam a message on CurseForge. Every report gets reviewed.
 
 For a recipe problem, it helps to include the item and mod involved, what JEC or JEI shows, and the relevant lines from `/jectags` or `config/JustEnoughCalculation-TagReport.txt`.
 
@@ -128,7 +137,8 @@ JEI, IC2 and JEC are fetched from their Maven repositories as compile-only depen
 
 The jar's real classes were tested outside the game against stand-in Minecraft classes, with full JVM bytecode verification:
 
-* the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched;
+* the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched; and to the unmodified RFTools 5.92 jar: only the crafting grid's item matching changed, and the patched class passes bytecode analysis;
+* the crafting grid matching: charged energy crystals found, cable types, machine casings and worn vanilla tools still told apart, RFTools' own ore dictionary fallback unchanged, with and without JEC;
 * item matching, tag/damage rules, the mismatch report, `/jectags`, tooltips, ore unification (on preference, on save, `/jecunify`), and JEC's real calculator on an IC2 uranium chain;
 * the canner recipe reader with IC2's real API classes, and the two JEI pages' texture crops and slot positions;
 * the leftover-container fix (JEC screen open, JEI opened from JEC, JEC closed, other mods' containers);
@@ -141,5 +151,5 @@ The jar's real classes were tested outside the game against stand-in Minecraft c
 
 ## Credits
 
-* Written by itstwoam with Claude (Anthropic).
+* Written by Itstwoam with Claude (Anthropic).
 * [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, and Age of Engineering by ErnstLustig. This project is not affiliated with any of them.

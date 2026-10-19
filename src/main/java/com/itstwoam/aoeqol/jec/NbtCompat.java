@@ -172,6 +172,21 @@ public final class NbtCompat {
         return copy;
     }
 
+    /**
+     * True if the stack's damage value only stores wear or charge: the item can take damage and is on
+     * ListIgnoredDamage. Used by the RFTools crafting grid fix.
+     */
+    public static boolean isConditionDamage(ItemStack stack) {
+        Item item = stack == null ? null : stack.getItem();
+        if (item == null || !item.isDamageable()) return false;
+        refresh();
+        if (propDamage == null) {
+            for (Rule r : parse(DEFAULT_DAMAGE, false)) if (r.matches(regName(stack))) return true;
+            return false;
+        }
+        return isDamageIgnored(regName(stack));
+    }
+
     /** Replacement for ItemStackHelper.isItemEqual. */
     public static boolean isItemEqual(ItemStack one, ItemStack two) {
         if (one == null || two == null) return false;

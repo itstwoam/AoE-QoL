@@ -15,8 +15,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
- * Patches Just Enough Calculation 2.6.5 (MC 1.10.2) while its classes load. Every patch only adds a call into
- * this mod's own code ({@code com.itstwoam.aoeqol.jec}); the JEC jar itself is untouched.
+ * Patches Just Enough Calculation 2.6.5 and RFTools 5.92 (MC 1.10.2) while their classes load. Every patch only
+ * adds a call into this mod's own code ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}); the jars themselves
+ * are untouched.
  *
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
  * that patch is skipped and logged instead of crashing the game.
@@ -45,7 +46,7 @@ public class JecTransformer implements IClassTransformer {
     static final class Patch {
         final String method, desc, hookOwner, hookName, hookDesc, what;
         final Kind kind;
-        final String[] loads;   // e.g. "a0" (ALOAD 0), "j3" (LLOAD 3)
+        final String[] loads;   // e.g. "a0" (ALOAD 0), "j3" (LLOAD 3), "i3" (ILOAD 3)
         final int store;        // local for PREPEND_ASSIGN
         boolean applied;
 
@@ -90,6 +91,10 @@ public class JecTransformer implements IClassTransformer {
             new Patch("setRecipe", "(" + STRING + STRING + "I" + RECIPE + ")V", Kind.PREPEND_ASSIGN,
                 H + "OreUnify", "onRecipeSaved", "(" + RECIPE + STRING + ")" + RECIPE, "a3,a0", 3,
                 "unification of edited recipes"));
+        add("mcjty/rftools/craftinggrid/StorageCraftingTools",
+            new Patch("match", "(" + ITEMSTACK + "Lgnu/trove/set/hash/TIntHashSet;" + ITEMSTACK + "Z)Z", Kind.REPLACE,
+                "com/itstwoam/aoeqol/rftools/GridMatch", "match", "(" + ITEMSTACK + "Ljava/lang/Object;" + ITEMSTACK + "Z)Z",
+                "a0,a1,a2,i3", -1, "RFTools crafting grid: charged IC2 batteries/crystals"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -104,7 +109,9 @@ public class JecTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (basicClass == null || transformedName == null || !transformedName.startsWith("pers.towdium.just_enough_calculation.")) {
+        if (basicClass == null || transformedName == null
+                || !(transformedName.startsWith("pers.towdium.just_enough_calculation.")
+                     || transformedName.startsWith("mcjty.rftools.craftinggrid."))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
@@ -112,13 +119,13 @@ public class JecTransformer implements IClassTransformer {
         try {
             byte[] out = apply(basicClass, patches);
             for (Patch p : patches) {
-                if (p.applied) LOG.info("Patched JEC {}.{} ({})", transformedName, p.method, p.what);
-                else LOG.warn("JEC {}.{}{} not found - '{}' not patched (different JEC version?)",
+                if (p.applied) LOG.info("Patched {}.{} ({})", transformedName, p.method, p.what);
+                else LOG.warn("{}.{}{} not found - '{}' not patched (different mod version?)",
                         transformedName, p.method, p.desc, p.what);
             }
             return out;
         } catch (Throwable t) {
-            LOG.error("Could not patch JEC class " + transformedName + ", leaving it unchanged", t);
+            LOG.error("Could not patch class " + transformedName + ", leaving it unchanged", t);
             return basicClass;
         }
     }
@@ -145,7 +152,8 @@ public class JecTransformer implements IClassTransformer {
 
     private static void loadArgs(MethodVisitor mv, Patch p) {
         for (String l : p.loads) {
-            mv.visitVarInsn(l.charAt(0) == 'j' ? Opcodes.LLOAD : Opcodes.ALOAD, Integer.parseInt(l.substring(1)));
+            char k = l.charAt(0);
+            mv.visitVarInsn(k == 'j' ? Opcodes.LLOAD : k == 'i' ? Opcodes.ILOAD : Opcodes.ALOAD, Integer.parseInt(l.substring(1)));
         }
     }
 

@@ -4,8 +4,9 @@ import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 /**
- * Registers {@link JecTransformer}, which patches Just Enough Calculation's classes in memory while they load.
- * The JEC jar on disk is never modified. If JEC isn't installed, its classes never load and nothing happens.
+ * Registers {@link JecTransformer}, which patches Just Enough Calculation's and RFTools' classes in memory while
+ * they load. The jars on disk are never modified. If a mod isn't installed, its classes never load and nothing
+ * happens.
  */
 @IFMLLoadingPlugin.Name("AoE-QoL")
 @IFMLLoadingPlugin.MCVersion("1.10.2")
