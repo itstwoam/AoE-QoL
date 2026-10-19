@@ -9,7 +9,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 | [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, lists every output of multi-output recipes in the step list, and fixes items going invisible in your inventory after using JEC |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 | [IC2 Reinforced Stone in JEI](#ic2-reinforced-stone-in-jei) | IC2 2.6.252-ex110 + JEI | Shows how Reinforced Stone is made (scaffold + construction foam), which has no crafting recipe |
-| [RFTools crafting grid fix](#rftools-crafting-grid-fix) | RFTools 1.1x-5.92 | The Storage Scanner's and Modular Storage's crafting grid now finds charged IC2 batteries and energy crystals (e.g. for an MFE) |
+| [RFTools crafting fixes](#rftools-crafting-fixes) | RFTools 1.1x-5.92 | The crafting grid (Storage Scanner, Modular Storage) and the Crafter now find charged batteries/crystals and worn tools, and pick the right variant (cable insulation, Mekanism tier) |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
@@ -96,11 +96,21 @@ Hovering over the arrow explains the hardening: about 10 minutes in full light a
 
 ---
 
-## RFTools crafting grid fix
+## RFTools crafting fixes
 
-The crafting grid in RFTools' Storage Scanner and Modular Storage looks for each ingredient in two passes. The first pass wants the same item **and the same damage value** as the recipe in the grid. IC2 batteries and energy crystals keep their charge in the damage value, so a charged crystal never matched. The second pass then accepts any item of the same kind regardless of its variant, which for IC2 grabs the wrong cable or machine casing; the recipe check fails, and the grid reported the crystals as missing (for example when crafting an MFE).
+The crafting grid in RFTools' Storage Scanner and Modular Storage, and the RFTools Crafter block, look for each ingredient in two passes:
 
-AoE-QoL patches the first pass (in memory, like the JEC fix) so a damage difference is accepted for items whose damage value is only wear or charge: the item must be able to take damage (so it has no variants) and be on the same `ListIgnoredDamage` list the JEC fix uses (default `ic2:*`). Without JEC installed, the default applies. Everything else, including the second pass, works exactly as before, and variants such as cable types or machine casings are still told apart.
+1. **strict:** same item and same damage value (NBT is never looked at);
+2. **loose**, only if the strict pass left something missing: same item with any damage value (the grid also accepts a shared ore dictionary name).
+
+The mod's own recipe check then decides whether the collected items work. Two kinds of items trip this:
+
+* **Wear or charge in the damage value** (IC2 batteries and energy crystals, worn tools such as the IC2 Forge Hammer or shears): a different charge or wear fails the strict pass. The loose pass then picks *any* variant of the other ingredients (the wrong IC2 cable or machine casing), the recipe check fails, and the grid shows the crystals as missing, for example when crafting an MFE. **Now:** the strict pass ignores the damage value of items that can take damage. Those items have no variants, so their damage is always wear or charge.
+* **Variant in NBT** (IC2 cable insulation, Mekanism energy cube / tank / bin tiers, IC2 fluid cells): the strict pass can't tell them apart and takes whichever comes first, e.g. an uninsulated gold cable for a recipe that needs 2× insulated. The craft then fails without any slot marked missing. **Now:** each pass first looks for an item whose NBT matches the recipe's exactly, ignoring the tags on `ListIgnoredNBTKeys` (IC2's charge and heat by default), and only then falls back to RFTools' own choice. If the recipe's item has no NBT, nothing changes.
+
+The Crafter's ghost-slot filter (input slots set to one item) also accepts a charged or worn copy of that item now.
+
+Nothing can be crafted that wasn't craftable before: the recipe check still runs on whatever is picked, so a wrong pick only fails a craft. Charge on IC2 crystals is not carried into an MFE; that is how IC2's recipe works, so drain them first. Without JEC installed, the default ignore list applies. Retrieving items through RFTools screen modules (Storage Control) still matches without NBT; the Storage Scanner's own list and retrieval already match exactly.
 
 ---
 
@@ -137,8 +147,8 @@ JEI, IC2 and JEC are fetched from their Maven repositories as compile-only depen
 
 The jar's real classes were tested outside the game against stand-in Minecraft classes, with full JVM bytecode verification:
 
-* the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched; and to the unmodified RFTools 5.92 jar: only the crafting grid's item matching changed, and the patched class passes bytecode analysis;
-* the crafting grid matching: charged energy crystals found, cable types, machine casings and worn vanilla tools still told apart, RFTools' own ore dictionary fallback unchanged, with and without JEC;
+* the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched; and to the unmodified RFTools 5.92 jar: only the crafting grid's and the Crafter's item search changed (five changes in two classes), and both patched classes pass type-checking bytecode verification against RFTools, McJtyLib and Forge;
+* the RFTools search: 2× insulated gold cable picked over an uninsulated one listed first, Mekanism Basic cube over an Ultimate one, charged crystals and worn shears accepted, IE's NBT-worn hammer still accepted, copper cable never taken for gold in the strict pass, stack counts spread over several slots, the Crafter's keep-one setting, its ghost-slot filter, and no crash on unexpected input, with and without JEC;
 * item matching, tag/damage rules, the mismatch report, `/jectags`, tooltips, ore unification (on preference, on save, `/jecunify`), and JEC's real calculator on an IC2 uranium chain;
 * the canner recipe reader with IC2's real API classes, and the two JEI pages' texture crops and slot positions;
 * the leftover-container fix (JEC screen open, JEI opened from JEC, JEC closed, other mods' containers);

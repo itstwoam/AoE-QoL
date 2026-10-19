@@ -2,7 +2,7 @@
 {
   "modid": "aoeqol",
   "name": "AoE-QoL",
-  "description": "Quality-of-life fixes for the Age of Engineering modpack: Just Enough Calculation fixes (ignored tags/damage, /jectags, ore dictionary unification, full step list), JEI pages for the IC2 Canning Machine and Reinforced Stone, and charged IC2 batteries/crystals in the RFTools crafting grid. Each part is only active when the mod it works with is installed.",
+  "description": "Quality-of-life fixes for the Age of Engineering modpack: Just Enough Calculation fixes (ignored tags/damage, /jectags, ore dictionary unification, full step list), JEI pages for the IC2 Canning Machine and Reinforced Stone, and RFTools crafting grid / Crafter fixes for charged batteries, worn tools and item variants. Each part is only active when the mod it works with is installed.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://github.com/itstwoam/AoE-QoL",

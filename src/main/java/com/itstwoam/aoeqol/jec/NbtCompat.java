@@ -173,18 +173,18 @@ public final class NbtCompat {
     }
 
     /**
-     * True if the stack's damage value only stores wear or charge: the item can take damage and is on
-     * ListIgnoredDamage. Used by the RFTools crafting grid fix.
+     * The stack's NBT with the tags on ListIgnoredNBTKeys (and JEC's own label) removed; never null.
+     * Used by the RFTools crafting fixes to compare item variants.
      */
-    public static boolean isConditionDamage(ItemStack stack) {
-        Item item = stack == null ? null : stack.getItem();
-        if (item == null || !item.isDamageable()) return false;
+    public static NBTTagCompound strippedTag(ItemStack stack) {
         refresh();
-        if (propDamage == null) {
-            for (Rule r : parse(DEFAULT_DAMAGE, false)) if (r.matches(regName(stack))) return true;
-            return false;
+        String name = regName(stack);
+        if (propNbt == null) {
+            NBTTagCompound copy = stack.getTagCompound() == null ? new NBTTagCompound() : stack.getTagCompound().copy();
+            for (Rule r : parse(DEFAULT_NBT, true)) if (r.matches(name)) copy.removeTag(r.tag);
+            return copy;
         }
-        return isDamageIgnored(regName(stack));
+        return strip(stack.getTagCompound(), name, true);
     }
 
     /** Replacement for ItemStackHelper.isItemEqual. */

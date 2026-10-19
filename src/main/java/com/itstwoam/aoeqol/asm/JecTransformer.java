@@ -40,7 +40,9 @@ public class JecTransformer implements IClassTransformer {
         /** {@code argN = Hook.name(loads...);} inserted at the start (replaces an argument). */
         PREPEND_ASSIGN,
         /** {@code Hook.name(loads...);} inserted before every RETURN. */
-        BEFORE_RETURN
+        BEFORE_RETURN,
+        /** Calls to {@code redirect} (owner.name desc) inside the method become INVOKESTATIC Hook.name. */
+        REDIRECT
     }
 
     static final class Patch {
@@ -48,6 +50,8 @@ public class JecTransformer implements IClassTransformer {
         final Kind kind;
         final String[] loads;   // e.g. "a0" (ALOAD 0), "j3" (LLOAD 3), "i3" (ILOAD 3)
         final int store;        // local for PREPEND_ASSIGN
+        String rOwner, rName, rDesc; // REDIRECT target call
+        int redirected;
         boolean applied;
 
         Patch(String method, String desc, Kind kind, String hookOwner, String hookName, String hookDesc,
@@ -57,6 +61,13 @@ public class JecTransformer implements IClassTransformer {
             this.loads = loads.isEmpty() ? new String[0] : loads.split(",");
             this.store = store; this.what = what;
         }
+    }
+
+    static Patch redirect(String method, String desc, String owner, String name, String callDesc,
+                          String hookOwner, String hookName, String hookDesc, String what) {
+        Patch p = new Patch(method, desc, Kind.REDIRECT, hookOwner, hookName, hookDesc, "", -1, what);
+        p.rOwner = owner; p.rName = name; p.rDesc = callDesc;
+        return p;
     }
 
     /** class (internal name) -> patches */
@@ -91,10 +102,27 @@ public class JecTransformer implements IClassTransformer {
             new Patch("setRecipe", "(" + STRING + STRING + "I" + RECIPE + ")V", Kind.PREPEND_ASSIGN,
                 H + "OreUnify", "onRecipeSaved", "(" + RECIPE + STRING + ")" + RECIPE, "a3,a0", 3,
                 "unification of edited recipes"));
+        String RFT = "com/itstwoam/aoeqol/rftools/";
         add("mcjty/rftools/craftinggrid/StorageCraftingTools",
             new Patch("match", "(" + ITEMSTACK + "Lgnu/trove/set/hash/TIntHashSet;" + ITEMSTACK + "Z)Z", Kind.REPLACE,
-                "com/itstwoam/aoeqol/rftools/GridMatch", "match", "(" + ITEMSTACK + "Ljava/lang/Object;" + ITEMSTACK + "Z)Z",
-                "a0,a1,a2,i3", -1, "RFTools crafting grid: charged IC2 batteries/crystals"));
+                RFT + "GridMatch", "match", "(" + ITEMSTACK + "Ljava/lang/Object;" + ITEMSTACK + "Z)Z",
+                "a0,a1,a2,i3", -1, "crafting grid: wear/charge ignored"),
+            new Patch("findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I" + ITEMSTACK
+                    + "ILmcjty/rftools/craftinggrid/IItemSource;Z)I", Kind.REPLACE,
+                RFT + "GridMatch", "findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I"
+                    + ITEMSTACK + "ILjava/lang/Object;Z)I",
+                "a0,a1,i2,a3,i4,a5,i6", -1, "crafting grid: exact variants first"));
+        add("mcjty/rftools/blocks/crafter/CrafterBaseTE",
+            new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
+                RFT + "CrafterMatch", "match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", "a0,a1,i2", -1,
+                "Crafter: wear/charge ignored"),
+            new Patch("testAndConsumeCraftingItems", "(Lmcjty/rftools/blocks/crafter/CraftingRecipe;Ljava/util/Map;Z)Z",
+                Kind.REPLACE, RFT + "CrafterMatch", "testAndConsumeCraftingItems",
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/Map;Z)Z", "a0,a1,a2,i3", -1,
+                "Crafter: exact variants first"),
+            redirect("func_94041_b", "(I" + ITEMSTACK + ")Z", "net/minecraft/item/ItemStack", "func_77969_a",
+                "(" + ITEMSTACK + ")Z", RFT + "CrafterMatch", "ghostAccepts", "(" + ITEMSTACK + ITEMSTACK + ")Z",
+                "Crafter: charged/worn items accepted in ghost slots"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -111,7 +139,8 @@ public class JecTransformer implements IClassTransformer {
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (basicClass == null || transformedName == null
                 || !(transformedName.startsWith("pers.towdium.just_enough_calculation.")
-                     || transformedName.startsWith("mcjty.rftools.craftinggrid."))) {
+                     || transformedName.startsWith("mcjty.rftools.craftinggrid.")
+                     || transformedName.startsWith("mcjty.rftools.blocks.crafter."))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
@@ -119,7 +148,9 @@ public class JecTransformer implements IClassTransformer {
         try {
             byte[] out = apply(basicClass, patches);
             for (Patch p : patches) {
-                if (p.applied) LOG.info("Patched {}.{} ({})", transformedName, p.method, p.what);
+                if (p.applied && p.kind == Kind.REDIRECT && p.redirected == 0) {
+                    LOG.warn("{}.{}: call to redirect not found - '{}' not patched", transformedName, p.method, p.what);
+                } else if (p.applied) LOG.info("Patched {}.{} ({})", transformedName, p.method, p.what);
                 else LOG.warn("{}.{}{} not found - '{}' not patched (different mod version?)",
                         transformedName, p.method, p.desc, p.what);
             }
@@ -132,7 +163,7 @@ public class JecTransformer implements IClassTransformer {
 
     /** Applies the patches to one class. Unchanged methods are copied byte-for-byte. Package-visible for tests. */
     static byte[] apply(byte[] bytes, final List<Patch> patches) {
-        for (Patch p : patches) p.applied = false;
+        for (Patch p : patches) { p.applied = false; p.redirected = 0; }
         ClassReader reader = new ClassReader(bytes);
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         reader.accept(new ClassVisitor(Opcodes.ASM5, writer) {
@@ -188,6 +219,18 @@ public class JecTransformer implements IClassTransformer {
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
                         }
                         super.visitInsn(opcode);
+                    }
+                };
+            case REDIRECT:
+                return new MethodVisitor(Opcodes.ASM5, mv) {
+                    @Override
+                    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+                        if (opcode == Opcodes.INVOKEVIRTUAL && owner.equals(p.rOwner) && name.equals(p.rName) && desc.equals(p.rDesc)) {
+                            p.redirected++;
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
+                            return;
+                        }
+                        super.visitMethodInsn(opcode, owner, name, desc, itf);
                     }
                 };
             default:
