@@ -8,6 +8,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 |---|---|---|
 | [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, lists every output of multi-output recipes in the step list, and fixes items going invisible in your inventory after using JEC |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
+| [IC2 Reinforced Stone in JEI](#ic2-reinforced-stone-in-jei) | IC2 2.6.252-ex110 + JEI | Shows how Reinforced Stone is made (scaffold + construction foam), which has no crafting recipe |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
@@ -83,6 +84,17 @@ Page titles use IC2's translated machine names. Recipes are read from IC2's own 
 
 ---
 
+## IC2 Reinforced Stone in JEI
+
+Reinforced Stone has no crafting recipe: you spray an **Iron Scaffold** with construction foam using a CF Sprayer, the foam hardens in place, and you mine the result. AoE-QoL adds a JEI page for it, so pressing `R` on Reinforced Stone (or `U` on an Iron Scaffold or construction foam) shows:
+
+* **Iron Scaffold + 100 mB construction foam -> Reinforced Stone**
+* **Reinforced Iron Scaffold + 100 mB construction foam -> Reinforced Stone + Iron Fence** (the fence pops off when sprayed)
+
+Hovering over the arrow explains the hardening: about 10 minutes in full light and much slower in the dark, or right-click the foam with sand to harden it instantly. Mined before it hardens, it drops the scaffold back. The amounts are IC2's own (100 mB of foam per block). The CF Sprayer and CF Pack are listed as the tools. Wooden scaffolds turn into normal construction foam walls instead, so they aren't listed.
+
+---
+
 ## Issues and requests
 
 Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Post it in the **Comments** on the mod's CurseForge page, or send itstwoam a message on CurseForge. Every report gets reviewed.
@@ -97,7 +109,7 @@ Item, mod: (e.g. Uranium Fuel Rod, IndustrialCraft 2)
 What happens:
 What you expected:
 /jectags lines: (for recipe problems)
-AoE-QoL version: (e.g. 1.0.1)
+AoE-QoL version: (e.g. 1.1.0)
 Pack: (Age of Engineering version, plus any mods you added or updated)
 ```
 
