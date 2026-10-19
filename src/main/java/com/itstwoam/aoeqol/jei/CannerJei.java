@@ -36,18 +36,18 @@ public final class CannerJei {
         List<CannerEnrichRecipe> enrich = enrichRecipes(Recipes.cannerEnrich);
 
         ItemStack canner = item("canner"), solidCanner = item("solid_canner");
-        String solidTitle = solidCanner != null ? solidCanner.getDisplayName() : "Solid Canning Machine";
         String cannerName = canner != null ? canner.getDisplayName() : "Fluid/Solid Canning Machine";
-        registry.addRecipeCategories(new CannerSolidCategory(gui, solidTitle),
+        registry.addRecipeCategories(new CannerSolidCategory(gui, cannerName + " (Solid Canning)"),
                 new CannerEnrichCategory(gui, cannerName + " (Fluid Enriching)"));
         registry.addRecipeHandlers(new SimpleHandler<CannerSolidRecipe>(CannerSolidRecipe.class, UID_SOLID),
                 new SimpleHandler<CannerEnrichRecipe>(CannerEnrichRecipe.class, UID_ENRICH));
         registry.addRecipes(solid);
         registry.addRecipes(enrich);
 
-        // both machines do solid canning; only the Fluid/Solid Canning Machine enriches fluids
-        if (solidCanner != null) registry.addRecipeCategoryCraftingItem(solidCanner, UID_SOLID);
+        // solid canning recipes are defined by the Fluid/Solid Canning Machine (TileEntityCanner) and also read by
+        // the Solid Canning Machine, so both are stations; only the Fluid/Solid one enriches fluids
         if (canner != null) registry.addRecipeCategoryCraftingItem(canner, UID_SOLID, UID_ENRICH);
+        if (solidCanner != null) registry.addRecipeCategoryCraftingItem(solidCanner, UID_SOLID);
         AoEQoL.LOG.info("Added IC2 Canning Machine to JEI: {} solid canning and {} fluid enriching recipes",
                 solid.size(), enrich.size());
     }

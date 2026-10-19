@@ -76,8 +76,8 @@ Cause: JEC closes its screens without telling the client the screen's container 
 
 IC2 2.6.252-ex110 (the last IC2 release for 1.10.2) builds its JEI pages from each machine's GUI layout file. The canning machines have older hand-coded GUIs with no layout file, so they never got pages. AoE-QoL adds two, drawn with the machines' own GUI textures and with every slot, tank and progress arrow where the real machine has it:
 
-* **Solid Canning Machine**: `[filling] > [container] -> [output]`, e.g. uranium fuel + empty fuel rod -> uranium fuel rod, or food + tin cans -> filled tin can. Both the Solid Canning Machine and the Fluid/Solid Canning Machine are listed as stations, since both run these recipes.
-* **Fluid/Solid Canning Machine (Fluid Enriching)**: `[input tank] + [additive] -> [output tank]`, e.g. distilled water + lapis -> coolant, using IC2's own tank frames and gauge marks.
+* **Fluid/Solid Canning Machine (Solid Canning)**: `[container] -> [filling] -> [output]`, drawn like the machine in its solid canning mode, e.g. empty fuel rod + uranium fuel -> uranium fuel rod, or tin cans + food -> filled tin can. These recipes belong to the Fluid/Solid Canning Machine; the Solid Canning Machine runs the same list, so both are listed as stations.
+* **Fluid/Solid Canning Machine (Fluid Enriching)**: `[input tank] + [additive] -> [output tank]`, e.g. distilled water + lapis -> coolant, with IC2's own tank frames and gauge marks.
 
 Page titles use IC2's translated machine names. Recipes are read from IC2's own recipe lists when JEI loads, so changes made by the pack's scripts are included. JEC records which JEI recipe types exist the first time the game starts; restart once more if JEC's transfer button doesn't appear on the new pages.
 
