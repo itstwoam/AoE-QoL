@@ -9,7 +9,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 | [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, and cleans up the step list |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the Canning Machine's recipes to JEI, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 
-> **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please report anything that misbehaves in game.
+> **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
 ---
 
@@ -77,9 +77,11 @@ JEC records which JEI recipe types exist the first time the game starts; restart
 
 ---
 
-## Coming from the earlier patched JEC jar?
+## Issues and requests
 
-If you used the hand-patched `JustEnoughCalculation-1.10.2-2.6.5.jar` from before this mod existed, **put the original JEC jar back** before adding AoE-QoL; otherwise every change is applied twice. Your config settings and recipe files carry over unchanged.
+Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Open an issue in this repository's [Issues](https://github.com/itstwoam/AoE-QoL/issues) tab. Every issue gets reviewed.
+
+For a recipe problem, it helps to include the item and mod involved, what JEC or JEI shows, and the relevant lines from `/jectags` or `config/JustEnoughCalculation-TagReport.txt`.
 
 ## Building
 
