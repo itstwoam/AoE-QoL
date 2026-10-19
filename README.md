@@ -6,7 +6,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 
 | Part | Needs | What it does |
 |---|---|---|
-| [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, and cleans up the step list |
+| [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, cleans up the step list, and fixes items going invisible in your inventory after using JEC |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
@@ -64,6 +64,12 @@ Safety rules: names are compared ignoring case (`plateTin` = `platetin`); both i
 
 JEC labels each step with the item it was run for. For a recipe with several outputs (e.g. a Thermal Centrifuge giving 2 tiny U-235 + 5 U-238) that splits one machine's runs over several lines, and a line like "2 Tiny U-235" looks like extra crafting. Now every step that uses a multi-output recipe is listed under that recipe's **first output slot**, totalled over all runs ("12 Tiny U-235" = 6 centrifuge runs). Reorder a recipe's outputs to change the label.
 
+### 5. Items invisible in your inventory after using JEC
+
+After closing JEC's calculator, items that went into your **main inventory** without a screen open (for example taken from Storage Drawers with a full hotbar) were invisible until you clicked a slot or opened a chest. The hotbar was unaffected.
+
+Cause: JEC closes its screens without telling the client the screen's container is gone, so the client keeps thinking JEC's container is open. Minecraft always applies hotbar updates from the server, but drops updates for other inventory slots that don't match the open container. AoE-QoL notices a leftover JEC container once you're back in the game with no screen open and switches back to your inventory, which is what closing the screen properly would have done. JEC's containers only exist on the client, and nothing else is ever touched.
+
 ---
 
 ## IC2 Canning Machine in JEI
@@ -101,6 +107,7 @@ The jar's real classes were tested outside the game against stand-in Minecraft c
 * the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched;
 * item matching, tag/damage rules, the mismatch report, `/jectags`, tooltips, ore unification (on preference, on save, `/jecunify`), and JEC's real calculator on an IC2 uranium chain;
 * the canner recipe reader with IC2's real API classes, and the two JEI pages' texture crops and slot positions;
+* the leftover-container fix (JEC screen open, JEI opened from JEC, JEC closed, other mods' containers);
 * running without JEC and without IC2 (everything stays off), and a JEC version missing the expected methods (patches skipped, no crash);
 * every Minecraft method and field referenced by the jar checked against the official MCP mappings for Forge 12.18.3.2511.
 

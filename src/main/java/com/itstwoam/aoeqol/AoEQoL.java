@@ -2,7 +2,9 @@ package com.itstwoam.aoeqol;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +14,7 @@ import org.apache.logging.log4j.Logger;
  * <ul>
  *   <li>Just Enough Calculation fixes: applied in memory by {@link com.itstwoam.aoeqol.asm.JecTransformer}.</li>
  *   <li>JEI pages for the IC2 Canning Machine: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
+ *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
  * </ul>
  * Every part switches itself off when the mod it works with isn't installed.
  */
@@ -23,6 +26,14 @@ public class AoEQoL {
     public static final String NAME = "AoE-QoL";
     public static final String VERSION = "@VERSION@";
     public static final Logger LOG = LogManager.getLogger(NAME);
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        // client-only classes are only touched on the client
+        if (event.getSide().isClient() && Loader.isModLoaded("je_calculation")) {
+            MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecContainerFix());
+        }
+    }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
