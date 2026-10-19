@@ -6,7 +6,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 
 | Part | Needs | What it does |
 |---|---|---|
-| [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, cleans up the step list, and fixes items going invisible in your inventory after using JEC |
+| [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, lists every output of multi-output recipes in the step list, and fixes items going invisible in your inventory after using JEC |
 | [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
@@ -60,9 +60,9 @@ Setting: `S:ListOreUnifyNames` (default `ingot* plate* dust* nugget* gear* rod* 
 
 Safety rules: names are compared ignoring case (`plateTin` = `platetin`); both items must have the **same full set** of names (red dye `{dye, dyeRed}` never replaces blue dye `{dye, dyeBlue}`); wood isn't in the default list (picking oak would turn spruce logs into oak). Every change, and every item that was close but not changed, is written to `config/JustEnoughCalculation-OreUnify-log.txt`. There's no undo button, so back up `saves/<world>/playerdata/*.jeca` before the first `/jecunify`.
 
-### 4. Clearer calculator step list
+### 4. Every output in the calculator step list
 
-JEC labels each step with the item it was run for. For a recipe with several outputs (e.g. a Thermal Centrifuge giving 2 tiny U-235 + 5 U-238) that splits one machine's runs over several lines, and a line like "2 Tiny U-235" looks like extra crafting. Now every step that uses a multi-output recipe is listed under that recipe's **first output slot**, totalled over all runs ("12 Tiny U-235" = 6 centrifuge runs). Reorder a recipe's outputs to change the label.
+JEC labels each step with the one item it was run for. For a recipe with several outputs, such as a Thermal Centrifuge giving tiny U-235 and U-238 from the same runs, only that item appeared, so U-238 for a uranium fuel rod never showed up in the steps even though the next recipe needs it. Now every step that uses a multi-output recipe lists **all** of the recipe's outputs, each totalled over all runs (e.g. "12 Tiny U-235" and "30 U-238" for 6 centrifuge runs). Anything the next steps don't use still shows up under leftovers.
 
 ### 5. Items invisible in your inventory after using JEC
 
@@ -97,7 +97,7 @@ Item, mod: (e.g. Uranium Fuel Rod, IndustrialCraft 2)
 What happens:
 What you expected:
 /jectags lines: (for recipe problems)
-AoE-QoL version: (e.g. 1.0.0)
+AoE-QoL version: (e.g. 1.0.1)
 Pack: (Age of Engineering version, plus any mods you added or updated)
 ```
 

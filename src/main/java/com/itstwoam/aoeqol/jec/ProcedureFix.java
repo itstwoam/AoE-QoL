@@ -1,19 +1,19 @@
 package com.itstwoam.aoeqol.jec;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.item.ItemStack;
 import pers.towdium.just_enough_calculation.core.Recipe;
 import pers.towdium.just_enough_calculation.util.helpers.ItemStackHelper;
 
 /**
- * JEC's calculator step list ("procedure") labels every step with the item it was run for. For a recipe with
- * several outputs (e.g. a Thermal Centrifuge making U-238 and tiny U-235) that splits one machine's runs over
- * several lines, and the second line looks like extra crafting ("2 tiny U-235").
+ * JEC's calculator step list ("procedure") labels every step with the one item it was run for. For a recipe with
+ * several outputs (e.g. a Thermal Centrifuge making tiny U-235 and U-238) only that item is shown, so the other
+ * outputs the same machine runs make never appear, even when a later step uses them.
  *
- * Fix: a step that uses a multi-output recipe is listed under the recipe's FIRST output slot, with the amount
- * that slot produces over all runs, so later runs of the same recipe merge into one line. The order of the
- * outputs in a saved recipe decides the label.
+ * Fix: a step that uses a multi-output recipe lists EVERY output of the recipe, each with the amount it produces
+ * over all runs (JEC merges repeated runs of the same recipe into one line per item).
  *
  * Injected at the end of JEC's Calculator.CostList(Recipe, ItemStack, long) constructor. CostList and its
  * "procedure" field are package-private in JEC, so they are reached through reflection.
@@ -34,17 +34,16 @@ public final class ProcedureFix {
             }
             List<ItemStack> procedure = (List<ItemStack>) procedureField.get(step);
             if (procedure == null || procedure.size() != 1) return;
-            ItemStack first = null;
-            int outputs = 0;
-            for (ItemStack s : recipe.getOutput()) {
-                if (s == null) continue;
-                if (first == null) first = s;
-                outputs++;
+            List<ItemStack> outputs = new ArrayList<ItemStack>();
+            for (ItemStack s : recipe.getOutput()) if (s != null) outputs.add(s);
+            if (outputs.size() < 2) return;
+            procedure.clear();
+            // JEC shows the procedure list in reverse, so add the outputs back to front to keep the recipe's order
+            for (int i = outputs.size() - 1; i >= 0; i--) {
+                ItemStack s = outputs.get(i);
+                procedure.add(ItemStackHelper.NBT.setData(s.copy(), ItemStackHelper.NBT.getType(s),
+                        ItemStackHelper.NBT.getAmount(s) * runs));
             }
-            if (outputs < 2 || first == null || ItemStackHelper.isItemEqual(first, dest)) return;
-            ItemStack label = ItemStackHelper.NBT.setData(first.copy(), ItemStackHelper.NBT.getType(first),
-                    ItemStackHelper.NBT.getAmount(first) * runs);
-            procedure.set(0, label);
         } catch (Throwable t) {
             broken = true;
             System.out.println("[AoE-QoL] Calculator step-list fix disabled: " + t);
