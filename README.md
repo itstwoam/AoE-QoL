@@ -85,7 +85,7 @@ Page titles use IC2's translated machine names. Recipes are read from IC2's own 
 
 ## Issues and requests
 
-Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Open an issue in this repository's [Issues](https://github.com/itstwoam/AoE-QoL/issues) tab. Every issue gets reviewed.
+Found a recipe that won't chain in JEC, a missing or wrong JEI page, or have another quality-of-life change you'd like to see for Age of Engineering? Post it in the **Comments** on the mod's CurseForge page, or send itstwoam a message on CurseForge. Every report gets reviewed.
 
 For a recipe problem, it helps to include the item and mod involved, what JEC or JEI shows, and the relevant lines from `/jectags` or `config/JustEnoughCalculation-TagReport.txt`.
 
