@@ -1,0 +1,13 @@
+[
+{
+  "modid": "aoeqol",
+  "name": "AoE-QoL",
+  "description": "Quality-of-life fixes for the Age of Engineering modpack: Just Enough Calculation fixes (ignored tags/damage, /jectags, ore dictionary unification, clearer step list) and JEI pages for the IC2 Canning Machine. Each part is only active when the mod it works with is installed.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/itstwoam/AoE-QoL",
+  "authorList": ["itstwoam"],
+  "credits": "Written with Claude (Anthropic). Just Enough Calculation by Towdium, IndustrialCraft 2 by the IC2 team, JEI by mezz.",
+  "dependencies": []
+}
+]

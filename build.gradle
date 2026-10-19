@@ -1,0 +1,66 @@
+// AoE-QoL - quality-of-life fixes for the Age of Engineering modpack (Minecraft 1.10.2, Forge 12.18.3.2511).
+// Build with Java 8:  ./gradlew build     ->  build/libs/AoE-QoL-<version>.jar
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://maven.minecraftforge.net/" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.0.0"
+group = "com.itstwoam.aoeqol"
+archivesBaseName = "AoE-QoL"
+sourceCompatibility = targetCompatibility = "1.8"
+
+minecraft {
+    version = "1.10.2-12.18.3.2511"
+    runDir = "run"
+    mappings = "snapshot_20161111"
+    replace "@VERSION@", project.version
+    replaceIn "AoEQoL.java"
+    // load the coremod part when running the game from the dev workspace
+    clientJvmArgs += "-Dfml.coreMods.load=com.itstwoam.aoeqol.asm.LoadingPlugin"
+    serverJvmArgs += "-Dfml.coreMods.load=com.itstwoam.aoeqol.asm.LoadingPlugin"
+}
+
+repositories {
+    maven { name = "JEI"; url = "https://dvs1.progwml6.com/files/maven" }
+    maven { name = "IC2"; url = "https://maven.ic2.player.to/" }
+    maven { name = "CurseMaven"; url = "https://cursemaven.com" }
+}
+
+dependencies {
+    // Compile-time only: none of these are bundled into the jar. They're the exact versions in Age of Engineering 1.1.2.
+    deobfProvided "mezz.jei:jei_1.10.2:3.14.7.420:api"
+    deobfProvided "net.industrial-craft:industrialcraft-2:2.6.252-ex110:api"
+    deobfProvided "curse.maven:jec-242223:2490671"   // Just Enough Calculation 1.10.2-2.6.5
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'FMLCorePlugin': 'com.itstwoam.aoeqol.asm.LoadingPlugin',
+            'FMLCorePluginContainsFMLMod': 'true'
+        )
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
