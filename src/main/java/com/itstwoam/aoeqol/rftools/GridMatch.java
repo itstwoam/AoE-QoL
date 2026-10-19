@@ -38,7 +38,7 @@ public final class GridMatch {
      * Replaces StorageCraftingTools.findMatchingItems. Same as RFTools' version (takes items from the sources in
      * order until the slot's count is met, recording what it took for undo) except that it looks in tiers: first
      * items matching the recipe's item exactly, then the rest of what the strict test accepts, and in the loose pass
-     * finally the rest of what the loose test accepts. Returns the count still missing.
+     * then ore dictionary equivalents and finally other variants of the same item. Returns the count still missing.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static int findMatchingItems(InventoryCrafting work, List undo, int slot, ItemStack stack, int count,
@@ -65,7 +65,7 @@ public final class GridMatch {
             getItems = source.getMethod("getItems");
         }
         TIntHashSet ids = new TIntHashSet(OreDictionary.getOreIDs(stack));
-        int tiers = strictDamage ? 2 : 3;
+        int tiers = strictDamage ? 2 : 4;
         for (int tier = 0; tier < tiers && count > 0; tier++) {
             for (Object o : (Iterable<?>) getItems.invoke(itemSource)) {
                 Pair pair = (Pair) o;
@@ -85,11 +85,27 @@ public final class GridMatch {
         return count;
     }
 
+    /**
+     * Tier 0: exact (same variant and NBT). 1: the rest of the strict test. Loose pass only: 2: a different item
+     * sharing an ore dictionary name (IE iron plate for IC2's), 3: RFTools' last resort, the same item in another
+     * variant (IC2 copper plate for IC2 iron plate), which the recipe usually rejects.
+     */
     static boolean accepts(int tier, ItemStack target, TIntHashSet ids, ItemStack input) {
         boolean exact = ItemMatch.exact(target, input);
         if (tier == 0) return exact;
         boolean strict = ItemMatch.strict(target, input);
         if (tier == 1) return strict && !exact;
-        return !strict && !exact && loose(target, ids, input);
+        if (exact || strict) return false;
+        boolean ore = sharesOre(ids, input);
+        if (tier == 2) return ore;
+        return !ore && target.getItem() == input.getItem();
+    }
+
+    static boolean sharesOre(TIntHashSet ids, ItemStack input) {
+        if (ids == null || ids.isEmpty()) return false;
+        for (int id : OreDictionary.getOreIDs(input)) {
+            if (ids.contains(id)) return true;
+        }
+        return false;
     }
 }

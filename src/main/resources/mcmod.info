@@ -7,7 +7,7 @@
   "mcversion": "${mcversion}",
   "url": "https://github.com/itstwoam/AoE-QoL",
   "authorList": ["Itstwoam"],
-  "credits": "Written with Claude (Anthropic). Just Enough Calculation by Towdium, IndustrialCraft 2 by the IC2 team, JEI by mezz.",
+  "credits": "Written with Claude (Anthropic). Just Enough Calculation by Towdium, IndustrialCraft 2 by the IC2 team, JEI by mezz, RFTools by McJty, Age of Engineering by davqvist.",
   "dependencies": []
 }
 ]
