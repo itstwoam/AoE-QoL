@@ -7,7 +7,7 @@ Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replaci
 | Part | Needs | What it does |
 |---|---|---|
 | [Just Enough Calculation fixes](#just-enough-calculation-fixes) | JEC 1.10.2-2.6.5 | Makes the calculator chain recipes for items that carry state (IC2 reactor parts, batteries...), helps you find the tag that blocks a chain, unifies ore dictionary variants, and cleans up the step list |
-| [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the Canning Machine's recipes to JEI, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
+| [IC2 Canning Machine in JEI](#ic2-canning-machine-in-jei) | IC2 2.6.252-ex110 + JEI | Adds the canning machines' recipes to JEI, drawn like the machines' own screens, so pressing `R` on a uranium fuel rod, food can or coolant shows how it's made |
 
 > **Status:** written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
@@ -68,12 +68,12 @@ JEC labels each step with the item it was run for. For a recipe with several out
 
 ## IC2 Canning Machine in JEI
 
-IC2 2.6.252-ex110 (the last IC2 release for 1.10.2) registers JEI pages for its other machines but not the Canning Machine. AoE-QoL adds two pages, read from IC2's own recipe lists when JEI loads (so pack script changes are included), with the Canning Machine as the station:
+IC2 2.6.252-ex110 (the last IC2 release for 1.10.2) builds its JEI pages from each machine's GUI layout file. The canning machines have older hand-coded GUIs with no layout file, so they never got pages. AoE-QoL adds two, drawn with the machines' own GUI textures and with every slot, tank and progress arrow where the real machine has it:
 
-* **Canning Machine**: solid canning, e.g. empty fuel rod + uranium fuel → uranium fuel rod; tin cans + food → filled tin can.
-* **Canning Machine (Fluid Enriching)**: fluid + additive → fluid, e.g. distilled water + lapis → coolant.
+* **Solid Canning Machine**: `[filling] > [container] -> [output]`, e.g. uranium fuel + empty fuel rod -> uranium fuel rod, or food + tin cans -> filled tin can. Both the Solid Canning Machine and the Fluid/Solid Canning Machine are listed as stations, since both run these recipes.
+* **Fluid/Solid Canning Machine (Fluid Enriching)**: `[input tank] + [additive] -> [output tank]`, e.g. distilled water + lapis -> coolant, using IC2's own tank frames and gauge marks.
 
-JEC records which JEI recipe types exist the first time the game starts; restart once more if JEC's transfer button doesn't appear on the new pages.
+Page titles use IC2's translated machine names. Recipes are read from IC2's own recipe lists when JEI loads, so changes made by the pack's scripts are included. JEC records which JEI recipe types exist the first time the game starts; restart once more if JEC's transfer button doesn't appear on the new pages.
 
 ---
 
@@ -100,7 +100,7 @@ The jar's real classes were tested outside the game against stand-in Minecraft c
 
 * the transformer applied to the unmodified JEC 2.6.5 jar: all nine changes applied to the expected seven classes, nothing else touched;
 * item matching, tag/damage rules, the mismatch report, `/jectags`, tooltips, ore unification (on preference, on save, `/jecunify`), and JEC's real calculator on an IC2 uranium chain;
-* the canner recipe reader with IC2's real API classes;
+* the canner recipe reader with IC2's real API classes, and the two JEI pages' texture crops and slot positions;
 * running without JEC and without IC2 (everything stays off), and a JEC version missing the expected methods (patches skipped, no crash);
 * every Minecraft method and field referenced by the jar checked against the official MCP mappings for Forge 12.18.3.2511.
 

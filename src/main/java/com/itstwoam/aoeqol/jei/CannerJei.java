@@ -16,8 +16,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 /**
- * Adds the IC2 Canning Machine to JEI. IC2 2.6.252-ex110 registers JEI pages for its other machines but not this
- * one, so items made in it (uranium fuel rods, food cans, coolant...) show no recipe when you press R.
+ * Adds IC2's canning machines to JEI. IC2 2.6.252-ex110 generates its JEI pages from each machine's GUI layout file;
+ * the canning machines have hand-coded GUIs with no layout file, so they got no pages, and items made in them
+ * (uranium fuel rods, food cans, coolant...) show no recipe when you press R. The pages here are drawn from the
+ * machines' own GUI textures instead.
  *
  * Recipes are read from IC2's own recipe managers when JEI loads, so changes made by the pack's scripts are
  * included. Only loaded when IC2 is installed.
@@ -33,20 +35,29 @@ public final class CannerJei {
         List<CannerSolidRecipe> solid = solidRecipes(Recipes.cannerBottle);
         List<CannerEnrichRecipe> enrich = enrichRecipes(Recipes.cannerEnrich);
 
-        registry.addRecipeCategories(new CannerSolidCategory(gui), new CannerEnrichCategory(gui));
+        ItemStack canner = item("canner"), solidCanner = item("solid_canner");
+        String solidTitle = solidCanner != null ? solidCanner.getDisplayName() : "Solid Canning Machine";
+        String cannerName = canner != null ? canner.getDisplayName() : "Fluid/Solid Canning Machine";
+        registry.addRecipeCategories(new CannerSolidCategory(gui, solidTitle),
+                new CannerEnrichCategory(gui, cannerName + " (Fluid Enriching)"));
         registry.addRecipeHandlers(new SimpleHandler<CannerSolidRecipe>(CannerSolidRecipe.class, UID_SOLID),
                 new SimpleHandler<CannerEnrichRecipe>(CannerEnrichRecipe.class, UID_ENRICH));
         registry.addRecipes(solid);
         registry.addRecipes(enrich);
 
-        ItemStack canner = null;
-        try {
-            canner = IC2Items.getItem("te", "canner");
-        } catch (Throwable ignored) {
-        }
+        // both machines do solid canning; only the Fluid/Solid Canning Machine enriches fluids
+        if (solidCanner != null) registry.addRecipeCategoryCraftingItem(solidCanner, UID_SOLID);
         if (canner != null) registry.addRecipeCategoryCraftingItem(canner, UID_SOLID, UID_ENRICH);
         AoEQoL.LOG.info("Added IC2 Canning Machine to JEI: {} solid canning and {} fluid enriching recipes",
                 solid.size(), enrich.size());
+    }
+
+    private static ItemStack item(String teName) {
+        try {
+            return IC2Items.getItem("te", teName);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     /** Solid canning recipes (container + filling -> item). Public for tests. */

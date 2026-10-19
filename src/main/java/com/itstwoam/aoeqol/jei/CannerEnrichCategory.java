@@ -10,51 +10,61 @@ import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.util.ResourceLocation;
 
-/** JEI page: Canning Machine, fluid enriching. Layout: [fluid] + [additive] -> [fluid]. */
+/**
+ * JEI page: fluid enriching (e.g. distilled water + lapis -> coolant). Drawn with the Fluid/Solid Canning
+ * Machine's own GUI texture, with IC2's tank frames and gauge marks where the machine draws its two tanks and
+ * the additive in the centre slot: [input tank] + [additive] -> [output tank].
+ */
 final class CannerEnrichCategory extends BlankRecipeCategory<CannerEnrichRecipe> {
-    private final IDrawable background, slot;
-    private final IDrawableAnimated arrow;
+    private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUICanner.png");
+    private static final ResourceLocation COMMON = new ResourceLocation("ic2", "textures/gui/common.png");
+    // crop of GUICanner.png: everything above the player inventory, minus the title
+    private static final int U = 36, V = 14;
+    // tank positions from IC2's GuiCanner (TankGauge.createNormal: 20x55 frame, fluid area inset by 4)
+    private static final int TANK_IN_X = 39, TANK_OUT_X = 117, TANK_Y = 42;
 
-    CannerEnrichCategory(IGuiHelper gui) {
-        background = gui.createBlankDrawable(110, 34);
-        slot = gui.getSlotDrawable();
-        IDrawableStatic arrowFull = gui.createDrawable(CannerSolidCategory.FURNACE, 176, 14, 24, 17);
-        arrow = gui.createAnimatedDrawable(arrowFull, 100, IDrawableAnimated.StartDirection.LEFT, false);
+    private final String title;
+    private final IDrawable background;
+    private final IDrawableStatic tankFrame, gaugeMarks;
+    private final IDrawableAnimated progress;
+
+    CannerEnrichCategory(IGuiHelper gui, String title) {
+        this.title = title;
+        background = gui.createDrawable(TEXTURE, U, V, 104, 86);
+        tankFrame = gui.createDrawable(COMMON, 6, 100, 20, 55);
+        gaugeMarks = gui.createDrawable(COMMON, 42, 104, 12, 47);
+        // the machine's progress indicator (233,0), drawn where the GUI draws it (74,22)
+        progress = gui.createAnimatedDrawable(gui.createDrawable(TEXTURE, 233, 0, 23, 14), 100,
+                IDrawableAnimated.StartDirection.LEFT, false);
     }
 
     @Override public String getUid() { return CannerJei.UID_ENRICH; }
-    @Override public String getTitle() { return "Canning Machine (Fluid Enriching)"; }
+    @Override public String getTitle() { return title; }
     @Override public IDrawable getBackground() { return background; }
 
     @Override
     public void drawExtras(Minecraft minecraft) {
-        tankFrame(0, 0);
-        slot.draw(minecraft, 26, 8);
-        tankFrame(86, 0);
-        minecraft.fontRendererObj.drawString("+", 20, 13, 0x404040);
-    }
-
-    private static void tankFrame(int x, int y) {
-        Gui.drawRect(x, y, x + 18, y + 34, 0xFF373737);
-        Gui.drawRect(x + 1, y + 1, x + 17, y + 33, 0xFF8B8B8B);
+        tankFrame.draw(minecraft, TANK_IN_X - U, TANK_Y - V);
+        tankFrame.draw(minecraft, TANK_OUT_X - U, TANK_Y - V);
     }
 
     @Override
     public void drawAnimations(Minecraft minecraft) {
-        arrow.draw(minecraft, 54, 9);
+        progress.draw(minecraft, 74 - U, 22 - V);
     }
 
     @Override
     public void setRecipe(IRecipeLayout layout, CannerEnrichRecipe recipe, IIngredients ingredients) {
         int capacity = Math.max(1000, Math.max(recipe.input.amount, recipe.output.amount));
         IGuiFluidStackGroup fluids = layout.getFluidStacks();
-        fluids.init(0, true, 1, 1, 16, 32, capacity, true, null);
-        fluids.init(1, false, 87, 1, 16, 32, capacity, true, null);
+        fluids.init(0, true, TANK_IN_X + 4 - U, TANK_Y + 4 - V, 12, 47, capacity, true, gaugeMarks);
+        fluids.init(1, false, TANK_OUT_X + 4 - U, TANK_Y + 4 - V, 12, 47, capacity, true, gaugeMarks);
         fluids.set(ingredients);
+        // centre slot from IC2's ContainerCanner (item at 80,44)
         IGuiItemStackGroup items = layout.getItemStacks();
-        items.init(0, true, 26, 8);
+        items.init(0, true, 80 - 1 - U, 44 - 1 - V);
         items.set(ingredients);
     }
 }
