@@ -4,7 +4,7 @@ import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 /**
- * Registers {@link JecTransformer}, which patches Just Enough Calculation's, RFTools' and Ender IO's classes in memory while
+ * Registers {@link PatchTransformer}, which patches Just Enough Calculation's, RFTools' and Ender IO's classes in memory while
  * they load. The jars on disk are never modified. If a mod isn't installed, its classes never load and nothing
  * happens.
  */
@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 public class LoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {JecTransformer.class.getName()};
+        return new String[] {PatchTransformer.class.getName()};
     }
 
     @Override

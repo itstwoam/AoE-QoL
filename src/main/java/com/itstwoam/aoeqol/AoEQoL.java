@@ -12,8 +12,10 @@ import org.apache.logging.log4j.Logger;
  * AoE-QoL: quality-of-life fixes for the Age of Engineering modpack (MC 1.10.2).
  *
  * <ul>
- *   <li>Just Enough Calculation fixes: applied in memory by {@link com.itstwoam.aoeqol.asm.JecTransformer}.</li>
- *   <li>JEI pages for the IC2 Canning Machine: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
+ *   <li>Fixes to Just Enough Calculation, RFTools and Ender IO: applied in memory by
+ *       {@link com.itstwoam.aoeqol.asm.PatchTransformer}, which calls into the {@code jec}, {@code rftools} and
+ *       {@code enderio} packages.</li>
+ *   <li>JEI pages for the IC2 canning machines and Reinforced Stone: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
  *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
  * </ul>
  * Every part switches itself off when the mod it works with isn't installed.

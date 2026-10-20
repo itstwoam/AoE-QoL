@@ -23,7 +23,7 @@ import org.objectweb.asm.Type;
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
  * that patch is skipped and logged instead of crashing the game.
  */
-public class JecTransformer implements IClassTransformer {
+public class PatchTransformer implements IClassTransformer {
     static final Logger LOG = LogManager.getLogger("AoE-QoL");
 
     private static final String JEC = "pers/towdium/just_enough_calculation/";
