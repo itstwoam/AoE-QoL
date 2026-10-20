@@ -53,6 +53,12 @@ public final class ItemMatch {
         return t.equals(stripped(input));
     }
 
+    /** The recipe's item has NBT (ignoring condition tags) and the input's differs, e.g. cable insulation. */
+    static boolean variantDiffers(ItemStack target, ItemStack input) {
+        NBTTagCompound t = stripped(target);
+        return !t.hasNoTags() && !t.equals(stripped(input));
+    }
+
     private static NBTTagCompound stripped(ItemStack stack) {
         if (!jecChecked) {
             jec = Loader.isModLoaded("je_calculation");

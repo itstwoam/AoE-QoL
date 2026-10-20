@@ -15,6 +15,7 @@ Releases come out on Fridays and include everything since the previous release.
 - Charged batteries and energy crystals, and worn tools, are recognized (e.g. crafting an MFE).
 - The right variant is picked when it's stored in NBT (cable insulation, Mekanism tiers).
 - Other mods' ore dictionary equivalents are used before other variants of the same item (e.g. IE iron plates for the Basic Machine Casing).
+- When the wrong variant is all you have (e.g. uninsulated cable for an EU-Splitter Cable), the grid marks that ingredient red instead of only the result.
 - The Crafter's ghost slots accept charged or worn copies of the set item.
 - The Storage Scanner's search box and JEI's search box stay in sync, like AE2's "JEI synchronized" search (can be turned off).
 

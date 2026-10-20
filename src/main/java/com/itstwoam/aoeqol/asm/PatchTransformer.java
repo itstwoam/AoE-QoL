@@ -40,7 +40,7 @@ public class PatchTransformer implements IClassTransformer {
         PREPEND,
         /** {@code argN = Hook.name(loads...);} inserted at the start (replaces an argument). */
         PREPEND_ASSIGN,
-        /** {@code Hook.name(loads...);} inserted before every RETURN. */
+        /** {@code Hook.name(loads...);} inserted before every return (the return value stays on the stack). */
         BEFORE_RETURN,
         /** Calls to {@code redirect} (owner.name desc) inside the method become INVOKESTATIC Hook.name. */
         REDIRECT
@@ -112,7 +112,13 @@ public class PatchTransformer implements IClassTransformer {
                     + "ILmcjty/rftools/craftinggrid/IItemSource;Z)I", Kind.REPLACE,
                 RFT + "GridMatch", "findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I"
                     + ITEMSTACK + "ILjava/lang/Object;Z)I",
-                "a0,a1,i2,a3,i4,a5,i6", -1, "crafting grid: exact variants first"));
+                "a0,a1,i2,a3,i4,a5,i6", -1, "crafting grid: exact variants first"),
+            new Patch("tryRecipe", "(Lnet/minecraft/entity/player/EntityPlayerMP;Lmcjty/rftools/blocks/crafter/CraftingRecipe;I"
+                    + "Lmcjty/rftools/craftinggrid/IItemSource;Z)[I", Kind.PREPEND,
+                RFT + "GridMatch", "beginTest", "()V", "", -1, "crafting grid: test craft start"),
+            new Patch("tryRecipe", "(Lnet/minecraft/entity/player/EntityPlayerMP;Lmcjty/rftools/blocks/crafter/CraftingRecipe;I"
+                    + "Lmcjty/rftools/craftinggrid/IItemSource;Z)[I", Kind.BEFORE_RETURN,
+                RFT + "GridMatch", "afterTest", "([I)V", "a8", -1, "crafting grid: wrong variant slots shown red"));
         add("mcjty/rftools/blocks/crafter/CrafterBaseTE",
             new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
                 RFT + "CrafterMatch", "match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", "a0,a1,i2", -1,
@@ -186,10 +192,12 @@ public class PatchTransformer implements IClassTransformer {
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
                 MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
+                // several patches may target one method; they are chained (a REPLACE ends the chain)
                 for (Patch p : patches) {
                     if (p.applied || !p.method.equals(name) || !p.desc.equals(desc)) continue;
                     p.applied = true;
-                    return patchMethod(mv, p);
+                    mv = patchMethod(mv, p);
+                    if (mv == null) break;
                 }
                 return mv;
             }
@@ -230,7 +238,7 @@ public class PatchTransformer implements IClassTransformer {
                 return new MethodVisitor(Opcodes.ASM5, mv) {
                     @Override
                     public void visitInsn(int opcode) {
-                        if (opcode == Opcodes.RETURN) {
+                        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
                             loadArgs(mv, p);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
                         }

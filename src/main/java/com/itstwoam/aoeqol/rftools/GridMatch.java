@@ -15,6 +15,8 @@ import org.apache.commons.lang3.tuple.Pair;
 public final class GridMatch {
     private static Method getItems, decrStackSize;
     private static boolean failed;
+    /** Grid slots filled with a different NBT variant than the recipe shows, during the current test craft. */
+    private static final boolean[] variantSlots = new boolean[9];
 
     private GridMatch() {}
 
@@ -71,6 +73,7 @@ public final class GridMatch {
                 Pair pair = (Pair) o;
                 ItemStack input = (ItemStack) pair.getValue();
                 if (ItemMatch.valid(input) && accepts(tier, stack, ids, input)) {
+                    if (tier > 0 && slot >= 0 && slot < 9 && ItemMatch.variantDiffers(stack, input)) variantSlots[slot] = true;
                     work.setInventorySlotContents(slot, input.copy());
                     int ss = count;
                     if (input.stackSize - ss < 0) ss = input.stackSize;
@@ -83,6 +86,23 @@ public final class GridMatch {
             }
         }
         return count;
+    }
+
+    /** Start of StorageCraftingTools.tryRecipe (a test craft). */
+    public static void beginTest() {
+        java.util.Arrays.fill(variantSlots, false);
+    }
+
+    /**
+     * End of StorageCraftingTools.tryRecipe. RFTools reports per slot how many items are missing, plus slot 9 =
+     * "the recipe doesn't accept what was found". When nothing is missing but the recipe still fails, RFTools can
+     * only mark the result red. If some slots were filled with a different NBT variant than the recipe shows
+     * (e.g. uninsulated cable for insulated), mark those slots instead, which is almost always the reason.
+     */
+    public static void afterTest(int[] missing) {
+        if (missing == null || missing.length < 10 || missing[9] <= 0) return;
+        for (int i = 0; i < 9; i++) if (missing[i] > 0) return;
+        for (int i = 0; i < 9; i++) if (variantSlots[i]) missing[i] = 1;
     }
 
     /**
