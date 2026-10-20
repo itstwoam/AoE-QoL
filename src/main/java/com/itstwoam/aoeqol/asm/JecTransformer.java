@@ -13,11 +13,12 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /**
- * Patches Just Enough Calculation 2.6.5 and RFTools 5.92 (MC 1.10.2) while their classes load. Every patch only
- * adds a call into this mod's own code ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}); the jars themselves
- * are untouched.
+ * Patches Just Enough Calculation 2.6.5, RFTools 5.92 and Ender IO 3.1.193 (MC 1.10.2) while their classes load.
+ * Every patch only adds a call into this mod's own code ({@code com.itstwoam.aoeqol.jec}, {@code .rftools},
+ * {@code .enderio}); the jars themselves are untouched.
  *
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
  * that patch is skipped and logged instead of crashing the game.
@@ -33,7 +34,7 @@ public class JecTransformer implements IClassTransformer {
     private static final String STRING = "Ljava/lang/String;";
 
     enum Kind {
-        /** Body becomes {@code return Hook.name(arg0, arg1);} (static method with two object args). */
+        /** Body becomes {@code return Hook.name(loads...);} (the hook takes the loaded values, returns the same type). */
         REPLACE,
         /** {@code Hook.name(loads...);} inserted at the start of the method. */
         PREPEND,
@@ -123,6 +124,15 @@ public class JecTransformer implements IClassTransformer {
             redirect("func_94041_b", "(I" + ITEMSTACK + ")Z", "net/minecraft/item/ItemStack", "func_77969_a",
                 "(" + ITEMSTACK + ")Z", RFT + "CrafterMatch", "ghostAccepts", "(" + ITEMSTACK + ITEMSTACK + ")Z",
                 "Crafter: charged/worn items accepted in ghost slots"));
+        add("crazypants/enderio/machine/capbank/BlockItemCapBank$InnerProv",
+            new Patch("hasCapability", "(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Z",
+                Kind.REPLACE, "com/itstwoam/aoeqol/enderio/CapBankFix", "hasCapability",
+                "(Ljava/lang/Object;Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Z",
+                "a0,a1,a2", -1, "creative capacitor bank: no energy capability reported"),
+            new Patch("getCapability", "(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Ljava/lang/Object;",
+                Kind.REPLACE, "com/itstwoam/aoeqol/enderio/CapBankFix", "getCapability",
+                "(Ljava/lang/Object;Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Ljava/lang/Object;",
+                "a0,a1,a2", -1, "creative capacitor bank: still no energy capability handed out"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -140,7 +150,8 @@ public class JecTransformer implements IClassTransformer {
         if (basicClass == null || transformedName == null
                 || !(transformedName.startsWith("pers.towdium.just_enough_calculation.")
                      || transformedName.startsWith("mcjty.rftools.craftinggrid.")
-                     || transformedName.startsWith("mcjty.rftools.blocks.crafter."))) {
+                     || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
+                     || transformedName.startsWith("crazypants.enderio.machine.capbank."))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
@@ -195,7 +206,7 @@ public class JecTransformer implements IClassTransformer {
                 mv.visitCode();
                 loadArgs(mv, p);
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
-                mv.visitInsn(Opcodes.IRETURN);
+                mv.visitInsn(Type.getReturnType(p.desc).getOpcode(Opcodes.IRETURN));
                 mv.visitMaxs(0, 0);
                 mv.visitEnd();
                 return null;
