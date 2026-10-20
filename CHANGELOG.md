@@ -9,6 +9,7 @@ Releases come out on Fridays and include everything since the previous release.
 
 ### IndustrialCraft 2
 - New JEI page for Reinforced Stone (Iron Scaffold + construction foam).
+- Comparators (and Super Circuit Maker inventory scanners) next to a BatBox, CESU, MFE or MFSU now follow its fill level instead of keeping an old value.
 
 ### RFTools (crafting grid and Crafter)
 - Charged batteries and energy crystals, and worn tools, are recognized (e.g. crafting an MFE).

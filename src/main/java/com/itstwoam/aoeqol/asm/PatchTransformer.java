@@ -16,9 +16,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * Patches Just Enough Calculation 2.6.5, RFTools 5.92 and Ender IO 3.1.193 (MC 1.10.2) while their classes load.
- * Every patch only adds a call into this mod's own code ({@code com.itstwoam.aoeqol.jec}, {@code .rftools},
- * {@code .enderio}); the jars themselves are untouched.
+ * Patches Just Enough Calculation 2.6.5, RFTools 5.92, Ender IO 3.1.193 and IC2 2.6.252-ex110 (MC 1.10.2) while
+ * their classes load. Every patch only adds a call into this mod's own code ({@code com.itstwoam.aoeqol.jec},
+ * {@code .rftools}, {@code .enderio}, {@code .ic2}); the jars themselves are untouched.
  *
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
  * that patch is skipped and logged instead of crashing the game.
@@ -133,6 +133,10 @@ public class PatchTransformer implements IClassTransformer {
                 Kind.REPLACE, "com/itstwoam/aoeqol/enderio/CapBankFix", "getCapability",
                 "(Ljava/lang/Object;Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Ljava/lang/Object;",
                 "a0,a1,a2", -1, "creative capacitor bank: still no energy capability handed out"));
+        add("ic2/core/block/wiring/TileEntityElectricBlock",
+            new Patch("updateEntityServer", "()V", Kind.BEFORE_RETURN,
+                "com/itstwoam/aoeqol/ic2/ComparatorFix", "afterTick", "(Ljava/lang/Object;)V", "a0", -1,
+                "energy storage: comparators updated when the fill level changes"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -151,7 +155,8 @@ public class PatchTransformer implements IClassTransformer {
                 || !(transformedName.startsWith("pers.towdium.just_enough_calculation.")
                      || transformedName.startsWith("mcjty.rftools.craftinggrid.")
                      || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
-                     || transformedName.startsWith("crazypants.enderio.machine.capbank."))) {
+                     || transformedName.startsWith("crazypants.enderio.machine.capbank.")
+                     || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));

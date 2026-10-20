@@ -9,7 +9,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | Part | Needs | What it does |
 |---|---|---|
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list, invisible-items fix |
-| [IC2 in JEI](#ic2-in-jei) | IC2 2.6.252-ex110 + JEI | JEI pages for the canning machines and for Reinforced Stone |
+| [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -57,10 +57,11 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 
 ---
 
-## IC2 in JEI
+## IC2
 
-* **Canning machines.** IC2 never gave the canning machines JEI pages. AoE-QoL adds *Solid Canning* (e.g. empty fuel rod + uranium fuel -> fuel rod) and *Fluid Enriching* (e.g. distilled water + lapis -> coolant), drawn with the Fluid/Solid Canning Machine's own GUI and read from IC2's recipe lists, so pack scripts are included. If JEC's transfer button doesn't appear on the new pages, restart once more.
-* **Reinforced Stone.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
+* **Canning machines in JEI.** IC2 never gave the canning machines JEI pages. AoE-QoL adds *Solid Canning* (e.g. empty fuel rod + uranium fuel -> fuel rod) and *Fluid Enriching* (e.g. distilled water + lapis -> coolant), drawn with the Fluid/Solid Canning Machine's own GUI and read from IC2's recipe lists, so pack scripts are included. If JEC's transfer button doesn't appear on the new pages, restart once more.
+* **Reinforced Stone in JEI.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
+* **Comparators on energy storage.** BatBoxes, CESUs, MFEs and MFSUs (and their chargepads) report their fill level to comparators but never told the world when it changed, so comparators and things like Super Circuit Maker inventory scanners kept showing an old value until a block next to them changed. They now update whenever the level changes, and once when the world loads.
 
 ---
 
@@ -140,7 +141,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools and Ender IO jars, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 
