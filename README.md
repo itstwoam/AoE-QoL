@@ -94,7 +94,7 @@ Item, mod: (e.g. Uranium Fuel Rod, IndustrialCraft 2)
 What happens:
 What you expected:
 /jectags lines: (for recipe problems)
-AoE-QoL version: (e.g. 1.1.1)
+AoE-QoL version: (e.g. 1.1.0)
 Pack: (Age of Engineering version, plus any mods you added or updated)
 ```
 

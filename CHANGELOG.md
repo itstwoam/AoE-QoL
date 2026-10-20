@@ -2,7 +2,7 @@
 
 Releases come out on Fridays and include everything since the previous release.
 
-## Next release (Friday 2026-10-23)
+## 1.1.0 (Friday 2026-10-23)
 
 ### Just Enough Calculation
 - The calculator step list shows every output of a multi-output recipe (e.g. both tiny U-235 and U-238 from a Thermal Centrifuge).
