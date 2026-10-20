@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
  *       {@code enderio} packages.</li>
  *   <li>JEI pages for the IC2 canning machines and Reinforced Stone: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
  *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
+ *   <li>BetterFPS "Async" creative search switched to "On" (crashes): {@link com.itstwoam.aoeqol.client.BetterFpsFix}.</li>
  * </ul>
  * Every part switches itself off when the mod it works with isn't installed.
  */
@@ -34,6 +35,9 @@ public class AoEQoL {
         // client-only classes are only touched on the client
         if (event.getSide().isClient() && Loader.isModLoaded("je_calculation")) {
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecContainerFix());
+        }
+        if (event.getSide().isClient()) {
+            com.itstwoam.aoeqol.client.BetterFpsFix.init(event.getModConfigurationDirectory());
         }
     }
 

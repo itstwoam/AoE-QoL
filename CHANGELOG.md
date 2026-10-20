@@ -19,8 +19,11 @@ Releases come out on Fridays and include everything since the previous release.
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
+### BetterFPS
+- BetterFPS's "Async" creative search is switched to "On" because it can crash the game (e.g. with Mekanism cables); search stays fast. You're told once in chat. To keep Async, set `preventAsyncCreativeSearch=false` in `config/aoeqol.cfg`.
+
 ### Other
-- Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools and Ender IO added.
+- Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools, Ender IO and BetterFPS added.
 
 ## 1.0.0
 

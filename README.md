@@ -12,6 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [IC2 in JEI](#ic2-in-jei) | IC2 2.6.252-ex110 + JEI | JEI pages for the canning machines and for Reinforced Stone |
 | [RFTools crafting](#rftools-crafting) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
+| [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
 > Written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
 
@@ -82,6 +83,13 @@ A wrong pick can only make a craft fail, never change it: the recipe check still
 
 ---
 
+## BetterFPS
+
+* **Creative search crash.** BetterFPS's "Async" creative search starts a background thread for every key you type, and each one runs every mod's tooltip code off the main thread. That code isn't thread-safe, and in Age of Engineering it crashes the game (for example while Mekanism draws its cables in the search results). AoE-QoL switches the setting to "On" for the session: BetterFPS's fast search still runs, just on the main thread. BetterFPS's own config file isn't changed, and you're told once in chat.
+* **To keep Async anyway**, set `B:preventAsyncCreativeSearch=false` in `config/aoeqol.cfg`.
+
+---
+
 ## Issues and requests
 
 Found a recipe that won't chain in JEC, a missing or wrong JEI page, a crash, or have another quality-of-life change you'd like to see for Age of Engineering? Post it in the **Comments** on the mod's CurseForge page, or send Itstwoam a message on CurseForge. Every report gets reviewed.
@@ -113,7 +121,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools and Ender IO jars (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools and Ender IO jars, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 
@@ -122,4 +130,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
