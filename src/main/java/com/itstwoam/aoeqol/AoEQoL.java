@@ -18,12 +18,15 @@ import org.apache.logging.log4j.Logger;
  *   <li>JEI pages for the IC2 canning machines and Reinforced Stone: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
  *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
  *   <li>BetterFPS "Async" creative search switched to "On" (crashes): {@link com.itstwoam.aoeqol.client.BetterFpsFix}.</li>
+ *   <li>Storage Scanner search synced with JEI: {@link com.itstwoam.aoeqol.client.ScannerJeiSync}.</li>
+ *   <li>Settings: {@link AoEQoLConfig}, in game through {@link com.itstwoam.aoeqol.client.ConfigGuiFactory}.</li>
  * </ul>
  * Every part switches itself off when the mod it works with isn't installed.
  */
 @Mod(modid = AoEQoL.MODID, name = AoEQoL.NAME, version = AoEQoL.VERSION,
      acceptedMinecraftVersions = "[1.10.2]", acceptableRemoteVersions = "*",
-     dependencies = "after:je_calculation;after:IC2;after:JEI")
+     dependencies = "after:je_calculation;after:IC2;after:JEI;after:rftools",
+     guiFactory = "com.itstwoam.aoeqol.client.ConfigGuiFactory")
 public class AoEQoL {
     public static final String MODID = "aoeqol";
     public static final String NAME = "AoE-QoL";
@@ -36,8 +39,13 @@ public class AoEQoL {
         if (event.getSide().isClient() && Loader.isModLoaded("je_calculation")) {
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecContainerFix());
         }
+        AoEQoLConfig.init(event.getModConfigurationDirectory());
         if (event.getSide().isClient()) {
-            com.itstwoam.aoeqol.client.BetterFpsFix.init(event.getModConfigurationDirectory());
+            com.itstwoam.aoeqol.client.BetterFpsFix.init();
+            MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ConfigGuiFactory.ChangeHandler());
+            if (Loader.isModLoaded("rftools") && Loader.isModLoaded("JEI")) {
+                MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ScannerJeiSync());
+            }
         }
     }
 

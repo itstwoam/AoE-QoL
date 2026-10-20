@@ -1,0 +1,8 @@
+aoeqol.config.betterfps=BetterFPS
+aoeqol.config.betterfps.tooltip=BetterFPS: creative inventory search.
+aoeqol.config.preventAsyncCreativeSearch=Prevent async creative search
+aoeqol.config.preventAsyncCreativeSearch.tooltip=BetterFPS's "Async" creative search can crash the game. On: use BetterFPS's normal fast search instead. Off: keep Async. Applies the next time the creative inventory opens.
+aoeqol.config.rftools=RFTools
+aoeqol.config.rftools.tooltip=RFTools: Storage Scanner.
+aoeqol.config.syncStorageScannerWithJei=Sync Storage Scanner search with JEI
+aoeqol.config.syncStorageScannerWithJei.tooltip=Typing in the Storage Scanner's search box fills in JEI's, and the other way round, like AE2's "JEI synchronized" search.

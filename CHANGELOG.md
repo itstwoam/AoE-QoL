@@ -15,14 +15,16 @@ Releases come out on Fridays and include everything since the previous release.
 - The right variant is picked when it's stored in NBT (cable insulation, Mekanism tiers).
 - Other mods' ore dictionary equivalents are used before other variants of the same item (e.g. IE iron plates for the Basic Machine Casing).
 - The Crafter's ghost slots accept charged or worn copies of the set item.
+- The Storage Scanner's search box and JEI's search box stay in sync, like AE2's "JEI synchronized" search (can be turned off).
 
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
 ### BetterFPS
-- BetterFPS's "Async" creative search is switched to "On" because it can crash the game (e.g. with Mekanism cables); search stays fast. You're told once in chat. To keep Async, set `preventAsyncCreativeSearch=false` in `config/aoeqol.cfg`.
+- BetterFPS's "Async" creative search is switched to "On" because it can crash the game (e.g. with Mekanism cables); search stays fast. You're told once in chat. To keep Async, turn it off in the settings.
 
 ### Other
+- In-game settings: Mods → AoE-QoL → Config (also `config/aoeqol.cfg`).
 - Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools, Ender IO and BetterFPS added.
 
 ## 1.0.0

@@ -10,7 +10,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 |---|---|---|
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list, invisible-items fix |
 | [IC2 in JEI](#ic2-in-jei) | IC2 2.6.252-ex110 + JEI | JEI pages for the canning machines and for Reinforced Stone |
-| [RFTools crafting](#rftools-crafting) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents |
+| [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
@@ -64,7 +64,9 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 
 ---
 
-## RFTools crafting
+## RFTools
+
+### Crafting
 
 Applies to the crafting grid in the Storage Scanner and Modular Storage, and to the Crafter block. RFTools looks for each ingredient with a strict test (same item and damage value) and, if that fails, a loose one (same item in any variant, or a shared ore dictionary name); the mod's own recipe check then decides.
 
@@ -74,6 +76,10 @@ Applies to the crafting grid in the Storage Scanner and Modular Storage, and to 
 * The Crafter's ghost-slot filter accepts charged or worn copies of the set item.
 
 A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
+
+### Storage Scanner search synced with JEI
+
+Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing in its search box fills in JEI's search box and the other way round, and opening the scanner takes over what JEI's box already holds. The scanner's own item filter and container highlighting work as usual. Turn it off with **Sync Storage Scanner search with JEI** in the [settings](#settings).
 
 ---
 
@@ -86,7 +92,20 @@ A wrong pick can only make a craft fail, never change it: the recipe check still
 ## BetterFPS
 
 * **Creative search crash.** BetterFPS's "Async" creative search starts a background thread for every key you type, and each one runs every mod's tooltip code off the main thread. That code isn't thread-safe, and in Age of Engineering it crashes the game (for example while Mekanism draws its cables in the search results). AoE-QoL switches the setting to "On" for the session: BetterFPS's fast search still runs, just on the main thread. BetterFPS's own config file isn't changed, and you're told once in chat.
-* **To keep Async anyway**, set `B:preventAsyncCreativeSearch=false` in `config/aoeqol.cfg`.
+* **To keep Async anyway**, turn off **Prevent async creative search** in the [settings](#settings); it applies the next time you open the creative inventory.
+
+---
+
+## Settings
+
+**Mods → AoE-QoL → Config** in game (changes apply without a restart), or `config/aoeqol.cfg`:
+
+| Setting | Default | |
+|---|---|---|
+| Prevent async creative search (`preventAsyncCreativeSearch`) | on | BetterFPS creative search uses "On" instead of "Async" |
+| Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
+
+A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
 
 ---
 
