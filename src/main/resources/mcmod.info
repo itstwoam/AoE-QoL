@@ -2,7 +2,7 @@
 {
   "modid": "aoeqol",
   "name": "AoE-QoL",
-  "description": "Quality-of-life fixes for the Age of Engineering modpack: Just Enough Calculation fixes (ignored tags/damage, /jectags, ore dictionary unification, full step list), JEI pages for the IC2 Canning Machine and Reinforced Stone, comparator updates for IC2 energy storage, a fix for IC2 cable networks going dead after a split, RFTools crafting grid / Crafter fixes and Storage Scanner search synced with JEI, an Ender IO creative capacitor bank crash fix, a startup crash fix for Turkish/Azerbaijani systems, a fix for the quit-to-title freeze, and BetterFPS async creative search turned off (crashes). Each part is only active when the mod it works with is installed.",
+  "description": "Quality-of-life fixes for the Age of Engineering modpack: Just Enough Calculation fixes (ignored tags/damage, /jectags, ore dictionary unification, full step list), JEI pages for the IC2 Canning Machine and Reinforced Stone, comparator updates for IC2 energy storage, a fix for IC2 cable networks going dead after a split, RFTools crafting grid / Crafter fixes and Storage Scanner search synced with JEI, an Ender IO creative capacitor bank crash fix, a startup crash fix for Turkish/Azerbaijani systems, a fix for the quit-to-title freeze, a fix for the view spinning when a screen closes, and BetterFPS async creative search turned off (crashes). Each part is only active when the mod it works with is installed.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://github.com/itstwoam/AoE-QoL",

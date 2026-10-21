@@ -153,6 +153,13 @@ public class PatchTransformer implements IClassTransformer {
             new Patch("<init>", "(Lic2/core/energy/grid/EnergyNetLocal;)V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/ic2/GridSplitFix", "created", "(Ljava/lang/Object;)V", "a0", -1,
                 "energy net: networks split off by a removed cable get their routes calculated"));
+        add("net/minecraft/util/MouseHelper",
+            new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
+                "mouse capture: remember the cursor position"),
+            redirect("func_74374_c", "()V", "org/lwjgl/input/Mouse", "getDX", "()I",
+                "com/itstwoam/aoeqol/client/MouseFix", "dx", "()I", "mouse reading: leftover jump after a screen closes ignored"),
+            redirect("func_74374_c", "()V", "org/lwjgl/input/Mouse", "getDY", "()I",
+                "com/itstwoam/aoeqol/client/MouseFix", "dy", "()I", "mouse reading (vertical)"));
         add("net/minecraft/server/integrated/IntegratedServer",
             redirect("func_71263_m", "()V",
                 "com/google/common/util/concurrent/Futures", "getUnchecked", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
@@ -180,6 +187,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
+                     || transformedName.equals("net.minecraft.util.MouseHelper")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }

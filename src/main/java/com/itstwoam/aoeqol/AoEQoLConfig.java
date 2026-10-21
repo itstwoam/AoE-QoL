@@ -10,10 +10,10 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft";
 
     public static Configuration config;
-    public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown;
+    public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump;
 
     private AoEQoLConfig() {}
 
@@ -44,6 +44,14 @@ public final class AoEQoLConfig {
               + "but IC2 refuses the connection, so conduits need a Yeta Wrench and dust doesn't bend into it).\n"
               + "Existing dust and conduits pick up the change when a block next to them changes.")
                 .setLanguageKey("aoeqol.config.splitterCableConnectsRedstone");
+        ConfigCategory minecraft = config.getCategory(MINECRAFT);
+        minecraft.setComment("Minecraft itself.");
+        minecraft.setLanguageKey("aoeqol.config.minecraft");
+        ignoreMouseJump = config.get(MINECRAFT, "ignoreLeftoverMouseJump", true,
+                "Now and then, closing a screen (inventory, chest, machine) spins your view: the cursor's distance from\n"
+              + "the middle of the window is read as one big mouse movement. true: that one leftover reading is ignored,\n"
+              + "real mouse movement is unchanged. false: Minecraft's normal behaviour.")
+                .setLanguageKey("aoeqol.config.ignoreLeftoverMouseJump");
         config.getCategory(LOCALE).setComment("Turkish/Azerbaijani system language: always fixed, nothing to set.");
         localeNoticeShown = config.get(LOCALE, "noticeShown", false,
                 "Set by AoE-QoL after it has mentioned the Turkish text case fix in chat once.").setShowInGui(false);

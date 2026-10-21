@@ -10,3 +10,7 @@ aoeqol.config.ic2=IndustrialCraft 2
 aoeqol.config.ic2.tooltip=IndustrialCraft 2.
 aoeqol.config.splitterCableConnectsRedstone=EU-Splitter Cable connects to redstone
 aoeqol.config.splitterCableConnectsRedstone.tooltip=Redstone dust and Ender IO redstone conduits connect to the EU-Splitter Cable by themselves (no Yeta Wrench needed). Existing dust and conduits update when a block next to them changes.
+aoeqol.config.minecraft=Minecraft
+aoeqol.config.minecraft.tooltip=Minecraft itself.
+aoeqol.config.ignoreLeftoverMouseJump=Ignore leftover mouse jump
+aoeqol.config.ignoreLeftoverMouseJump.tooltip=Now and then, closing a screen spins your view, because the cursor's distance from the middle of the window is read as one big mouse movement. On: that one leftover reading is ignored; real mouse movement is unchanged. Off: Minecraft's normal behaviour.

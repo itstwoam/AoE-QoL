@@ -12,7 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
-| [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title" |
+| [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
 > Written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
@@ -96,6 +96,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ## Minecraft
 
+* **View spinning when a screen closes.** Now and then (about 1 close in 50, any screen, vanilla included), closing an inventory, chest or machine spins your view by however far the cursor was from the middle of the window, up to 150 degrees on a large window. When a screen closes, Minecraft captures the mouse and moves the hidden cursor back to the middle, but occasionally Windows still delivers one last cursor position from before the move, and the gap is read as one huge mouse movement. AoE-QoL remembers where the cursor was when the screen closed and ignores that one matching reading in the next few frames; all other mouse movement passes through unchanged (setting: *Ignore leftover mouse jump*).
 * **Freeze on "Save and Quit to Title".** When the world closes, the game hands its built-in server one last job (log out anyone still connected) and waits for it with no time limit. Your disconnect also makes the server shut down, and now and then the server stops a split second before picking the job up, so the game waits forever. It happens more often after opening the world to LAN. The game now runs the job itself once the server has fully stopped, which is what Minecraft already does when the job arrives later. By then everyone has been logged out and saved, so nothing is skipped and normal quits are unchanged.
 * **Crash on a Turkish or Azerbaijani system.** Many mods in the pack (Extreme Reactors, Mekanism, Compact Solar Arrays, AE2, Draconic Evolution and more, and Minecraft itself for mod IDs) build internal names by lower-casing with the computer's language rules. In Turkish and Azerbaijani a capital I becomes a dotless "ı", so e.g. `IDLE` turns into `ıdle`, which Minecraft rejects, and the game fails to start. Before any mod loads, AoE-QoL switches Java's text case rules to neutral on those systems. Number and date formats stay as they are, and Minecraft's in-game language isn't affected. The player is told once in chat. This isn't a setting, since turning it off would only bring the crash back.
 
@@ -114,6 +115,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 | Setting | Default | |
 |---|---|---|
+| Ignore leftover mouse jump (`ignoreLeftoverMouseJump`) | on | The view doesn't spin when a screen closes |
 | Prevent async creative search (`preventAsyncCreativeSearch`) | on | BetterFPS creative search uses "On" instead of "Async" |
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
@@ -153,7 +155,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the mouse fix is run against recorded jumps, real movement and the setting turned off, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 

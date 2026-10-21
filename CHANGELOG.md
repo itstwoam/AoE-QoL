@@ -26,6 +26,7 @@ Releases come out on Fridays and include everything since the previous release.
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
 ### Minecraft
+- Fixed the view sometimes spinning wildly when closing an inventory, chest or machine screen (setting: Ignore leftover mouse jump, on by default).
 - Fixed the game occasionally freezing on "Save and Quit to Title" (more often after opening the world to LAN). Your world was always saved; now the game also gets back to the title screen.
 - Fixed the game failing to start when the computer's language is Turkish or Azerbaijani (Extreme Reactors, Mekanism, Compact Solar Arrays and other mods). Number formats and Minecraft's language are unchanged. You're told once in chat.
 
