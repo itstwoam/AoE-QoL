@@ -52,6 +52,16 @@ public final class CannerJei {
                 solid.size(), enrich.size());
     }
 
+    /** IC2's universal fluid cell: empty for null, else filled with that fluid; null if not available. */
+    static ItemStack cell(String fluidName) {
+        try {
+            ItemStack s = IC2Items.getItem("fluid_cell", fluidName);
+            return s == null ? null : s.copy();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     private static ItemStack item(String teName) {
         try {
             return IC2Items.getItem("te", teName);
@@ -83,7 +93,9 @@ public final class CannerJei {
             if (e.getKey() == null || e.getKey().fluid == null || e.getValue() == null) continue;
             List<ItemStack> additives = stacks(e.getKey().additive);
             if (additives.isEmpty()) continue;
-            out.add(new CannerEnrichRecipe(e.getKey().fluid.copy(), additives, e.getValue().copy()));
+            FluidStack result = e.getValue().copy();
+            ItemStack filled = result.getFluid() == null ? null : cell(result.getFluid().getName());
+            out.add(new CannerEnrichRecipe(e.getKey().fluid.copy(), additives, result, filled == null ? null : cell(null), filled));
         }
         return out;
     }

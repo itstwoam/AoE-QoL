@@ -59,7 +59,7 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 
 ## IC2
 
-* **Canning machines in JEI.** IC2 never gave the canning machines JEI pages. AoE-QoL adds *Solid Canning* (e.g. empty fuel rod + uranium fuel -> fuel rod) and *Fluid Enriching* (e.g. distilled water + lapis -> coolant), drawn with the Fluid/Solid Canning Machine's own GUI and read from IC2's recipe lists, so pack scripts are included. If JEC's transfer button doesn't appear on the new pages, restart once more.
+* **Canning machines in JEI.** IC2 never gave the canning machines JEI pages. AoE-QoL adds *Solid Canning* (e.g. empty fuel rod + uranium fuel -> fuel rod) and *Fluid Enriching* (e.g. distilled water + lapis -> coolant, with an empty cell filled into a Coolant Cell, which is how `R` on a Coolant Cell finds it), drawn with the Fluid/Solid Canning Machine's own GUI and read from IC2's recipe lists, so pack scripts are included. If JEC's transfer button doesn't appear on the new pages, restart once more.
 * **Reinforced Stone in JEI.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
 * **Comparators on energy storage.** BatBoxes, CESUs, MFEs and MFSUs (and their chargepads) report their fill level to comparators but never told the world when it changed, so comparators and things like Super Circuit Maker inventory scanners kept showing an old value until a block next to them changed. They now update whenever the level changes, and once when the world loads.
 

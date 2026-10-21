@@ -15,7 +15,8 @@ import net.minecraft.util.ResourceLocation;
 /**
  * JEI page: fluid enriching (e.g. distilled water + lapis -> coolant). Drawn with the Fluid/Solid Canning
  * Machine's own GUI texture, with IC2's tank frames and gauge marks where the machine draws its two tanks and
- * the additive in the centre slot: [input tank] + [additive] -> [output tank].
+ * the additive in the centre slot: [input tank] + [additive] -> [output tank], plus the machine's cell slots:
+ * [empty cell] -> [filled cell] (e.g. a Coolant Cell).
  */
 final class CannerEnrichCategory extends BlankRecipeCategory<CannerEnrichRecipe> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUICanner.png");
@@ -62,9 +63,16 @@ final class CannerEnrichCategory extends BlankRecipeCategory<CannerEnrichRecipe>
         fluids.init(0, true, TANK_IN_X + 4 - U, TANK_Y + 4 - V, 12, 47, capacity, true, gaugeMarks);
         fluids.init(1, false, TANK_OUT_X + 4 - U, TANK_Y + 4 - V, 12, 47, capacity, true, gaugeMarks);
         fluids.set(ingredients);
-        // centre slot from IC2's ContainerCanner (item at 80,44)
+        // slots from IC2's ContainerCanner: additive in the centre (80,44); in this mode the left slot (41,17)
+        // takes an empty cell, which the machine fills from the output tank into the right slot (119,17)
         IGuiItemStackGroup items = layout.getItemStacks();
         items.init(0, true, 80 - 1 - U, 44 - 1 - V);
-        items.set(ingredients);
+        items.set(0, recipe.additives);
+        if (recipe.emptyCell != null) {
+            items.init(1, true, 41 - 1 - U, 17 - 1 - V);
+            items.init(2, false, 119 - 1 - U, 17 - 1 - V);
+            items.set(1, recipe.emptyCell);
+            items.set(2, recipe.filledCell);
+        }
     }
 }
