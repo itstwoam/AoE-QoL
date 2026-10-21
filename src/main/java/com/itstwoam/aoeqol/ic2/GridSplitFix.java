@@ -22,7 +22,7 @@ public final class GridSplitFix {
     private GridSplitFix() {}
 
     public static void created(Object grid) {
-        if (broken) return;
+        if (broken || !com.itstwoam.aoeqol.AoEQoLConfig.ON_IC2_SPLIT_NETWORKS) return;
         try {
             Field f = dirty;
             if (f == null) {

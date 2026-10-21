@@ -32,7 +32,8 @@ public final class ConfigGuiFactory implements IModGuiFactory {
             list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.MINECRAFT)));
             if (BetterFpsFix.installed()) list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.BETTERFPS)));
             if (Loader.isModLoaded("IC2")) list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.IC2)));
-            if (Loader.isModLoaded("rftools") && Loader.isModLoaded("JEI")) list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.RFTOOLS)));
+            if (Loader.isModLoaded("je_calculation")) list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.JEC)));
+            if (Loader.isModLoaded("rftools")) list.add(new ConfigElement(AoEQoLConfig.config.getCategory(AoEQoLConfig.RFTOOLS)));
             return list;
         }
     }
@@ -43,6 +44,7 @@ public final class ConfigGuiFactory implements IModGuiFactory {
         public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
             if (!AoEQoL.MODID.equals(event.getModID())) return;
             AoEQoLConfig.config.save();
+            AoEQoLConfig.sync();
             BetterFpsFix.apply();
         }
     }

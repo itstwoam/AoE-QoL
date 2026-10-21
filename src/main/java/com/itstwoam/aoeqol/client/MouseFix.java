@@ -1,7 +1,6 @@
 package com.itstwoam.aoeqol.client;
 
 import com.itstwoam.aoeqol.AoEQoLConfig;
-import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.LogManager;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -26,8 +25,7 @@ public final class MouseFix {
     private MouseFix() {}
 
     private static boolean enabled() {
-        Property p = AoEQoLConfig.ignoreMouseJump;
-        return p == null || p.getBoolean();
+        return AoEQoLConfig.ON_MOUSE_JUMP;
     }
 
     /** Before Minecraft captures the mouse (a screen is closing): remember where the cursor is. */

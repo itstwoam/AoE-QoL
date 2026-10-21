@@ -21,9 +21,9 @@ New versions come out on **Fridays** and bundle everything since the previous on
 
 ## Just Enough Calculation
 
-* **Items that only differ in condition now match.** JEC treated items as different if any NBT tag or damage value differed, so IC2 reactor parts (heat), batteries and crystals (charge) never chained. Two config lists decide what to ignore (see below); IC2 is covered by default.
+* **Items that only differ in condition now match.** JEC treated items as different if any NBT tag or damage value differed, so IC2 reactor parts (heat), batteries and crystals (charge) never chained. Two config lists decide what to ignore (see below); IC2 is covered by default (setting: *Recipes chain for items in any condition*).
 * **Finding the tag that blocks a chain:** `/jectags`, a report file and F3+H tooltips (see below).
-* **Ore dictionary unification.** Choosing an ore dictionary preference (during a JEI transfer, or on the calculator's *oreDict* screen) rewrites every saved recipe to use it; recipes saved later are unified automatically, and `/jecunify` applies all preferences at once. Items are only swapped when they have exactly the same set of ore names (`S:ListOreUnifyNames`, default `ingot* plate* dust* nugget* gear* rod* stick* wire* block* gem*`). Every change is logged to `config/JustEnoughCalculation-OreUnify-log.txt`. There's no undo, so back up `saves/<world>/playerdata/*.jeca` before the first `/jecunify`.
+* **Ore dictionary unification.** Choosing an ore dictionary preference (during a JEI transfer, or on the calculator's *oreDict* screen) rewrites every saved recipe to use it; recipes saved later are unified automatically, and `/jecunify` applies all preferences at once. Items are only swapped when they have exactly the same set of ore names (`S:ListOreUnifyNames`, default `ingot* plate* dust* nugget* gear* rod* stick* wire* block* gem*`). Every change is logged to `config/JustEnoughCalculation-OreUnify-log.txt` (setting: *Ore dictionary unification*). There's no undo, so back up `saves/<world>/playerdata/*.jeca` before the first `/jecunify`.
 * **Every output in the step list.** A step using a multi-output recipe (e.g. a Thermal Centrifuge) lists all its outputs, totalled over all runs, not just the one it was run for.
 * **Items invisible in your inventory after using JEC.** JEC left its closed screen's container active on the client, so items picked up into the main inventory didn't show until you clicked a slot. Fixed.
 
@@ -64,7 +64,7 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 * **Reinforced Stone in JEI.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
 * **EU-Splitter Cable and redstone.** The splitter stops EU while it gets a redstone signal, but IC2 refused redstone connections to it, so Ender IO redstone conduits didn't output to it without a Yeta Wrench and redstone dust didn't bend into it. It now accepts redstone connections (setting: *EU-Splitter Cable connects to redstone*). Other IC2 blocks are unchanged. Existing dust and conduits pick it up when a block next to them changes.
 * **Comparators on energy storage.** BatBoxes, CESUs, MFEs and MFSUs (and their chargepads) report their fill level to comparators but never told the world when it changed, so comparators and things like Super Circuit Maker inventory scanners kept showing an old value until a block next to them changed. They now update whenever the level changes, and once when the world loads.
-* **Networks going dead after a split.** IC2 keeps a list of routes (generator to machine) for each cable network and only recalculates a network when it's told it changed. When a cable, splitter or machine leaves a network and splits it in two, IC2 keeps one piece as the old network (recalculated) and moves the rest into new networks that it never calculates. Their generators and machines stayed connected but got no power until something was placed in them or the world was reloaded. Splits happen when a cable is broken, when an EU-Splitter Cable in the middle of a run switches off, or when part of a network unloads. New networks are now calculated right away.
+* **Networks going dead after a split.** IC2 keeps a list of routes (generator to machine) for each cable network and only recalculates a network when it's told it changed. When a cable, splitter or machine leaves a network and splits it in two, IC2 keeps one piece as the old network (recalculated) and moves the rest into new networks that it never calculates. Their generators and machines stayed connected but got no power until something was placed in them or the world was reloaded. Splits happen when a cable is broken, when an EU-Splitter Cable in the middle of a run switches off, or when part of a network unloads. New networks are now calculated right away (setting: *Keep split cable networks powered*).
 
 ---
 
@@ -80,7 +80,7 @@ Applies to the crafting grid in the Storage Scanner and Modular Storage, and to 
 * **Showing what's wrong:** when the grid finds everything but the recipe still refuses it, RFTools could only mark the result red. If a slot was filled with a different variant than the recipe shows (e.g. uninsulated cable where the EU-Splitter needs fully insulated HV cable), that slot is now marked red too.
 * The Crafter's ghost-slot filter accepts charged or worn copies of the set item.
 
-A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
+All of this can be turned off (setting: *Smarter ingredient matching*). A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
 
 ### Storage Scanner search synced with JEI
 
@@ -97,7 +97,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 ## Minecraft
 
 * **View spinning when a screen closes.** Now and then (about 1 close in 50, any screen, vanilla included), closing an inventory, chest or machine spins your view by however far the cursor was from the middle of the window, up to 150 degrees on a large window. When a screen closes, Minecraft captures the mouse and moves the hidden cursor back to the middle, but occasionally Windows still delivers one last cursor position from before the move, and the gap is read as one huge mouse movement. AoE-QoL remembers where the cursor was when the screen closed and ignores that one matching reading in the next few frames; all other mouse movement passes through unchanged (setting: *Ignore leftover mouse jump*).
-* **Freeze on "Save and Quit to Title".** When the world closes, the game hands its built-in server one last job (log out anyone still connected) and waits for it with no time limit. Your disconnect also makes the server shut down, and now and then the server stops a split second before picking the job up, so the game waits forever. It happens more often after opening the world to LAN. The game now runs the job itself once the server has fully stopped, which is what Minecraft already does when the job arrives later. By then everyone has been logged out and saved, so nothing is skipped and normal quits are unchanged.
+* **Freeze on "Save and Quit to Title".** When the world closes, the game hands its built-in server one last job (log out anyone still connected) and waits for it with no time limit. Your disconnect also makes the server shut down, and now and then the server stops a split second before picking the job up, so the game waits forever. It happens more often after opening the world to LAN. The game now runs the job itself once the server has fully stopped, which is what Minecraft already does when the job arrives later. By then everyone has been logged out and saved, so nothing is skipped and normal quits are unchanged (setting: *Fix freeze on Save and Quit*).
 * **Crash on a Turkish or Azerbaijani system.** Many mods in the pack (Extreme Reactors, Mekanism, Compact Solar Arrays, AE2, Draconic Evolution and more, and Minecraft itself for mod IDs) build internal names by lower-casing with the computer's language rules. In Turkish and Azerbaijani a capital I becomes a dotless "ı", so e.g. `IDLE` turns into `ıdle`, which Minecraft rejects, and the game fails to start. Before any mod loads, AoE-QoL switches Java's text case rules to neutral on those systems. Number and date formats stay as they are, and Minecraft's in-game language isn't affected. The player is told once in chat. This isn't a setting, since turning it off would only bring the crash back.
 
 ---
@@ -115,12 +115,17 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 | Setting | Default | |
 |---|---|---|
+| Recipes chain for items in any condition (`ignoreConditionTags`) | on | JEC: items that only differ in heat, charge or wear count as the same |
+| Ore dictionary unification (`oreDictUnification`) | on | JEC: ore dictionary preferences rewrite saved recipes; `/jecunify` |
+| Smarter ingredient matching (`smarterIngredientMatching`) | on | RFTools crafting grid and Crafter: charged/worn items, exact variant first, equivalents, wrong variant red |
+| Keep split cable networks powered (`fixSplitNetworks`) | on | IC2: networks split by a broken cable or splitter keep working |
+| Fix freeze on Save and Quit (`fixQuitFreeze`) | on | The game reaches the title screen after the server stops |
 | Ignore leftover mouse jump (`ignoreLeftoverMouseJump`) | on | The view doesn't spin when a screen closes |
 | Prevent async creative search (`preventAsyncCreativeSearch`) | on | BetterFPS creative search uses "On" instead of "Async" |
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
 
-A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
+Crash fixes are always on, and new JEI pages and the fuller step list have no setting either. Everything that changes how something behaves can be turned off. A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
 
 ---
 

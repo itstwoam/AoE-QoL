@@ -10,10 +10,18 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec";
 
     public static Configuration config;
-    public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump;
+    public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
+            jecConditionTags, jecOreUnify, rftoolsMatching, ic2SplitNetworks, quitFreezeFix;
+
+    /**
+     * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
+     * the property each time). On until the config is loaded; updated by {@link #sync()} whenever settings change.
+     */
+    public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_RFTOOLS_MATCHING = true,
+            ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true;
 
     private AoEQoLConfig() {}
 
@@ -44,6 +52,28 @@ public final class AoEQoLConfig {
               + "but IC2 refuses the connection, so conduits need a Yeta Wrench and dust doesn't bend into it).\n"
               + "Existing dust and conduits pick up the change when a block next to them changes.")
                 .setLanguageKey("aoeqol.config.splitterCableConnectsRedstone");
+        ConfigCategory jec = config.getCategory(JEC);
+        jec.setComment("Just Enough Calculation.");
+        jec.setLanguageKey("aoeqol.config.jec");
+        jecConditionTags = config.get(JEC, "ignoreConditionTags", true,
+                "Items that only differ in condition (heat, charge, wear) count as the same item, so recipes using them\n"
+              + "chain, e.g. IC2 reactor parts, batteries and energy crystals. Which tags count is set by ListIgnoredNBTKeys\n"
+              + "and ListIgnoredDamage in JEC's own config. false: JEC's normal exact matching.")
+                .setLanguageKey("aoeqol.config.ignoreConditionTags");
+        jecOreUnify = config.get(JEC, "oreDictUnification", true,
+                "Choosing an ore dictionary preference rewrites your saved recipes to use it, and recipes saved later are\n"
+              + "unified automatically; /jecunify applies all preferences. false: saved recipes are never changed.")
+                .setLanguageKey("aoeqol.config.oreDictUnification");
+        rftoolsMatching = config.get(RFTOOLS, "smarterIngredientMatching", true,
+                "Crafting grid and Crafter: charged batteries/crystals and worn tools are recognised, the exact variant is\n"
+              + "taken first, other mods' ore dictionary equivalents come before other variants, and a wrong variant is\n"
+              + "marked red. false: RFTools' normal matching.")
+                .setLanguageKey("aoeqol.config.smarterIngredientMatching");
+        ic2SplitNetworks = config.get(IC2, "fixSplitNetworks", true,
+                "When a cable network is split (cable broken, splitter switching off, part of it unloading), the new pieces\n"
+              + "get their routes calculated right away. false: IC2's normal behaviour, where a split-off piece can stay\n"
+              + "without power until something is placed in it or the world is reloaded.")
+                .setLanguageKey("aoeqol.config.fixSplitNetworks");
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");
         minecraft.setLanguageKey("aoeqol.config.minecraft");
@@ -52,9 +82,24 @@ public final class AoEQoLConfig {
               + "the middle of the window is read as one big mouse movement. true: that one leftover reading is ignored,\n"
               + "real mouse movement is unchanged. false: Minecraft's normal behaviour.")
                 .setLanguageKey("aoeqol.config.ignoreLeftoverMouseJump");
+        quitFreezeFix = config.get(MINECRAFT, "fixQuitFreeze", true,
+                "\"Save and Quit to Title\" can freeze for good (more often after opening to LAN). true: once the built-in\n"
+              + "server has stopped, the game stops waiting for it. false: Minecraft's normal behaviour.")
+                .setLanguageKey("aoeqol.config.fixQuitFreeze");
         config.getCategory(LOCALE).setComment("Turkish/Azerbaijani system language: always fixed, nothing to set.");
         localeNoticeShown = config.get(LOCALE, "noticeShown", false,
                 "Set by AoE-QoL after it has mentioned the Turkish text case fix in chat once.").setShowInGui(false);
         if (config.hasChanged()) config.save();
+        sync();
+    }
+
+    /** Copies the settings into the fields the patched code reads. Called at start-up and when settings change. */
+    public static void sync() {
+        ON_JEC_CONDITION_TAGS = jecConditionTags.getBoolean();
+        ON_JEC_ORE_UNIFY = jecOreUnify.getBoolean();
+        ON_RFTOOLS_MATCHING = rftoolsMatching.getBoolean();
+        ON_IC2_SPLIT_NETWORKS = ic2SplitNetworks.getBoolean();
+        ON_QUIT_FREEZE = quitFreezeFix.getBoolean();
+        ON_MOUSE_JUMP = ignoreMouseJump.getBoolean();
     }
 }

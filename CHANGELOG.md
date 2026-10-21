@@ -34,6 +34,7 @@ Releases come out on Fridays and include everything since the previous release.
 - BetterFPS's "Async" creative search is switched to "On" because it can crash the game (e.g. with Mekanism cables); search stays fast. You're told once in chat. To keep Async, turn it off in the settings.
 
 ### Other
+- New settings, all on by default: the JEC condition-tag matching and ore dictionary unification, the RFTools ingredient matching, the IC2 split-network fix and the quit-freeze fix can now each be turned off. Crash fixes stay always on.
 - In-game settings: Mods → AoE-QoL → Config (also `config/aoeqol.cfg`).
 - Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools, Ender IO and BetterFPS added.
 

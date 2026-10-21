@@ -27,6 +27,7 @@ public final class QuitFix {
     private QuitFix() {}
 
     public static Object await(Future<?> job) {
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_QUIT_FREEZE) return Futures.getUnchecked(job);   // Minecraft's own wait
         boolean interrupted = false;
         try {
             while (true) {

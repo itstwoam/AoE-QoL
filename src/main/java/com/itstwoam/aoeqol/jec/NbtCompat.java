@@ -376,7 +376,7 @@ public final class NbtCompat {
 
     /** Prepended to JEC's tooltip handler. With F3+H on, lists an item's top-level NBT tags. */
     public static void onTooltip(ItemTooltipEvent event) {
-        if (tooltipBroken) return;
+        if (tooltipBroken || !com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_CONDITION_TAGS) return;
         try {
             if (!event.isShowAdvancedItemTooltips()) return;
             ItemStack stack = event.getItemStack();

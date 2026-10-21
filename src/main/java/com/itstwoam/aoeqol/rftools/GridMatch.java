@@ -91,6 +91,7 @@ public final class GridMatch {
     /** Start of StorageCraftingTools.tryRecipe (a test craft). */
     public static void beginTest() {
         java.util.Arrays.fill(variantSlots, false);
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_RFTOOLS_MATCHING) return;
     }
 
     /**
@@ -100,6 +101,7 @@ public final class GridMatch {
      * (e.g. uninsulated cable for insulated), mark those slots instead, which is almost always the reason.
      */
     public static void afterTest(int[] missing) {
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_RFTOOLS_MATCHING) return;
         if (missing == null || missing.length < 10 || missing[9] <= 0) return;
         for (int i = 0; i < 9; i++) if (missing[i] > 0) return;
         for (int i = 0; i < 9; i++) if (variantSlots[i]) missing[i] = 1;

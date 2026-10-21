@@ -201,7 +201,7 @@ public final class OreUnify {
      * against the existing ore dictionary preferences before JEC stores it. Silent: log file only.
      */
     public static Recipe onRecipeSaved(Recipe recipe, String group) {
-        if (bulk || recipe == null) return recipe;
+        if (bulk || recipe == null || !com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_ORE_UNIFY) return recipe;
         try {
             refresh();
             if (patterns.isEmpty()) return recipe;
@@ -243,6 +243,7 @@ public final class OreUnify {
 
     /** Prepended to PlayerRecordHelper.addOreDictPref: runs whenever a preference is chosen. */
     public static void onPreferenceSet(ItemStack preferred) {
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_ORE_UNIFY) return;
         try {
             refresh();
             if (preferred == null || patterns.isEmpty()) return;
@@ -263,6 +264,10 @@ public final class OreUnify {
 
     /** "/jecunify": apply every saved preference to all recipes. */
     public static void applyAll(ICommandSender sender) {
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_ORE_UNIFY) {
+            say(sender, "Ore dictionary unification is turned off in Mods > AoE-QoL > Config.");
+            return;
+        }
         try {
             refresh();
             if (patterns.isEmpty()) { say(sender, "Ore unification is turned off (ListOreUnifyNames is empty)."); return; }

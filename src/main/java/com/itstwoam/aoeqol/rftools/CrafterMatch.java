@@ -40,6 +40,7 @@ public final class CrafterMatch {
      */
     public static boolean ghostAccepts(ItemStack ghost, ItemStack stack) {
         if (ghost.isItemEqual(stack)) return true;
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_RFTOOLS_MATCHING) return false;   // RFTools' own check
         Item item = ghost.getItem();
         return stack != null && item != null && item == stack.getItem() && item.isDamageable();
     }

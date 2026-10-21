@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -34,7 +35,11 @@ public class PatchTransformer implements IClassTransformer {
     private static final String STRING = "Ljava/lang/String;";
 
     enum Kind {
-        /** Body becomes {@code return Hook.name(loads...);} (the hook takes the loaded values, returns the same type). */
+        /**
+         * Body becomes {@code return Hook.name(loads...);} (the hook takes the loaded values, returns the same type).
+         * With a gate (a static boolean in AoEQoLConfig) the original body is kept and only skipped while the gate is
+         * on: {@code if (AoEQoLConfig.GATE) return Hook.name(loads...);} followed by the original code.
+         */
         REPLACE,
         /** {@code Hook.name(loads...);} inserted at the start of the method. */
         PREPEND,
@@ -54,6 +59,7 @@ public class PatchTransformer implements IClassTransformer {
         final String[] loads;   // e.g. "a0" (ALOAD 0), "j3" (LLOAD 3), "i3" (ILOAD 3)
         final int store;        // local for PREPEND_ASSIGN
         String rOwner, rName, rDesc; // REDIRECT target call
+        String gate;                 // REPLACE only: AoEQoLConfig boolean that switches the replacement on
         int redirected;
         boolean applied;
 
@@ -64,6 +70,14 @@ public class PatchTransformer implements IClassTransformer {
             this.loads = loads.isEmpty() ? new String[0] : loads.split(",");
             this.store = store; this.what = what;
         }
+    }
+
+    static final String CONFIG = "com/itstwoam/aoeqol/AoEQoLConfig";
+
+    /** A REPLACE that only applies while the setting {@code gate} (a boolean field in AoEQoLConfig) is on. */
+    static Patch gated(String gate, Patch p) {
+        p.gate = gate;
+        return p;
     }
 
     static Patch redirect(String method, String desc, String owner, String name, String callDesc,
@@ -78,13 +92,13 @@ public class PatchTransformer implements IClassTransformer {
 
     static {
         add(JEC + "util/helpers/ItemStackHelper",
-            new Patch("isItemEqual", "(" + ITEMSTACK + ITEMSTACK + ")Z", Kind.REPLACE,
+            gated("ON_JEC_CONDITION_TAGS", new Patch("isItemEqual", "(" + ITEMSTACK + ITEMSTACK + ")Z", Kind.REPLACE,
                 H + "NbtCompat", "isItemEqual", "(" + ITEMSTACK + ITEMSTACK + ")Z", "a0,a1", -1,
-                "item matching with ignored tags/damage"));
+                "item matching with ignored tags/damage")));
         add(JEC + "util/helpers/ItemStackHelper$NBT",
-            new Patch("equalsIgnoreJEC", "(" + NBT + NBT + ")Z", Kind.REPLACE,
+            gated("ON_JEC_CONDITION_TAGS", new Patch("equalsIgnoreJEC", "(" + NBT + NBT + ")Z", Kind.REPLACE,
                 H + "NbtCompat", "equalsIgnoreJEC", "(" + NBT + NBT + ")Z", "a0,a1", -1,
-                "tag comparison"));
+                "tag comparison")));
         add(JEC + "JECConfig",
             new Patch("handleInit", "()V", Kind.PREPEND,
                 H + "NbtCompat", "init", "()V", "", -1, "config options"));
@@ -107,14 +121,14 @@ public class PatchTransformer implements IClassTransformer {
                 "unification of edited recipes"));
         String RFT = "com/itstwoam/aoeqol/rftools/";
         add("mcjty/rftools/craftinggrid/StorageCraftingTools",
-            new Patch("match", "(" + ITEMSTACK + "Lgnu/trove/set/hash/TIntHashSet;" + ITEMSTACK + "Z)Z", Kind.REPLACE,
+            gated("ON_RFTOOLS_MATCHING", new Patch("match", "(" + ITEMSTACK + "Lgnu/trove/set/hash/TIntHashSet;" + ITEMSTACK + "Z)Z", Kind.REPLACE,
                 RFT + "GridMatch", "match", "(" + ITEMSTACK + "Ljava/lang/Object;" + ITEMSTACK + "Z)Z",
-                "a0,a1,a2,i3", -1, "crafting grid: wear/charge ignored"),
-            new Patch("findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I" + ITEMSTACK
+                "a0,a1,a2,i3", -1, "crafting grid: wear/charge ignored")),
+            gated("ON_RFTOOLS_MATCHING", new Patch("findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I" + ITEMSTACK
                     + "ILmcjty/rftools/craftinggrid/IItemSource;Z)I", Kind.REPLACE,
                 RFT + "GridMatch", "findMatchingItems", "(Lnet/minecraft/inventory/InventoryCrafting;Ljava/util/List;I"
                     + ITEMSTACK + "ILjava/lang/Object;Z)I",
-                "a0,a1,i2,a3,i4,a5,i6", -1, "crafting grid: exact variants first"),
+                "a0,a1,i2,a3,i4,a5,i6", -1, "crafting grid: exact variants first")),
             new Patch("tryRecipe", "(Lnet/minecraft/entity/player/EntityPlayerMP;Lmcjty/rftools/blocks/crafter/CraftingRecipe;I"
                     + "Lmcjty/rftools/craftinggrid/IItemSource;Z)[I", Kind.PREPEND,
                 RFT + "GridMatch", "beginTest", "()V", "", -1, "crafting grid: test craft start"),
@@ -122,13 +136,13 @@ public class PatchTransformer implements IClassTransformer {
                     + "Lmcjty/rftools/craftinggrid/IItemSource;Z)[I", Kind.BEFORE_RETURN,
                 RFT + "GridMatch", "afterTest", "([I)V", "a8", -1, "crafting grid: wrong variant slots shown red"));
         add("mcjty/rftools/blocks/crafter/CrafterBaseTE",
-            new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
+            gated("ON_RFTOOLS_MATCHING", new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
                 RFT + "CrafterMatch", "match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", "a0,a1,i2", -1,
-                "Crafter: wear/charge ignored"),
-            new Patch("testAndConsumeCraftingItems", "(Lmcjty/rftools/blocks/crafter/CraftingRecipe;Ljava/util/Map;Z)Z",
+                "Crafter: wear/charge ignored")),
+            gated("ON_RFTOOLS_MATCHING", new Patch("testAndConsumeCraftingItems", "(Lmcjty/rftools/blocks/crafter/CraftingRecipe;Ljava/util/Map;Z)Z",
                 Kind.REPLACE, RFT + "CrafterMatch", "testAndConsumeCraftingItems",
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/Map;Z)Z", "a0,a1,a2,i3", -1,
-                "Crafter: exact variants first"),
+                "Crafter: exact variants first")),
             redirect("func_94041_b", "(I" + ITEMSTACK + ")Z", "net/minecraft/item/ItemStack", "func_77969_a",
                 "(" + ITEMSTACK + ")Z", RFT + "CrafterMatch", "ghostAccepts", "(" + ITEMSTACK + ITEMSTACK + ")Z",
                 "Crafter: charged/worn items accepted in ghost slots"));
@@ -241,6 +255,24 @@ public class PatchTransformer implements IClassTransformer {
     private static MethodVisitor patchMethod(final MethodVisitor mv, final Patch p) {
         switch (p.kind) {
             case REPLACE:
+                if (p.gate != null) {
+                    // if (AoEQoLConfig.GATE) return Hook.name(...);  then the original code, unchanged
+                    return new MethodVisitor(Opcodes.ASM5, mv) {
+                        @Override
+                        public void visitCode() {
+                            super.visitCode();
+                            Label original = new Label();
+                            super.visitFieldInsn(Opcodes.GETSTATIC, CONFIG, p.gate, "Z");
+                            super.visitJumpInsn(Opcodes.IFEQ, original);
+                            loadArgs(mv, p);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
+                            super.visitInsn(Type.getReturnType(p.desc).getOpcode(Opcodes.IRETURN));
+                            super.visitLabel(original);
+                            super.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                            super.visitInsn(Opcodes.NOP);   // keeps the original code's own first frame at its own offset
+                        }
+                    };
+                }
                 // write the new body and drop the original one
                 mv.visitCode();
                 loadArgs(mv, p);
