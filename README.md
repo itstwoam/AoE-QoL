@@ -12,6 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
+| [Compact Solar Arrays](#compact-solar-arrays) | Compact Solars 5.0.12 | No crash on startup when the computer's language is Turkish |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
 > Written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
@@ -92,6 +93,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Compact Solar Arrays
+
+* **Crash on a Turkish system.** Compact Solar Arrays builds internal names (block states, solar hat registry names) by lower-casing `MEDIUM_VOLTAGE` and `HIGH_VOLTAGE` with the computer's language rules. In Turkish a capital I becomes a dotless "ı", giving `medıum_voltage` and `hıgh_voltage`, which don't match its files, and the game fails to start. AoE-QoL makes those two spots use language-independent rules. Nothing shown on screen changes.
+
+---
+
 ## BetterFPS
 
 * **Creative search crash.** BetterFPS's "Async" creative search starts a background thread for every key you type, and each one runs every mod's tooltip code off the main thread. That code isn't thread-safe, and in Age of Engineering it crashes the game (for example while Mekanism draws its cables in the search results). AoE-QoL switches the setting to "On" for the session: BetterFPS's fast search still runs, just on the main thread. BetterFPS's own config file isn't changed, and you're told once in chat.
@@ -144,7 +151,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO, IC2 and Compact Solars jars, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 
@@ -153,4 +160,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, Compact Solar Arrays by cpw, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
