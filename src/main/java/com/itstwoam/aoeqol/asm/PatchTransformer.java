@@ -16,8 +16,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * Patches Just Enough Calculation 2.6.5, RFTools 5.92, Ender IO 3.1.193 and IC2 2.6.252-ex110 (MC 1.10.2) while their classes load. Every patch only adds a call into this mod's own code
- * ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}, {@code .enderio}, {@code .ic2}); the jars
+ * Patches Just Enough Calculation 2.6.5, RFTools 5.92, Ender IO 3.1.193, IC2 2.6.252-ex110 and one spot in Minecraft 1.10.2 while their classes load. Every patch only adds a call into this mod's own code
+ * ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}, {@code .enderio}, {@code .ic2}, {@code .misc}); the jars
  * themselves are untouched.
  *
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
@@ -149,6 +149,15 @@ public class PatchTransformer implements IClassTransformer {
             new Patch("updateEntityServer", "()V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/ic2/ComparatorFix", "afterTick", "(Ljava/lang/Object;)V", "a0", -1,
                 "energy storage: comparators updated when the fill level changes"));
+        add("ic2/core/energy/grid/Grid",
+            new Patch("<init>", "(Lic2/core/energy/grid/EnergyNetLocal;)V", Kind.BEFORE_RETURN,
+                "com/itstwoam/aoeqol/ic2/GridSplitFix", "created", "(Ljava/lang/Object;)V", "a0", -1,
+                "energy net: networks split off by a removed cable get their routes calculated"));
+        add("net/minecraft/server/integrated/IntegratedServer",
+            redirect("func_71263_m", "()V",
+                "com/google/common/util/concurrent/Futures", "getUnchecked", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
+                "com/itstwoam/aoeqol/misc/QuitFix", "await", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
+                "quit to title no longer freezes waiting for a server that already stopped"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -169,7 +178,9 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
                      || transformedName.startsWith("crazypants.enderio.machine.capbank.")
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
-                     || transformedName.equals("ic2.core.block.TileEntityBlock"))) {
+                     || transformedName.equals("ic2.core.block.TileEntityBlock")
+                     || transformedName.equals("ic2.core.energy.grid.Grid")
+                     || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
@@ -267,7 +278,7 @@ public class PatchTransformer implements IClassTransformer {
                 return new MethodVisitor(Opcodes.ASM5, mv) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-                        if (opcode == Opcodes.INVOKEVIRTUAL && owner.equals(p.rOwner) && name.equals(p.rName) && desc.equals(p.rDesc)) {
+                        if ((opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKESTATIC) && owner.equals(p.rOwner) && name.equals(p.rName) && desc.equals(p.rDesc)) {
                             p.redirected++;
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
                             return;

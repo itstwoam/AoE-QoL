@@ -9,10 +9,10 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | Part | Needs | What it does |
 |---|---|---|
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list, invisible-items fix |
-| [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels |
+| [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
-| [Turkish system language](#turkish-system-language) | — | No crash on startup when the computer's language is Turkish or Azerbaijani |
+| [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title" |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
 > Written for and tested against the exact mod versions in Age of Engineering 1.1.2. Tests run outside the game (see [Testing](#testing)); please [report](#issues-and-requests) anything that misbehaves in game.
@@ -64,6 +64,7 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 * **Reinforced Stone in JEI.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
 * **EU-Splitter Cable and redstone.** The splitter stops EU while it gets a redstone signal, but IC2 refused redstone connections to it, so Ender IO redstone conduits didn't output to it without a Yeta Wrench and redstone dust didn't bend into it. It now accepts redstone connections (setting: *EU-Splitter Cable connects to redstone*). Other IC2 blocks are unchanged. Existing dust and conduits pick it up when a block next to them changes.
 * **Comparators on energy storage.** BatBoxes, CESUs, MFEs and MFSUs (and their chargepads) report their fill level to comparators but never told the world when it changed, so comparators and things like Super Circuit Maker inventory scanners kept showing an old value until a block next to them changed. They now update whenever the level changes, and once when the world loads.
+* **Networks going dead after a split.** IC2 keeps a list of routes (generator to machine) for each cable network and only recalculates a network when it's told it changed. When a cable, splitter or machine leaves a network and splits it in two, IC2 keeps one piece as the old network (recalculated) and moves the rest into new networks that it never calculates. Their generators and machines stayed connected but got no power until something was placed in them or the world was reloaded. Splits happen when a cable is broken, when an EU-Splitter Cable in the middle of a run switches off, or when part of a network unloads. New networks are now calculated right away.
 
 ---
 
@@ -93,8 +94,9 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
-## Turkish system language
+## Minecraft
 
+* **Freeze on "Save and Quit to Title".** When the world closes, the game hands its built-in server one last job (log out anyone still connected) and waits for it with no time limit. Your disconnect also makes the server shut down, and now and then the server stops a split second before picking the job up, so the game waits forever. It happens more often after opening the world to LAN. The game now runs the job itself once the server has fully stopped, which is what Minecraft already does when the job arrives later. By then everyone has been logged out and saved, so nothing is skipped and normal quits are unchanged.
 * **Crash on a Turkish or Azerbaijani system.** Many mods in the pack (Extreme Reactors, Mekanism, Compact Solar Arrays, AE2, Draconic Evolution and more, and Minecraft itself for mod IDs) build internal names by lower-casing with the computer's language rules. In Turkish and Azerbaijani a capital I becomes a dotless "ı", so e.g. `IDLE` turns into `ıdle`, which Minecraft rejects, and the game fails to start. Before any mod loads, AoE-QoL switches Java's text case rules to neutral on those systems. Number and date formats stay as they are, and Minecraft's in-game language isn't affected. The player is told once in chat. This isn't a setting, since turning it off would only bring the crash back.
 
 ---
@@ -151,7 +153,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 

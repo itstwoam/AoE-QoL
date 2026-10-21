@@ -12,6 +12,7 @@ Releases come out on Fridays and include everything since the previous release.
 - The canning machine's Fluid Enriching page also shows the empty cell -> filled cell slots, so Coolant Cells (for 10k Coolant Cells and Overclocker Upgrades) show their recipe in JEI.
 - Redstone dust and Ender IO redstone conduits connect to the EU-Splitter Cable by themselves (no Yeta Wrench needed); can be turned off.
 - Comparators (and Super Circuit Maker inventory scanners) next to a BatBox, CESU, MFE or MFSU now follow its fill level instead of keeping an old value.
+- Fixed cable networks going dead (no power until a cable was replaced or the world reloaded) after a network was split by breaking a cable, a splitter switching off, or part of it unloading.
 
 ### RFTools (crafting grid and Crafter)
 - Charged batteries and energy crystals, and worn tools, are recognized (e.g. crafting an MFE).
@@ -24,7 +25,8 @@ Releases come out on Fridays and include everything since the previous release.
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
-### Turkish system language
+### Minecraft
+- Fixed the game occasionally freezing on "Save and Quit to Title" (more often after opening the world to LAN). Your world was always saved; now the game also gets back to the title screen.
 - Fixed the game failing to start when the computer's language is Turkish or Azerbaijani (Extreme Reactors, Mekanism, Compact Solar Arrays and other mods). Number formats and Minecraft's language are unchanged. You're told once in chat.
 
 ### BetterFPS
