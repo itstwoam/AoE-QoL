@@ -10,6 +10,7 @@ Releases come out on Fridays and include everything since the previous release.
 ### IndustrialCraft 2
 - New JEI page for Reinforced Stone (Iron Scaffold + construction foam).
 - The canning machine's Fluid Enriching page also shows the empty cell -> filled cell slots, so Coolant Cells (for 10k Coolant Cells and Overclocker Upgrades) show their recipe in JEI.
+- Redstone dust and Ender IO redstone conduits connect to the EU-Splitter Cable by themselves (no Yeta Wrench needed); can be turned off.
 - Comparators (and Super Circuit Maker inventory scanners) next to a BatBox, CESU, MFE or MFSU now follow its fill level instead of keeping an old value.
 
 ### RFTools (crafting grid and Crafter)

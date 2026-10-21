@@ -61,6 +61,7 @@ Rule of thumb: a tag that one copy has and the other doesn't, or a number that c
 
 * **Canning machines in JEI.** IC2 never gave the canning machines JEI pages. AoE-QoL adds *Solid Canning* (e.g. empty fuel rod + uranium fuel -> fuel rod) and *Fluid Enriching* (e.g. distilled water + lapis -> coolant, with an empty cell filled into a Coolant Cell, which is how `R` on a Coolant Cell finds it), drawn with the Fluid/Solid Canning Machine's own GUI and read from IC2's recipe lists, so pack scripts are included. If JEC's transfer button doesn't appear on the new pages, restart once more.
 * **Reinforced Stone in JEI.** It has no crafting recipe: spray an Iron Scaffold with construction foam (100 mB) and mine the hardened block. A Reinforced Iron Scaffold also gives back its Iron Fence. Hover the arrow for hardening times (about 10 minutes in full light, slower in the dark, instant with sand).
+* **EU-Splitter Cable and redstone.** The splitter stops EU while it gets a redstone signal, but IC2 refused redstone connections to it, so Ender IO redstone conduits didn't output to it without a Yeta Wrench and redstone dust didn't bend into it. It now accepts redstone connections (setting: *EU-Splitter Cable connects to redstone*). Other IC2 blocks are unchanged. Existing dust and conduits pick it up when a block next to them changes.
 * **Comparators on energy storage.** BatBoxes, CESUs, MFEs and MFSUs (and their chargepads) report their fill level to comparators but never told the world when it changed, so comparators and things like Super Circuit Maker inventory scanners kept showing an old value until a block next to them changed. They now update whenever the level changes, and once when the world loads.
 
 ---
@@ -106,6 +107,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 |---|---|---|
 | Prevent async creative search (`preventAsyncCreativeSearch`) | on | BetterFPS creative search uses "On" instead of "Async" |
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
+| EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
 
 A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
 

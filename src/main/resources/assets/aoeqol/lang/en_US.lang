@@ -6,3 +6,7 @@ aoeqol.config.rftools=RFTools
 aoeqol.config.rftools.tooltip=RFTools: Storage Scanner.
 aoeqol.config.syncStorageScannerWithJei=Sync Storage Scanner search with JEI
 aoeqol.config.syncStorageScannerWithJei.tooltip=Typing in the Storage Scanner's search box fills in JEI's, and the other way round, like AE2's "JEI synchronized" search.
+aoeqol.config.ic2=IndustrialCraft 2
+aoeqol.config.ic2.tooltip=IndustrialCraft 2.
+aoeqol.config.splitterCableConnectsRedstone=EU-Splitter Cable connects to redstone
+aoeqol.config.splitterCableConnectsRedstone.tooltip=Redstone dust and Ender IO redstone conduits connect to the EU-Splitter Cable by themselves (no Yeta Wrench needed). Existing dust and conduits update when a block next to them changes.

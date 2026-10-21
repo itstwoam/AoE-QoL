@@ -10,10 +10,10 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2";
 
     public static Configuration config;
-    public static Property preventAsyncSearch, noticeShown, scannerJeiSync;
+    public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone;
 
     private AoEQoLConfig() {}
 
@@ -36,6 +36,14 @@ public final class AoEQoLConfig {
                 "Keep the Storage Scanner's search box and JEI's search box in sync, like AE2's \"JEI synchronized\"\n"
               + "search mode: typing in either one fills in the other while the scanner is open.")
                 .setLanguageKey("aoeqol.config.syncStorageScannerWithJei");
+        ConfigCategory ic2 = config.getCategory(IC2);
+        ic2.setComment("IndustrialCraft 2.");
+        ic2.setLanguageKey("aoeqol.config.ic2");
+        splitterRedstone = config.get(IC2, "splitterCableConnectsRedstone", true,
+                "Let redstone dust and Ender IO redstone conduits connect to the EU-Splitter Cable (it reacts to redstone,\n"
+              + "but IC2 refuses the connection, so conduits need a Yeta Wrench and dust doesn't bend into it).\n"
+              + "Existing dust and conduits pick up the change when a block next to them changes.")
+                .setLanguageKey("aoeqol.config.splitterCableConnectsRedstone");
         if (config.hasChanged()) config.save();
     }
 }

@@ -43,7 +43,9 @@ public class PatchTransformer implements IClassTransformer {
         /** {@code Hook.name(loads...);} inserted before every return (the return value stays on the stack). */
         BEFORE_RETURN,
         /** Calls to {@code redirect} (owner.name desc) inside the method become INVOKESTATIC Hook.name. */
-        REDIRECT
+        REDIRECT,
+        /** Before every return, the value is passed through {@code Hook.name(value, loads...)}, which returns the new one. */
+        FILTER_RETURN
     }
 
     static final class Patch {
@@ -139,6 +141,10 @@ public class PatchTransformer implements IClassTransformer {
                 Kind.REPLACE, "com/itstwoam/aoeqol/enderio/CapBankFix", "getCapability",
                 "(Ljava/lang/Object;Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Ljava/lang/Object;",
                 "a0,a1,a2", -1, "creative capacitor bank: still no energy capability handed out"));
+        add("ic2/core/block/TileEntityBlock",
+            new Patch("connectRedstone", "(Lnet/minecraft/util/EnumFacing;)Z", Kind.FILTER_RETURN,
+                "com/itstwoam/aoeqol/ic2/SplitterRedstone", "connectRedstone", "(ZLjava/lang/Object;)Z", "a0", -1,
+                "EU-Splitter Cable accepts redstone connections"));
         add("ic2/core/block/wiring/TileEntityElectricBlock",
             new Patch("updateEntityServer", "()V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/ic2/ComparatorFix", "afterTick", "(Ljava/lang/Object;)V", "a0", -1,
@@ -162,7 +168,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.startsWith("mcjty.rftools.craftinggrid.")
                      || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
                      || transformedName.startsWith("crazypants.enderio.machine.capbank.")
-                     || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock"))) {
+                     || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
+                     || transformedName.equals("ic2.core.block.TileEntityBlock"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
@@ -239,6 +246,17 @@ public class PatchTransformer implements IClassTransformer {
                     @Override
                     public void visitInsn(int opcode) {
                         if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
+                            loadArgs(mv, p);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
+                        }
+                        super.visitInsn(opcode);
+                    }
+                };
+            case FILTER_RETURN:
+                return new MethodVisitor(Opcodes.ASM5, mv) {
+                    @Override
+                    public void visitInsn(int opcode) {
+                        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.ARETURN) {
                             loadArgs(mv, p);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
                         }
