@@ -16,9 +16,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * Patches Just Enough Calculation 2.6.5, RFTools 5.92, Ender IO 3.1.193, IC2 2.6.252-ex110 and Compact Solar Arrays
- * 5.0.12 (MC 1.10.2) while their classes load. Every patch only adds a call into this mod's own code
- * ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}, {@code .enderio}, {@code .ic2}, {@code .misc}); the jars
+ * Patches Just Enough Calculation 2.6.5, RFTools 5.92, Ender IO 3.1.193 and IC2 2.6.252-ex110 (MC 1.10.2) while their classes load. Every patch only adds a call into this mod's own code
+ * ({@code com.itstwoam.aoeqol.jec}, {@code .rftools}, {@code .enderio}, {@code .ic2}); the jars
  * themselves are untouched.
  *
  * Each patch names the exact method (name + descriptor) it expects. If a different JEC version doesn't have it,
@@ -150,15 +149,6 @@ public class PatchTransformer implements IClassTransformer {
             new Patch("updateEntityServer", "()V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/ic2/ComparatorFix", "afterTick", "(Ljava/lang/Object;)V", "a0", -1,
                 "energy storage: comparators updated when the fill level changes"));
-        add("cpw/mods/compactsolars/common/CompactSolarType",
-            redirect("<init>", "(Ljava/lang/String;IIILjava/lang/String;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)V",
-                "java/lang/String", "toLowerCase", "()Ljava/lang/String;",
-                "com/itstwoam/aoeqol/misc/LocaleFix", "lower", "(Ljava/lang/String;)Ljava/lang/String;",
-                "solar hat names independent of the system language (Turkish)"),
-            redirect("func_176610_l", "()Ljava/lang/String;",
-                "java/lang/String", "toLowerCase", "()Ljava/lang/String;",
-                "com/itstwoam/aoeqol/misc/LocaleFix", "lower", "(Ljava/lang/String;)Ljava/lang/String;",
-                "block state names independent of the system language (Turkish)"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,
@@ -179,8 +169,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
                      || transformedName.startsWith("crazypants.enderio.machine.capbank.")
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
-                     || transformedName.equals("ic2.core.block.TileEntityBlock")
-                     || transformedName.equals("cpw.mods.compactsolars.common.CompactSolarType"))) {
+                     || transformedName.equals("ic2.core.block.TileEntityBlock"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));

@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
  *   <li>JEI pages for the IC2 canning machines and Reinforced Stone: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
  *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
  *   <li>BetterFPS "Async" creative search switched to "On" (crashes): {@link com.itstwoam.aoeqol.client.BetterFpsFix}.</li>
+ *   <li>Turkish/Azerbaijani system language no longer crashes startup: {@link com.itstwoam.aoeqol.asm.TurkishLocaleFix}.</li>
  *   <li>Storage Scanner search synced with JEI: {@link com.itstwoam.aoeqol.client.ScannerJeiSync}.</li>
  *   <li>Settings: {@link AoEQoLConfig}, in game through {@link com.itstwoam.aoeqol.client.ConfigGuiFactory}.</li>
  * </ul>
@@ -42,6 +43,7 @@ public class AoEQoL {
         AoEQoLConfig.init(event.getModConfigurationDirectory());
         if (event.getSide().isClient()) {
             com.itstwoam.aoeqol.client.BetterFpsFix.init();
+            com.itstwoam.aoeqol.client.LocaleNotice.init();
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ConfigGuiFactory.ChangeHandler());
             if (Loader.isModLoaded("rftools") && Loader.isModLoaded("JEI")) {
                 MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ScannerJeiSync());

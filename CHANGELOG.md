@@ -24,8 +24,8 @@ Releases come out on Fridays and include everything since the previous release.
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
-### Compact Solar Arrays
-- Fixed the game failing to start when the computer's language is Turkish.
+### Turkish system language
+- Fixed the game failing to start when the computer's language is Turkish or Azerbaijani (Extreme Reactors, Mekanism, Compact Solar Arrays and other mods). Number formats and Minecraft's language are unchanged. You're told once in chat.
 
 ### BetterFPS
 - BetterFPS's "Async" creative search is switched to "On" because it can crash the game (e.g. with Mekanism cables); search stays fast. You're told once in chat. To keep Async, turn it off in the settings.
