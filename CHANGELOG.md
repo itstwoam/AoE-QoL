@@ -19,7 +19,7 @@ Releases come out on Fridays and include everything since the previous release.
 - Charged batteries and energy crystals, and worn tools, are recognized (e.g. crafting an MFE).
 - The right variant is picked when it's stored in NBT (cable insulation, Mekanism tiers).
 - Other mods' ore dictionary equivalents are used before other variants of the same item (e.g. IE iron plates for the Basic Machine Casing).
-- When the wrong variant is all you have (e.g. uninsulated cable for an EU-Splitter Cable), the grid marks that ingredient red instead of only the result, also when other ingredients are missing too.
+- When the wrong variant is all you have (e.g. uninsulated cable for an EU-Splitter Cable), the grid marks that ingredient red instead of only the result, also when other ingredients are missing.
 - The Crafter's ghost slots accept charged or worn copies of the set item.
 - The Storage Scanner's search box and JEI's search box stay in sync, like AE2's "JEI synchronized" search (can be turned off).
 
@@ -44,7 +44,8 @@ Releases come out on Fridays and include everything since the previous release.
 ### Other
 - New settings, all on by default: the JEC condition-tag matching and ore dictionary unification, the RFTools ingredient matching, the IC2 split-network fix and the quit-freeze fix can now each be turned off. Crash fixes stay always on.
 - In-game settings: Mods → AoE-QoL → Config (also `config/aoeqol.cfg`).
-- Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools, Ender IO and BetterFPS added.
+- Works on servers too: the server uses the same jar as the client. Neither side requires the other; each side gets the fixes that run on it.
+- Credits: author name capitalized (Itstwoam), Age of Engineering credited to davqvist, RFTools, Ender IO, Integrated Dynamics, Extra Utilities 2, QuantumStorage and BetterFPS added.
 
 ## 1.0.0
 

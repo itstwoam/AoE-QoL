@@ -4,6 +4,8 @@ Quality-of-life fixes for the **Age of Engineering** modpack (Minecraft **1.10.2
 
 Drop `AoE-QoL-<version>.jar` into your `mods` folder. Nothing else needs replacing: each part switches itself on only when the mod it works with is installed. Fixes to other mods are applied **in memory while they load** (a small coremod); their jars on disk are never modified, and if a mod version doesn't have what a fix expects, that fix is skipped and logged instead of crashing.
 
+**Servers** use the same jar: put it in the server's `mods` folder too. Neither side requires the other (players can join without it), and each side gets the fixes that run on it: crafting, energy-net and block-interaction fixes run where the world runs, screen, JEI, JEC and mouse fixes run in each player's game. In single player your game does both.
+
 New versions come out on **Fridays** and bundle everything since the previous one; see [CHANGELOG.md](CHANGELOG.md).
 
 | Part | Needs | What it does |
