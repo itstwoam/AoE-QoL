@@ -11,7 +11,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list, invisible-items fix |
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
-| [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block |
+| [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -92,6 +92,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 ## Integrated Dynamics and Extra Utilities 2
 
 * **Server crash: Redstone Reader facing an Extra Utilities 2 block.** The Redstone Reader asks the block it faces for a comparator value without first checking that the block has one (vanilla comparators always check), and Extra Utilities 2 answers that question with an error for its blocks that don't have one, e.g. the Scanner. Opening the reader crashed the server ("Ticking player"). The reader now checks first and reads 0 from blocks without a comparator value, and Extra Utilities 2 blocks answer 0 to anyone who asks anyway.
+* **Cable arms missing (only an outline) after connecting something.** Logic cables keep a ready-made description of how to draw themselves. When you place a cable or a cable-connecting block next to one, your game works out the new connection right away but kept the old description, so the new arm wasn't drawn until something else redrew the area. The description is now refreshed and the cable redrawn whenever its connections change.
 
 ---
 

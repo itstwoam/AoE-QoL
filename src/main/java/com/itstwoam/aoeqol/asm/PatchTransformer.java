@@ -175,6 +175,10 @@ public class PatchTransformer implements IClassTransformer {
                 "com/itstwoam/aoeqol/misc/ComparatorRead", "read",
                 "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I",
                 "Redstone Reader: comparator value only read from blocks that have one"));
+        add("org/cyclops/integrateddynamics/capability/cable/CableDefault",
+            new Patch("updateConnections", "()V", Kind.BEFORE_RETURN,
+                "com/itstwoam/aoeqol/integrateddynamics/CableRenderFix", "afterUpdateConnections", "(Ljava/lang/Object;)V", "a0", -1,
+                "logic cables redrawn when their connections change"));
         add("com/rwtema/extrautils2/tile/XUTile",
             new Patch("getComparatorLevel", "()I", Kind.REPLACE, "com/itstwoam/aoeqol/misc/ComparatorRead", "none", "()I", "", -1,
                 "blocks without a comparator value answer 0 instead of crashing"));
@@ -215,6 +219,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("net.minecraft.util.MouseHelper")
                      || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")
                      || transformedName.equals("com.rwtema.extrautils2.tile.XUTile")
+                     || transformedName.equals("org.cyclops.integrateddynamics.capability.cable.CableDefault")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }

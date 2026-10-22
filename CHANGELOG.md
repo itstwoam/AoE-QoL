@@ -24,6 +24,7 @@ Releases come out on Fridays and include everything since the previous release.
 
 ### Integrated Dynamics and Extra Utilities 2
 - Fixed a server crash when an Integrated Dynamics Redstone Reader faces an Extra Utilities 2 block such as the Scanner.
+- Fixed logic cable arms showing only as an outline after connecting a cable or block to them.
 
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
