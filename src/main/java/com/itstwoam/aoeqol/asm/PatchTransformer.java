@@ -50,7 +50,12 @@ public class PatchTransformer implements IClassTransformer {
         /** Calls to {@code redirect} (owner.name desc) inside the method become INVOKESTATIC Hook.name. */
         REDIRECT,
         /** Before every return, the value is passed through {@code Hook.name(value, loads...)}, which returns the new one. */
-        FILTER_RETURN
+        FILTER_RETURN,
+        /**
+         * Adds the method (public, given name and descriptor) if the class doesn't have it:
+         * {@code return Hook.name(loads...);}. Nothing changes if the method already exists.
+         */
+        ADD_METHOD
     }
 
     static final class Patch {
@@ -61,7 +66,7 @@ public class PatchTransformer implements IClassTransformer {
         String rOwner, rName, rDesc; // REDIRECT target call
         String gate;                 // REPLACE only: AoEQoLConfig boolean that switches the replacement on
         int redirected;
-        boolean applied;
+        boolean applied, existed;
 
         Patch(String method, String desc, Kind kind, String hookOwner, String hookName, String hookDesc,
               String loads, int store, String what) {
@@ -175,6 +180,13 @@ public class PatchTransformer implements IClassTransformer {
                 "com/itstwoam/aoeqol/misc/ComparatorRead", "read",
                 "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I",
                 "Redstone Reader: comparator value only read from blocks that have one"));
+        add("QuantumStorage/tile/TileQuantumTank",
+            new Patch("hasCapability", "(Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/util/EnumFacing;)Z",
+                Kind.FILTER_RETURN, "com/itstwoam/aoeqol/misc/QuantumTankFix", "hasCapability", "(ZLjava/lang/Object;)Z", "a1", -1,
+                "Quantum Tank: reports the item handler it hands out"),
+            new Patch("getStackInSlot", "(I)Lnet/minecraft/item/ItemStack;", Kind.ADD_METHOD,
+                "com/itstwoam/aoeqol/misc/QuantumTankFix", "getStackInSlot", "(Ljava/lang/Object;I)Lnet/minecraft/item/ItemStack;", "a0,i1", -1,
+                "Quantum Tank: missing item handler method added"));
         add("org/cyclops/integrateddynamics/capability/cable/CableDefault",
             new Patch("updateConnections", "()V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/integrateddynamics/CableRenderFix", "afterUpdateConnections", "(Ljava/lang/Object;)V", "a0", -1,
@@ -220,6 +232,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")
                      || transformedName.equals("com.rwtema.extrautils2.tile.XUTile")
                      || transformedName.equals("org.cyclops.integrateddynamics.capability.cable.CableDefault")
+                     || transformedName.equals("QuantumStorage.tile.TileQuantumTank")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }
@@ -228,7 +241,9 @@ public class PatchTransformer implements IClassTransformer {
         try {
             byte[] out = apply(basicClass, patches);
             for (Patch p : patches) {
-                if (p.applied && p.kind == Kind.REDIRECT && p.redirected == 0) {
+                if (p.kind == Kind.ADD_METHOD && p.existed) {
+                    LOG.info("{}.{} already exists, nothing to add ({})", transformedName, p.method, p.what);
+                } else if (p.applied && p.kind == Kind.REDIRECT && p.redirected == 0) {
                     LOG.warn("{}.{}: call to redirect not found - '{}' not patched", transformedName, p.method, p.what);
                 } else if (p.applied) LOG.info("Patched {}.{} ({})", transformedName, p.method, p.what);
                 else LOG.warn("{}.{}{} not found - '{}' not patched (different mod version?)",
@@ -243,21 +258,42 @@ public class PatchTransformer implements IClassTransformer {
 
     /** Applies the patches to one class. Unchanged methods are copied byte-for-byte. Package-visible for tests. */
     static byte[] apply(byte[] bytes, final List<Patch> patches) {
-        for (Patch p : patches) { p.applied = false; p.redirected = 0; }
+        for (Patch p : patches) { p.applied = false; p.existed = false; p.redirected = 0; }
         ClassReader reader = new ClassReader(bytes);
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         reader.accept(new ClassVisitor(Opcodes.ASM5, writer) {
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
                 MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
+                // ADD_METHOD: the method is already there, so there is nothing to add
+                for (Patch p : patches) {
+                    if (p.kind == Kind.ADD_METHOD && p.method.equals(name) && p.desc.equals(desc)) p.existed = true;
+                }
                 // several patches may target one method; they are chained (a REPLACE ends the chain)
                 for (Patch p : patches) {
+                    if (p.kind == Kind.ADD_METHOD) continue;
                     if (p.applied || !p.method.equals(name) || !p.desc.equals(desc)) continue;
                     p.applied = true;
                     mv = patchMethod(mv, p);
                     if (mv == null) break;
                 }
                 return mv;
+            }
+
+            @Override
+            public void visitEnd() {
+                for (Patch p : patches) {
+                    if (p.kind != Kind.ADD_METHOD || p.existed) continue;
+                    MethodVisitor mv = super.visitMethod(Opcodes.ACC_PUBLIC, p.method, p.desc, null, null);
+                    mv.visitCode();
+                    loadArgs(mv, p);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
+                    mv.visitInsn(Type.getReturnType(p.desc).getOpcode(Opcodes.IRETURN));
+                    mv.visitMaxs(0, 0);
+                    mv.visitEnd();
+                    p.applied = true;
+                }
+                super.visitEnd();
             }
         }, 0);
         return writer.toByteArray();

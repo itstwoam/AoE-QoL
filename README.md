@@ -12,6 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
+| [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -96,6 +97,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## QuantumStorage
+
+* **Server crash: Extra Utilities 2 transfer or retrieval node on a Quantum Tank.** The Quantum Tank says it has no item handler but hands one out when asked (its bucket slots), and the tank itself claims to be an item handler while missing one of the required methods in the shipped mod. Extra Utilities 2, told there's no item handler, used the tank itself and crashed on the missing method. (The tank's own item handler also accepted anything and stored nothing, so items pushed into it would have been deleted.) The tank now reports its bucket-slot item handler, so nodes and pipes use it like any inventory, and the missing method is added.
+
+---
+
 ## Ender IO
 
 * **Creative capacitor bank crash.** Ender IO's creative bank item claimed to have an energy capability but then handed out none, so mods that try to charge it crashed, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode while holding or carrying the bank. The bank now consistently reports no capability; other banks are unchanged.
@@ -177,4 +184,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.

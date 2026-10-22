@@ -26,6 +26,9 @@ Releases come out on Fridays and include everything since the previous release.
 - Fixed a server crash when an Integrated Dynamics Redstone Reader faces an Extra Utilities 2 block such as the Scanner.
 - Fixed logic cable arms showing only as an outline after connecting a cable or block to them.
 
+### QuantumStorage
+- Fixed a server crash when an Extra Utilities 2 transfer or retrieval node connects to a QuantumStorage Quantum Tank (nodes now use the tank's bucket slots).
+
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
