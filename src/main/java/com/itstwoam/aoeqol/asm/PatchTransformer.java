@@ -169,6 +169,15 @@ public class PatchTransformer implements IClassTransformer {
             new Patch("<init>", "(Lic2/core/energy/grid/EnergyNetLocal;)V", Kind.BEFORE_RETURN,
                 "com/itstwoam/aoeqol/ic2/GridSplitFix", "created", "(Ljava/lang/Object;)V", "a0", -1,
                 "energy net: networks split off by a removed cable get their routes calculated"));
+        add("org/cyclops/integrateddynamics/part/aspect/read/AspectReadBuilders$Redstone$2",
+            redirect("getOutput", "(Lorg/apache/commons/lang3/tuple/Pair;)Ljava/lang/Integer;",
+                "net/minecraft/block/state/IBlockState", "func_185888_a", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I",
+                "com/itstwoam/aoeqol/misc/ComparatorRead", "read",
+                "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I",
+                "Redstone Reader: comparator value only read from blocks that have one"));
+        add("com/rwtema/extrautils2/tile/XUTile",
+            new Patch("getComparatorLevel", "()I", Kind.REPLACE, "com/itstwoam/aoeqol/misc/ComparatorRead", "none", "()I", "", -1,
+                "blocks without a comparator value answer 0 instead of crashing"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -204,6 +213,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")
+                     || transformedName.equals("com.rwtema.extrautils2.tile.XUTile")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }
@@ -320,7 +331,7 @@ public class PatchTransformer implements IClassTransformer {
                 return new MethodVisitor(Opcodes.ASM5, mv) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-                        if ((opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKESTATIC) && owner.equals(p.rOwner) && name.equals(p.rName) && desc.equals(p.rDesc)) {
+                        if ((opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKESTATIC || opcode == Opcodes.INVOKEINTERFACE) && owner.equals(p.rOwner) && name.equals(p.rName) && desc.equals(p.rDesc)) {
                             p.redirected++;
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, p.hookOwner, p.hookName, p.hookDesc, false);
                             return;

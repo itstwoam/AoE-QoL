@@ -11,6 +11,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list, invisible-items fix |
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
+| [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -88,6 +89,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Integrated Dynamics and Extra Utilities 2
+
+* **Server crash: Redstone Reader facing an Extra Utilities 2 block.** The Redstone Reader asks the block it faces for a comparator value without first checking that the block has one (vanilla comparators always check), and Extra Utilities 2 answers that question with an error for its blocks that don't have one, e.g. the Scanner. Opening the reader crashed the server ("Ticking player"). The reader now checks first and reads 0 from blocks without a comparator value, and Extra Utilities 2 blocks answer 0 to anyone who asks anyway.
+
+---
+
 ## Ender IO
 
 * **Creative capacitor bank crash.** Ender IO's creative bank item claimed to have an energy capability but then handed out none, so mods that try to charge it crashed, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode while holding or carrying the bank. The bank now consistently reports no capability; other banks are unchanged.
@@ -160,7 +167,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the mouse fix is run against recorded jumps, real movement and the setting turned off, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the comparator fix is run against the real Extra Utilities 2 Scanner (it crashes without the fix), the mouse fix is run against recorded jumps, real movement and the setting turned off, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 
@@ -169,4 +176,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.

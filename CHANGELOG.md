@@ -22,6 +22,9 @@ Releases come out on Fridays and include everything since the previous release.
 - The Crafter's ghost slots accept charged or worn copies of the set item.
 - The Storage Scanner's search box and JEI's search box stay in sync, like AE2's "JEI synchronized" search (can be turned off).
 
+### Integrated Dynamics and Extra Utilities 2
+- Fixed a server crash when an Integrated Dynamics Redstone Reader faces an Extra Utilities 2 block such as the Scanner.
+
 ### Ender IO
 - Fixed a crash when a mod charges a creative capacitor bank, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode.
 
