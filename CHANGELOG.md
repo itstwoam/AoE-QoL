@@ -5,6 +5,7 @@ Releases come out on Fridays and include everything since the previous release.
 ## 1.1.0 (Friday 2026-10-23)
 
 ### Just Enough Calculation
+- Fixed JEC showing no recipes (or another server's) in single player after you had been on a server; your recipes were never lost, only hidden until a restart.
 - The calculator step list shows every output of a multi-output recipe (e.g. both tiny U-235 and U-238 from a Thermal Centrifuge).
 
 ### IndustrialCraft 2

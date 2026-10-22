@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
  *       {@code enderio} packages.</li>
  *   <li>JEI pages for the IC2 canning machines and Reinforced Stone: {@link com.itstwoam.aoeqol.jei.AoEQoLJeiPlugin}.</li>
  *   <li>Client fix for JEC leaving its container "open" (invisible inventory items): {@link com.itstwoam.aoeqol.client.JecContainerFix}.</li>
+ *   <li>JEC recipes shown again after leaving a server: {@link com.itstwoam.aoeqol.client.JecServerSwitchFix}.</li>
  *   <li>BetterFPS "Async" creative search switched to "On" (crashes): {@link com.itstwoam.aoeqol.client.BetterFpsFix}.</li>
  *   <li>Turkish/Azerbaijani system language no longer crashes startup: {@link com.itstwoam.aoeqol.asm.TurkishLocaleFix}.</li>
  *   <li>Storage Scanner search synced with JEI: {@link com.itstwoam.aoeqol.client.ScannerJeiSync}.</li>
@@ -39,6 +40,7 @@ public class AoEQoL {
         // client-only classes are only touched on the client
         if (event.getSide().isClient() && Loader.isModLoaded("je_calculation")) {
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecContainerFix());
+            MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecServerSwitchFix());
         }
         AoEQoLConfig.init(event.getModConfigurationDirectory());
         if (event.getSide().isClient()) {
