@@ -3,7 +3,12 @@ package com.itstwoam.aoeqol.rftools;
 import gnu.trove.set.hash.TIntHashSet;
 import java.lang.reflect.Method;
 import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.world.World;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.tuple.Pair;
@@ -96,15 +101,61 @@ public final class GridMatch {
 
     /**
      * End of StorageCraftingTools.tryRecipe. RFTools reports per slot how many items are missing, plus slot 9 =
-     * "the recipe doesn't accept what was found". When nothing is missing but the recipe still fails, RFTools can
-     * only mark the result red. If some slots were filled with a different NBT variant than the recipe shows
-     * (e.g. uninsulated cable for insulated), mark those slots instead, which is almost always the reason.
+     * "the recipe doesn't accept what was found", and marks those red. Slots filled with a different NBT variant
+     * than the recipe shows (e.g. another kind of IC2 cable, which counts as the same item and damage value) look
+     * found, so only the result (or only the other missing items) turned red.
+     *
+     * Nothing missing but the recipe refuses: the variant slots are marked, which is almost always the reason.
+     * Something missing as well: the recipe is asked with the missing slots filled from the recipe's own items.
+     * If it still refuses, but accepts once the variant slots get the recipe's items too, the variants are wrong
+     * and are marked as well; if it accepts the variants, they stay unmarked.
      */
-    public static void afterTest(int[] missing) {
+    public static void afterTest(int[] missing, InventoryCrafting work, InventoryCrafting shown, IRecipe recipe,
+                                 EntityPlayerMP player) {
         if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_RFTOOLS_MATCHING) return;
         if (missing == null || missing.length < 10 || missing[9] <= 0) return;
-        for (int i = 0; i < 9; i++) if (missing[i] > 0) return;
-        for (int i = 0; i < 9; i++) if (variantSlots[i]) missing[i] = 1;
+        boolean anyVariant = false, anyMissing = false;
+        for (int i = 0; i < 9; i++) {
+            anyVariant |= variantSlots[i];
+            anyMissing |= missing[i] > 0;
+        }
+        if (!anyVariant) return;
+        if (anyMissing) {
+            try {
+                if (work == null || shown == null || recipe == null || player == null) return;
+                World world = player.getEntityWorld();
+                InventoryCrafting test = copy(work);
+                for (int i = 0; i < 9; i++) if (missing[i] > 0) test.setInventorySlotContents(i, shownCopy(shown, i));
+                if (recipe.matches(test, world)) return;            // the variants would do
+                for (int i = 0; i < 9; i++) if (variantSlots[i]) test.setInventorySlotContents(i, shownCopy(shown, i));
+                if (!recipe.matches(test, world)) return;           // something else is wrong; can't tell what
+            } catch (Throwable t) {
+                return;
+            }
+        }
+        for (int i = 0; i < 9; i++) if (variantSlots[i] && missing[i] <= 0) missing[i] = 1;
+    }
+
+    private static InventoryCrafting copy(InventoryCrafting from) {
+        InventoryCrafting to = new InventoryCrafting(new NoContainer(), 3, 3);
+        for (int i = 0; i < 9 && i < from.getSizeInventory(); i++) {
+            ItemStack s = from.getStackInSlot(i);
+            to.setInventorySlotContents(i, s == null ? null : s.copy());
+        }
+        return to;
+    }
+
+    private static ItemStack shownCopy(InventoryCrafting shown, int slot) {
+        if (slot >= shown.getSizeInventory()) return null;
+        ItemStack s = shown.getStackInSlot(slot);
+        return s == null ? null : s.copy();
+    }
+
+    private static final class NoContainer extends Container {
+        @Override
+        public boolean canInteractWith(EntityPlayer player) {
+            return false;
+        }
     }
 
     /**

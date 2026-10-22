@@ -134,7 +134,9 @@ public class PatchTransformer implements IClassTransformer {
                 RFT + "GridMatch", "beginTest", "()V", "", -1, "crafting grid: test craft start"),
             new Patch("tryRecipe", "(Lnet/minecraft/entity/player/EntityPlayerMP;Lmcjty/rftools/blocks/crafter/CraftingRecipe;I"
                     + "Lmcjty/rftools/craftinggrid/IItemSource;Z)[I", Kind.BEFORE_RETURN,
-                RFT + "GridMatch", "afterTest", "([I)V", "a8", -1, "crafting grid: wrong variant slots shown red"));
+                RFT + "GridMatch", "afterTest", "([ILnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/inventory/InventoryCrafting;"
+                    + "Lnet/minecraft/item/crafting/IRecipe;Lnet/minecraft/entity/player/EntityPlayerMP;)V", "a8,a5,a7,a9,a0", -1,
+                "crafting grid: wrong variant slots shown red"));
         add("mcjty/rftools/blocks/crafter/CrafterBaseTE",
             gated("ON_RFTOOLS_MATCHING", new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
                 RFT + "CrafterMatch", "match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", "a0,a1,i2", -1,

@@ -77,7 +77,7 @@ Applies to the crafting grid in the Storage Scanner and Modular Storage, and to 
 * **Charged batteries and crystals, worn tools:** the strict test ignores the damage value of items that can take damage, since for those it's only charge or wear (e.g. crafting an MFE no longer reports the crystals missing).
 * **The right variant:** items whose NBT matches the recipe's exactly are taken first (2× insulated gold cable, a Basic Energy Cube), ignoring the tags on `ListIgnoredNBTKeys`.
 * **Other mods' equivalents:** in the loose test, items sharing an ore dictionary name (IE iron plates for IC2's) come before other variants of the same item (IC2 copper plates).
-* **Showing what's wrong:** when the grid finds everything but the recipe still refuses it, RFTools could only mark the result red. If a slot was filled with a different variant than the recipe shows (e.g. uninsulated cable where the EU-Splitter needs fully insulated HV cable), that slot is now marked red too.
+* **Showing what's wrong:** RFTools marks missing ingredients red, but a slot filled with a different variant than the recipe shows (e.g. copper cable where the EU-Splitter needs insulated HV cable; all IC2 cables count as the same item) looked found. Such slots are now marked red too, also when other ingredients are missing. The recipe itself is asked first, so a variant it would accept is never marked.
 * The Crafter's ghost-slot filter accepts charged or worn copies of the set item.
 
 All of this can be turned off (setting: *Smarter ingredient matching*). A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
