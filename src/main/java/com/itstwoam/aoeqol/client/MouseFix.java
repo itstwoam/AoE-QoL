@@ -12,15 +12,17 @@ import org.lwjgl.opengl.Display;
  * view spins by the cursor's distance from the middle (70-150 degrees on a 4K window).
  *
  * Fix (setting "Ignore leftover mouse jump", on by default): when the mouse is captured, the cursor's distance from
- * the middle is remembered. For the next few frames, a mouse reading that matches that distance (within a few
- * pixels) is dropped, once. Every other reading passes through unchanged, so real movement isn't affected.
+ * the middle is remembered. For the next few frames, a mouse reading that matches that distance is dropped, once.
+ * "Matches" allows for the cursor having moved a little in between: 12 pixels, or a fifth of the distance when that is
+ * more (a 586-pixel jump on a 4K window was 13 pixels off). Every other reading passes through unchanged, so real movement isn't affected.
  *
  * Hooks: start of MouseHelper.grabMouseCursor(), and the Mouse.getDX()/getDY() calls in MouseHelper.mouseXYChange().
  */
 public final class MouseFix {
     static final int FRAMES = 6, TOLERANCE = 12, MIN_OFFSET = 40;
+    static final double TOLERANCE_SHARE = 0.2;
 
-    private static int offsetX, offsetY, framesLeft, pendingDY;
+    private static int offsetX, offsetY, tolerance, framesLeft, pendingDY;
 
     private MouseFix() {}
 
@@ -35,6 +37,7 @@ public final class MouseFix {
         try {
             offsetX = Mouse.getX() - Display.getWidth() / 2;
             offsetY = Mouse.getY() - Display.getHeight() / 2;
+            tolerance = Math.max(TOLERANCE, (int) (Math.sqrt((double) offsetX * offsetX + (double) offsetY * offsetY) * TOLERANCE_SHARE));
             if (Math.abs(offsetX) + Math.abs(offsetY) >= MIN_OFFSET) framesLeft = FRAMES;
         } catch (Throwable t) {
             framesLeft = 0;
@@ -47,7 +50,7 @@ public final class MouseFix {
         pendingDY = Mouse.getDY();
         if (framesLeft > 0) {
             framesLeft--;
-            if (Math.abs(dx - offsetX) <= TOLERANCE && Math.abs(pendingDY - offsetY) <= TOLERANCE) {
+            if (Math.abs(dx - offsetX) <= tolerance && Math.abs(pendingDY - offsetY) <= tolerance) {
                 framesLeft = 0;
                 LogManager.getLogger("AoE-QoL").info("Ignored a leftover mouse jump of {},{} after a screen closed", dx, pendingDY);
                 pendingDY = 0;
