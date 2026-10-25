@@ -7,6 +7,9 @@ Releases come out on Fridays and include everything since the previous release.
 ### Just Enough Calculation
 - The page arrows on the calculator, item picker and ore dictionary screens go the right way: "<" goes back a page and ">" goes forward, like the recipe list (setting: Page arrows the right way round).
 
+### AoE-QoL settings
+- Fixed setting changes being lost: pressing Done on a section (Minecraft, IC2, RFTools...) now saves right away. Before, a change was only kept if you also pressed Done on the main AoE-QoL screen afterwards.
+
 ## 1.1.0 (Friday 2026-10-23)
 
 ### Just Enough Calculation
