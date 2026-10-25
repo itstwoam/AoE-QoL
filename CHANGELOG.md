@@ -9,6 +9,7 @@ Releases come out on Fridays and include everything since the previous release.
 
 ### AoE-QoL settings
 - Fixed setting changes being lost: pressing Done on a section (Minecraft, IC2, RFTools...) now saves right away. Before, a change was only kept if you also pressed Done on the main AoE-QoL screen afterwards.
+- Escape on the settings screens now keeps your changes, like Done, instead of throwing them away.
 
 ## 1.1.0 (Friday 2026-10-23)
 
