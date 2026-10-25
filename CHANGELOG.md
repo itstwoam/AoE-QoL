@@ -2,6 +2,11 @@
 
 Releases come out on Fridays and include everything since the previous release.
 
+## 1.2.0 (Friday 2026-10-30)
+
+### Just Enough Calculation
+- The page arrows on the calculator, item picker and ore dictionary screens go the right way: "<" goes back a page and ">" goes forward, like the recipe list (setting: Page arrows the right way round).
+
 ## 1.1.0 (Friday 2026-10-23)
 
 ### Just Enough Calculation

@@ -206,6 +206,11 @@ public class PatchTransformer implements IClassTransformer {
                 "com/google/common/util/concurrent/Futures", "getUnchecked", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
                 "com/itstwoam/aoeqol/misc/QuitFix", "await", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
                 "quit to title no longer freezes waiting for a server that already stopped"));
+        for (String gui : new String[] {"GuiCalculator", "GuiPicker", "GuiOreDict"}) {
+            add(JEC + "gui/guis/" + gui,
+                new Patch("init", "()V", Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/client/JecPageArrows", "afterInit",
+                    "(Ljava/lang/Object;)V", "a0", -1, "page arrows the right way round"));
+        }
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,

@@ -26,3 +26,5 @@ aoeqol.config.fixSplitNetworks=Keep split cable networks powered
 aoeqol.config.fixSplitNetworks.tooltip=When a cable network is split (cable broken, splitter switching off, part of it unloading), the new pieces get their routes right away. Off: IC2's normal behaviour, where a split-off piece can stay unpowered until something is placed in it or the world reloads.
 aoeqol.config.fixQuitFreeze=Fix freeze on Save and Quit
 aoeqol.config.fixQuitFreeze.tooltip="Save and Quit to Title" can freeze for good, more often after opening to LAN. On: once the built-in server has stopped, the game stops waiting for it. Off: Minecraft's normal behaviour.
+aoeqol.config.pageArrowsRightWayRound=Page arrows the right way round
+aoeqol.config.pageArrowsRightWayRound.tooltip=On the calculator, item picker and ore dictionary screens JEC's page arrows are swapped. On: "<" goes back a page and ">" goes forward, like the recipe list. Applies the next time a screen opens. Off: JEC's own arrows.

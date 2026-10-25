@@ -29,6 +29,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 * **Finding the tag that blocks a chain:** `/jectags`, a report file and F3+H tooltips (see below).
 * **Ore dictionary unification.** Choosing an ore dictionary preference (during a JEI transfer, or on the calculator's *oreDict* screen) rewrites every saved recipe to use it; recipes saved later are unified automatically, and `/jecunify` applies all preferences at once. Items are only swapped when they have exactly the same set of ore names (`S:ListOreUnifyNames`, default `ingot* plate* dust* nugget* gear* rod* stick* wire* block* gem*`). Every change is logged to `config/JustEnoughCalculation-OreUnify-log.txt` (setting: *Ore dictionary unification*). There's no undo, so back up `saves/<world>/playerdata/*.jeca` before the first `/jecunify`.
 * **Every output in the step list.** A step using a multi-output recipe (e.g. a Thermal Centrifuge) lists all its outputs, totalled over all runs, not just the one it was run for.
+* **Page arrows the right way round.** On the calculator, item picker and ore dictionary screens JEC's arrows were swapped ("<" went to the next page). They now go back with "<" and forward with ">", like the recipe list (setting: *Page arrows the right way round*).
 * **Items invisible in your inventory after using JEC.** JEC left its closed screen's container active on the client, so items picked up into the main inventory didn't show until you clicked a slot. Fixed.
 * **Recipes seemingly gone after playing on a server.** JEC keeps your single player recipes in one object, but when a server sends you its recipe list, JEC points its screens at that list and never points them back. Back in a single player world the calculator showed the server's (often empty) list until the game was restarted; your recipes were still loaded and saved normally. Leaving a server now points JEC back at your own recipes.
 
@@ -135,6 +136,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 |---|---|---|
 | Recipes chain for items in any condition (`ignoreConditionTags`) | on | JEC: items that only differ in heat, charge or wear count as the same |
 | Ore dictionary unification (`oreDictUnification`) | on | JEC: ore dictionary preferences rewrite saved recipes; `/jecunify` |
+| Page arrows the right way round (`pageArrowsRightWayRound`) | on | JEC: "<" goes back a page, ">" forward, on every screen |
 | Smarter ingredient matching (`smarterIngredientMatching`) | on | RFTools crafting grid and Crafter: charged/worn items, exact variant first, equivalents, wrong variant red |
 | Keep split cable networks powered (`fixSplitNetworks`) | on | IC2: networks split by a broken cable or splitter keep working |
 | Fix freeze on Save and Quit (`fixQuitFreeze`) | on | The game reaches the title screen after the server stops |

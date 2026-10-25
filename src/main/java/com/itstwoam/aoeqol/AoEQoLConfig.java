@@ -14,13 +14,13 @@ public final class AoEQoLConfig {
 
     public static Configuration config;
     public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
-            jecConditionTags, jecOreUnify, rftoolsMatching, ic2SplitNetworks, quitFreezeFix;
+            jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, ic2SplitNetworks, quitFreezeFix;
 
     /**
      * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
      * the property each time). On until the config is loaded; updated by {@link #sync()} whenever settings change.
      */
-    public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_RFTOOLS_MATCHING = true,
+    public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true,
             ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true;
 
     private AoEQoLConfig() {}
@@ -64,6 +64,11 @@ public final class AoEQoLConfig {
                 "Choosing an ore dictionary preference rewrites your saved recipes to use it, and recipes saved later are\n"
               + "unified automatically; /jecunify applies all preferences. false: saved recipes are never changed.")
                 .setLanguageKey("aoeqol.config.oreDictUnification");
+        jecPageArrows = config.get(JEC, "pageArrowsRightWayRound", true,
+                "On the calculator, item picker and ore dictionary screens JEC's page arrows are swapped (\"<\" goes to the\n"
+              + "next page). true: \"<\" goes back and \">\" goes forward, like the recipe list. Applies the next time a\n"
+              + "screen opens. false: JEC's own arrows.")
+                .setLanguageKey("aoeqol.config.pageArrowsRightWayRound");
         rftoolsMatching = config.get(RFTOOLS, "smarterIngredientMatching", true,
                 "Crafting grid and Crafter: charged batteries/crystals and worn tools are recognised, the exact variant is\n"
               + "taken first, other mods' ore dictionary equivalents come before other variants, and a wrong variant is\n"
@@ -97,6 +102,7 @@ public final class AoEQoLConfig {
     public static void sync() {
         ON_JEC_CONDITION_TAGS = jecConditionTags.getBoolean();
         ON_JEC_ORE_UNIFY = jecOreUnify.getBoolean();
+        ON_JEC_PAGE_ARROWS = jecPageArrows.getBoolean();
         ON_RFTOOLS_MATCHING = rftoolsMatching.getBoolean();
         ON_IC2_SPLIT_NETWORKS = ic2SplitNetworks.getBoolean();
         ON_QUIT_FREEZE = quitFreezeFix.getBoolean();
