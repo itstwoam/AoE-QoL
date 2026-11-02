@@ -211,6 +211,10 @@ public class PatchTransformer implements IClassTransformer {
                 new Patch("init", "()V", Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/client/JecPageArrows", "afterInit",
                     "(Ljava/lang/Object;)V", "a0", -1, "page arrows the right way round"));
         }
+        add(JEC + "core/Calculator",
+            new Patch("getProcedure", "()Ljava/util/List;", Kind.FILTER_RETURN,
+                H + "StepOrder", "sort", "(Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;", "a0", -1,
+                "calculator steps in crafting order"));
         add(JEC + "core/Calculator$CostList",
             new Patch("<init>", "(" + RECIPE + ITEMSTACK + "J)V", Kind.BEFORE_RETURN,
                 H + "ProcedureFix", "fix", "(Ljava/lang/Object;" + RECIPE + ITEMSTACK + "J)V", "a0,a1,a2,j3", -1,

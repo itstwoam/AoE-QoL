@@ -5,6 +5,7 @@ Releases come out on Fridays and include everything since the previous release.
 ## 1.2.0 (Friday 2026-10-30)
 
 ### Just Enough Calculation
+- The calculator step list is in crafting order: every step comes after the steps that make its ingredients. Before, an item made in batches could be listed after something that needs it (e.g. Iron Tubing, 16 per craft, after the Pressure Valve made from it).
 - The page arrows on the calculator, item picker and ore dictionary screens go the right way: "<" goes back a page and ">" goes forward, like the recipe list (setting: Page arrows the right way round).
 
 ### Minecraft
