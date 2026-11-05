@@ -14,13 +14,13 @@ public final class AoEQoLConfig {
 
     public static Configuration config;
     public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
-            jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, ic2SplitNetworks, quitFreezeFix;
+            jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, rftoolsEmptyTag, ic2SplitNetworks, quitFreezeFix;
 
     /**
      * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
      * the property each time). On until the config is loaded; updated by {@link #sync()} whenever settings change.
      */
-    public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true,
+    public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true, ON_RFTOOLS_EMPTY_TAG = true,
             ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true;
 
     private AoEQoLConfig() {}
@@ -38,7 +38,7 @@ public final class AoEQoLConfig {
         noticeShown = config.get(BETTERFPS, "noticeShown", false,
                 "Set by AoE-QoL after it has mentioned the change in chat once.").setShowInGui(false);
         ConfigCategory rft = config.getCategory(RFTOOLS);
-        rft.setComment("RFTools: Storage Scanner.");
+        rft.setComment("RFTools: Storage Scanner, crafting grid and Crafter.");
         rft.setLanguageKey("aoeqol.config.rftools");
         scannerJeiSync = config.get(RFTOOLS, "syncStorageScannerWithJei", true,
                 "Keep the Storage Scanner's search box and JEI's search box in sync, like AE2's \"JEI synchronized\"\n"
@@ -74,6 +74,12 @@ public final class AoEQoLConfig {
               + "taken first, other mods' ore dictionary equivalents come before other variants, and a wrong variant is\n"
               + "marked red. false: RFTools' normal matching.")
                 .setLanguageKey("aoeqol.config.smarterIngredientMatching");
+        rftoolsEmptyTag = config.get(RFTOOLS, "takeOutBrandNewItems", true,
+                "Storage Scanner: brand-new IC2 electric items (an empty Re-Battery, crystal, drill...) can be taken out.\n"
+              + "Showing such an item's charge gives the copy on your screen an empty data tag that the stored item\n"
+              + "doesn't have, so the scanner found no match and handed over nothing. true: an empty tag counts the same\n"
+              + "as none. false: RFTools' exact matching.")
+                .setLanguageKey("aoeqol.config.takeOutBrandNewItems");
         ic2SplitNetworks = config.get(IC2, "fixSplitNetworks", true,
                 "When a cable network is split (cable broken, splitter switching off, part of it unloading), the new pieces\n"
               + "get their routes calculated right away. false: IC2's normal behaviour, where a split-off piece can stay\n"
@@ -104,6 +110,7 @@ public final class AoEQoLConfig {
         ON_JEC_ORE_UNIFY = jecOreUnify.getBoolean();
         ON_JEC_PAGE_ARROWS = jecPageArrows.getBoolean();
         ON_RFTOOLS_MATCHING = rftoolsMatching.getBoolean();
+        ON_RFTOOLS_EMPTY_TAG = rftoolsEmptyTag.getBoolean();
         ON_IC2_SPLIT_NETWORKS = ic2SplitNetworks.getBoolean();
         ON_QUIT_FREEZE = quitFreezeFix.getBoolean();
         ON_MOUSE_JUMP = ignoreMouseJump.getBoolean();

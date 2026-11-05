@@ -12,7 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 |---|---|---|
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list in crafting order, invisible-items fix |
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
-| [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI |
+| [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
@@ -89,6 +89,10 @@ Applies to the crafting grid in the Storage Scanner and Modular Storage, and to 
 
 All of this can be turned off (setting: *Smarter ingredient matching*). A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
 
+### Storage Scanner: brand-new items can be taken out
+
+Clicking a brand-new IC2 electric item in the Storage Scanner (an empty Re-Battery, crystal or drill that was never charged or used) handed over nothing. Such an item has no data tag, but as soon as your game shows its charge bar or tooltip, IC2 gives the copy on your screen an empty tag; the scanner only hands over an exact match, and "empty tag" isn't "no tag" to it. Now an empty tag counts the same as none; items whose tags really differ still don't match. Turn it off with **Take out brand-new items** in the [settings](#settings).
+
 ### Storage Scanner search synced with JEI
 
 Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing in its search box fills in JEI's search box and the other way round, and opening the scanner takes over what JEI's box already holds. The scanner's own item filter and container highlighting work as usual. Turn it off with **Sync Storage Scanner search with JEI** in the [settings](#settings).
@@ -144,6 +148,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 | Ignore leftover mouse jump (`ignoreLeftoverMouseJump`) | on | The view doesn't spin when a screen closes |
 | Prevent async creative search (`preventAsyncCreativeSearch`) | on | BetterFPS creative search uses "On" instead of "Async" |
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
+| Take out brand-new items (`takeOutBrandNewItems`) | on | Storage Scanner hands over never-charged IC2 items (e.g. an empty Re-Battery) |
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
 
 Crash fixes are always on, and new JEI pages and the fuller step list have no setting either. Everything that changes how something behaves can be turned off. A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).

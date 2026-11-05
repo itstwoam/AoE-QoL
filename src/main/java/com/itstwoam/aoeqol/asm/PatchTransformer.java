@@ -142,6 +142,13 @@ public class PatchTransformer implements IClassTransformer {
                 RFT + "GridMatch", "afterTest", "([ILnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/inventory/InventoryCrafting;"
                     + "Lnet/minecraft/item/crafting/IRecipe;Lnet/minecraft/entity/player/EntityPlayerMP;)V", "a8,a5,a7,a9,a0", -1,
                 "crafting grid: wrong variant slots shown red"));
+        add("mcjty/rftools/blocks/storagemonitor/StorageScannerTileEntity",
+            redirect("requestStackFromInv", "(Lnet/minecraft/util/math/BlockPos;" + ITEMSTACK + "[Ljava/lang/Integer;" + ITEMSTACK + ")" + ITEMSTACK,
+                "net/minecraftforge/items/ItemHandlerHelper", "canItemStacksStack", "(" + ITEMSTACK + ITEMSTACK + ")Z",
+                RFT + "ScannerTake", "canItemStacksStack", "(" + ITEMSTACK + ITEMSTACK + ")Z", "Storage Scanner: brand-new items can be taken out"),
+            redirect("requestStack", "(Lnet/minecraft/util/math/BlockPos;" + ITEMSTACK + "ILnet/minecraft/entity/player/EntityPlayer;)V",
+                "net/minecraftforge/items/ItemHandlerHelper", "canItemStacksStack", "(" + ITEMSTACK + ITEMSTACK + ")Z",
+                RFT + "ScannerTake", "canItemStacksStack", "(" + ITEMSTACK + ITEMSTACK + ")Z", "Storage Scanner: output slot check"));
         add("mcjty/rftools/blocks/crafter/CrafterBaseTE",
             gated("ON_RFTOOLS_MATCHING", new Patch("match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", Kind.REPLACE,
                 RFT + "CrafterMatch", "match", "(" + ITEMSTACK + ITEMSTACK + "Z)Z", "a0,a1,i2", -1,
@@ -233,6 +240,7 @@ public class PatchTransformer implements IClassTransformer {
                 || !(transformedName.startsWith("pers.towdium.just_enough_calculation.")
                      || transformedName.startsWith("mcjty.rftools.craftinggrid.")
                      || transformedName.startsWith("mcjty.rftools.blocks.crafter.")
+                     || transformedName.equals("mcjty.rftools.blocks.storagemonitor.StorageScannerTileEntity")
                      || transformedName.startsWith("crazypants.enderio.machine.capbank.")
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
