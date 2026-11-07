@@ -62,7 +62,8 @@ public final class AoEQoLConfig {
                 .setLanguageKey("aoeqol.config.ignoreConditionTags");
         jecOreUnify = config.get(JEC, "oreDictUnification", true,
                 "Choosing an ore dictionary preference rewrites your saved recipes to use it, and recipes saved later are\n"
-              + "unified automatically; /jecunify applies all preferences. false: saved recipes are never changed.")
+              + "unified automatically; /jecunify applies all preferences. With the calculator's inventory check, other\n"
+              + "mods' versions in your inventory count as the preferred item. false: saved recipes are never changed.")
                 .setLanguageKey("aoeqol.config.oreDictUnification");
         jecPageArrows = config.get(JEC, "pageArrowsRightWayRound", true,
                 "On the calculator, item picker and ore dictionary screens JEC's page arrows are swapped (\"<\" goes to the\n"

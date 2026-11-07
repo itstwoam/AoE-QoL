@@ -218,6 +218,10 @@ public class PatchTransformer implements IClassTransformer {
                 new Patch("init", "()V", Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/client/JecPageArrows", "afterInit",
                     "(Ljava/lang/Object;)V", "a0", -1, "page arrows the right way round"));
         }
+        add(JEC + "gui/guis/GuiCalculator",
+            redirect("updateLayout", "()V", "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;",
+                H + "OreUnify", "inventoryList", "([Ljava/lang/Object;)Ljava/util/List;",
+                "inventory check counts ore dictionary equivalents as the preferred item"));
         add(JEC + "core/Calculator",
             new Patch("getProcedure", "()Ljava/util/List;", Kind.FILTER_RETURN,
                 H + "StepOrder", "sort", "(Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;", "a0", -1,
@@ -229,9 +233,9 @@ public class PatchTransformer implements IClassTransformer {
     }
 
     private static void add(String cls, Patch... patches) {
-        List<Patch> list = new ArrayList<Patch>();
+        List<Patch> list = PATCHES.get(cls);
+        if (list == null) PATCHES.put(cls, list = new ArrayList<Patch>());
         Collections.addAll(list, patches);
-        PATCHES.put(cls, list);
     }
 
     @Override

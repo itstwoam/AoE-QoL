@@ -241,6 +241,49 @@ public final class OreUnify {
         }
     }
 
+    /**
+     * Redirected Arrays.asList in GuiCalculator.updateLayout, where JEC hands your inventory to the calculator
+     * ("Enable inventory check"). Recipes are unified to the preferred item, but the inventory was counted as is, so
+     * IC2 copper plates in your inventory didn't count toward a recipe that uses IE's. Each inventory stack that
+     * unification would replace is counted as the preferred item (same amount). Your inventory itself isn't touched.
+     */
+    public static List<Object> inventoryList(Object[] stacks) {
+        List<Object> plain = java.util.Arrays.asList(stacks);
+        if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_ORE_UNIFY || stacks == null) return plain;
+        try {
+            refresh();
+            if (patterns.isEmpty()) return plain;
+            Map<String, ItemStack> prefs = new LinkedHashMap<String, ItemStack>();
+            java.util.Set<String> conflicts = new java.util.HashSet<String>();
+            for (ItemStack p : PlayerRecordHelper.getOreDictPref()) {
+                String k = key(p);
+                if (k == null) continue;
+                if (prefs.containsKey(k)) conflicts.add(k); else prefs.put(k, p);
+            }
+            if (prefs.isEmpty()) return plain;
+            List<Object> out = new ArrayList<Object>(stacks.length);
+            for (Object o : stacks) {
+                if (!(o instanceof ItemStack)) { out.add(o); continue; }
+                ItemStack s = (ItemStack) o;
+                String key = key(s);
+                ItemStack p = key == null || conflicts.contains(key) ? null : prefs.get(key);
+                if (p == null || (p.getItem() == s.getItem() && p.getMetadata() == s.getMetadata())) { out.add(s); continue; }
+                ItemStack r = p.copy();
+                r.stackSize = s.stackSize;
+                NBTTagCompound tag = r.getTagCompound();
+                if (tag != null) {
+                    tag.removeTag("je_calculation");
+                    if (tag.hasNoTags()) r.setTagCompound(null);
+                }
+                out.add(r);
+            }
+            return out;
+        } catch (Throwable t) {
+            System.out.println(LOG + "Inventory unification failed (inventory counted as is): " + t);
+            return plain;
+        }
+    }
+
     /** Prepended to PlayerRecordHelper.addOreDictPref: runs whenever a preference is chosen. */
     public static void onPreferenceSet(ItemStack preferred) {
         if (!com.itstwoam.aoeqol.AoEQoLConfig.ON_JEC_ORE_UNIFY) return;
