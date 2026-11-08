@@ -42,6 +42,7 @@ Two lists in `config/JustEnoughCalculation.cfg` (also in game: Mods → Just Eno
 S:ListIgnoredNBTKeys <      # <item>@<tag>
     ic2:*@advDmg
     ic2:*@charge
+    actuallyadditions:*@Energy
  >
 S:ListIgnoredDamage <       # <item>
     ic2:*

@@ -46,7 +46,7 @@ public final class NbtCompat {
     private static final String CATEGORY = "general";
     private static final String KEY_NBT = "ListIgnoredNBTKeys";
     private static final String KEY_DAMAGE = "ListIgnoredDamage";
-    private static final String[] DEFAULT_NBT = {"ic2:*@advDmg", "ic2:*@charge"};
+    private static final String[] DEFAULT_NBT = {"ic2:*@advDmg", "ic2:*@charge", "actuallyadditions:*@Energy"};
     private static final String[] DEFAULT_DAMAGE = {"ic2:*"};
     private static final String COMMENT_NBT =
         "NBT tags to ignore when JEC compares items, so items that only differ in condition count as the same item.\n"
@@ -54,7 +54,8 @@ public final class NbtCompat {
       + "Only add tags that store condition (heat, charge, energy, wear). Tags that say WHAT an item is\n"
       + "(cable type, material, fluid, mob, label name) must not be listed or different items will merge.\n"
       + "Not sure which tag? Run the calculator, then use /jectags or open JustEnoughCalculation-TagReport.txt.\n"
-      + "Defaults: ic2:*@advDmg (IC2 reactor component heat / custom damage), ic2:*@charge (IC2 stored EU)";
+      + "Defaults: ic2:*@advDmg (IC2 reactor component heat / custom damage), ic2:*@charge (IC2 stored EU),\n"
+      + "actuallyadditions:*@Energy (Actually Additions battery charge)";
     private static final String COMMENT_DAMAGE =
         "Items whose damage value JEC should ignore. Format: modid:itemname, modid:* or *. One per line.\n"
       + "Only applies to items that can take damage (tools, batteries); items that use damage values for\n"

@@ -6,6 +6,7 @@ Releases come out on Fridays and include everything since the previous release.
 
 ### Just Enough Calculation
 - The calculator step list is in crafting order: every step comes after the steps that make its ingredients. Before, an item made in batches could be listed after something that needs it (e.g. Iron Tubing, 16 per craft, after the Pressure Valve made from it).
+- Actually Additions battery charge (`actuallyadditions:*@Energy`) is ignored by default, so recipes with batteries chain (e.g. the Triple Battery). Only new configs get the default; existing ones can add the line to `ListIgnoredNBTKeys`.
 - With the calculator's inventory check, other mods' versions of an item in your inventory count toward recipes unified to your preferred one (e.g. IC2 copper plates when the recipes use IE's). Before, only the preferred item was counted (setting: Ore dictionary unification).
 - The page arrows on the calculator, item picker and ore dictionary screens go the right way: "<" goes back a page and ">" goes forward, like the recipe list (setting: Page arrows the right way round).
 
