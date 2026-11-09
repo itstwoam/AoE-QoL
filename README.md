@@ -12,7 +12,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 |---|---|---|
 | [Just Enough Calculation](#just-enough-calculation) | JEC 1.10.2-2.6.5 | Chains recipes for items that carry state, finds the tag that blocks a chain, unifies ore dictionary variants, full step list in crafting order, invisible-items fix |
 | [IC2](#ic2) | IC2 2.6.252-ex110 (+ JEI) | JEI pages for the canning machines and Reinforced Stone; comparators follow energy storage levels; networks no longer go dead after being split |
-| [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it |
+| [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it, double chests counted once |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | No crash when another mod tries to charge a creative capacitor bank |
@@ -89,6 +89,10 @@ Applies to the crafting grid in the Storage Scanner and Modular Storage, and to 
 * The Crafter's ghost-slot filter accepts charged or worn copies of the set item.
 
 All of this can be turned off (setting: *Smarter ingredient matching*). A wrong pick can only make a craft fail, never change it: the recipe check still runs. IC2 crystal charge isn't carried into an MFE (that's IC2's recipe), so drain them first.
+
+### Storage Scanner: double chests counted once
+
+Everything in a vanilla double chest was counted twice in the Storage Scanner's "all inventories" view (and in its item counts on RFTools screens): each half is its own inventory in the scanner's list, but asking either half for its items gives the whole double chest. 64 clay dust showed as 128, while taking it out only found the real 64. Now a chest whose other half is also being counted only adds its own half. Viewing one chest on its own still shows the whole double chest, and taking items out is unchanged.
 
 ### Storage Scanner: brand-new items can be taken out
 

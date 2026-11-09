@@ -11,6 +11,7 @@ Releases come out on Fridays and include everything since the previous release.
 - The page arrows on the calculator, item picker and ore dictionary screens go the right way: "<" goes back a page and ">" goes forward, like the recipe list (setting: Page arrows the right way round).
 
 ### RFTools
+- The Storage Scanner no longer counts the contents of vanilla double chests twice (64 clay dust showed as 128).
 - Brand-new IC2 electric items (e.g. an empty Re-Battery) can be taken out of the Storage Scanner; clicking one used to hand over nothing (setting: Take out brand-new items).
 
 ### Minecraft
