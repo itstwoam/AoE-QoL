@@ -33,4 +33,4 @@ aoeqol.config.pageArrowsRightWayRound.tooltip=On the calculator, item picker and
 aoeqol.config.enderio=Ender IO
 aoeqol.config.enderio.tooltip=Ender IO: item filters.
 aoeqol.config.filtersDoWhatTheirModeSays=Filters do what their mode says
-aoeqol.config.filtersDoWhatTheirModeSays.tooltip=Item, Mod and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets nothing through, and new filters start as blacklist, so a filter nobody has set up still lets everything through. Filters already in the world keep their saved mode. Off: Ender IO's normal behaviour, where an empty whitelist lets everything through.
+aoeqol.config.filtersDoWhatTheirModeSays.tooltip=Item and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets nothing through. New filter items still start as an empty whitelist, so they pass nothing until you add items or switch to blacklist. A new Dimensional Transceiver's built-in filters start as blacklist, so it still passes everything until set up. Off: Ender IO's normal behaviour, where an empty whitelist lets everything through.

@@ -6,13 +6,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Ender IO item filters (Basic/Advanced/Limited, Mod, Species) do what their mode says.
+ * Ender IO item filters (Basic/Advanced/Limited, Species) do what their mode says.
  *
  * Ender IO treats an empty Item or Species filter as "no filter": an empty whitelist lets everything through, the
  * same as an empty blacklist. That reaches every user of the filter: item conduits (extract, insert, routing), the
- * Vacuum Chest and the Dimensional Transceiver. With the setting on, an empty whitelist lets nothing through. New
- * filters start as blacklist, so a filter that was never set up (a transceiver's built-in ones, a fresh filter
- * item) still lets everything through. Filters already in a world keep the mode they were saved with.
+ * Vacuum Chest and the Dimensional Transceiver. With the setting on, an empty whitelist lets nothing through; new
+ * filter items still start as an empty whitelist (Ender IO's default), so they pass nothing until set up. Only the
+ * transceiver's built-in filters start as blacklist, so a new transceiver still passes everything. Filters already
+ * in a world keep the mode they were saved with.
  */
 public final class FilterFix {
     private FilterFix() {}
@@ -41,11 +42,22 @@ public final class FilterFix {
         return result;
     }
 
-    /** End of the Item/Mod/Species filter constructors: a new filter starts as blacklist. Saved filters load their own mode afterwards. */
-    public static void created(Object filter) {
-        if (!AoEQoLConfig.ON_EIO_STRICT_FILTERS || filter == null) return;
+    private static volatile java.lang.reflect.Field sendField, receiveField;
+
+    /**
+     * End of the TileTransceiver constructor: its two built-in filters (not filter items) start as blacklist, so a
+     * new transceiver passes everything until set up. A saved transceiver loads its own mode afterwards (copyFrom).
+     */
+    public static void transceiverCreated(Object te) {
+        if (!AoEQoLConfig.ON_EIO_STRICT_FILTERS || te == null) return;
         try {
-            methods(filter.getClass())[2].invoke(filter, true);
+            if (sendField == null) {
+                java.lang.reflect.Field a = te.getClass().getDeclaredField("sendItemFilter"), b = te.getClass().getDeclaredField("recieveItemFilter");
+                a.setAccessible(true); b.setAccessible(true);
+                receiveField = b; sendField = a;
+            }
+            for (Object f : new Object[] {sendField.get(te), receiveField.get(te)})
+                if (f != null) methods(f.getClass())[2].invoke(f, true);
         } catch (Throwable t) {
             // leave Ender IO's default
         }

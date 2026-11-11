@@ -92,10 +92,10 @@ public final class AoEQoLConfig {
         eio.setComment("Ender IO: item filters.");
         eio.setLanguageKey("aoeqol.config.enderio");
         eioStrictFilters = config.get(ENDERIO, "filtersDoWhatTheirModeSays", true,
-                "Item, Mod and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets\n"
-              + "nothing through (Ender IO let everything through, like an empty blacklist), and new filters start as\n"
-              + "blacklist, so a filter nobody has set up still lets everything through. Filters already in the world keep\n"
-              + "their saved mode. false: Ender IO's normal behaviour (new filters start as whitelist).")
+                "Item and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets\n"
+              + "nothing through (Ender IO let everything through, like an empty blacklist). New filter items still start as\n"
+              + "an empty whitelist. A new Dimensional Transceiver's built-in filters start as blacklist, so it still passes\n"
+              + "everything until set up. false: Ender IO's normal behaviour.")
                 .setLanguageKey("aoeqol.config.filtersDoWhatTheirModeSays");
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");

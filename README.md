@@ -119,7 +119,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ## Ender IO
 
-* **Item filters do what their mode says.** Ender IO treated an empty Item or Species filter as no filter at all, so an empty whitelist let everything through, the same as an empty blacklist. A Vacuum Chest with a blank whitelist filter still picked up every item, and the same went for item conduits and the Dimensional Transceiver. Now an empty whitelist lets nothing through. New filters (a fresh or cleared filter item, a new transceiver's built-in filters) start as blacklist, so a filter nobody has set up still lets everything through. Filters already in your world keep the mode they were saved with. Covers the Basic, Advanced, Limited, Mod and Species filters (setting: Filters do what their mode says).
+* **Item filters do what their mode says.** Ender IO treated an empty Item or Species filter as no filter at all, so an empty whitelist let everything through, the same as an empty blacklist. A Vacuum Chest with a blank whitelist filter still picked up every item, and the same went for item conduits and the Dimensional Transceiver. Now an empty whitelist lets nothing through. New filter items still start as an empty whitelist (Ender IO's default), so they pass nothing until you add items or switch them to blacklist. A new Dimensional Transceiver's built-in filters start as blacklist, so a transceiver still passes everything until you set it up. Filters already in your world keep the mode they were saved with. Covers the Basic, Advanced, Limited and Species filters; the Mod filter already worked this way (setting: Filters do what their mode says).
 * **Creative capacitor bank crash.** Ender IO's creative bank item claimed to have an energy capability but then handed out none, so mods that try to charge it crashed, e.g. a Draconic Evolution capacitor in "charge held item" or "charge inventory" mode while holding or carrying the bank. The bank now consistently reports no capability; other banks are unchanged.
 
 ---
@@ -156,7 +156,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
 | Take out brand-new items (`takeOutBrandNewItems`) | on | Storage Scanner hands over never-charged IC2 items (e.g. an empty Re-Battery) |
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
-| Filters do what their mode says (`filtersDoWhatTheirModeSays`) | on | Ender IO: an empty whitelist filter passes nothing; new filters start as blacklist |
+| Filters do what their mode says (`filtersDoWhatTheirModeSays`) | on | Ender IO: an empty whitelist filter passes nothing; new transceivers' built-in filters start as blacklist |
 
 Crash fixes are always on, and new JEI pages and the fuller step list have no setting either. Everything that changes how something behaves can be turned off. A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
 

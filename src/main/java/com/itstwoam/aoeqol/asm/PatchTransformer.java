@@ -189,17 +189,13 @@ public class PatchTransformer implements IClassTransformer {
         String EF = "crazypants/enderio/conduit/item/filter/", FF = "com/itstwoam/aoeqol/enderio/FilterFix";
         add(EF + "ItemFilter",
             new Patch("doesItemPassFilter", "(Lcrazypants/enderio/conduit/item/NetworkedInventory;" + ITEMSTACK + ")Z", Kind.FILTER_RETURN,
-                FF, "pass", "(ZLjava/lang/Object;)Z", "a0", -1, "item filter: an empty whitelist passes nothing"),
-            new Patch("<init>", "(IZ)V", Kind.BEFORE_RETURN, FF, "created", "(Ljava/lang/Object;)V", "a0", -1,
-                "item filter: new filters start as blacklist"));
+                FF, "pass", "(ZLjava/lang/Object;)Z", "a0", -1, "item filter: an empty whitelist passes nothing"));
         add(EF + "SpeciesItemFilter",
             new Patch("doesItemPassFilter", "(" + ITEMSTACK + ")Z", Kind.FILTER_RETURN,
-                FF, "pass", "(ZLjava/lang/Object;)Z", "a0", -1, "species filter: an empty whitelist passes nothing"),
-            new Patch("<init>", "(I)V", Kind.BEFORE_RETURN, FF, "created", "(Ljava/lang/Object;)V", "a0", -1,
-                "species filter: new filters start as blacklist"));
-        add(EF + "ModItemFilter",
-            new Patch("<init>", "()V", Kind.BEFORE_RETURN, FF, "created", "(Ljava/lang/Object;)V", "a0", -1,
-                "mod filter: new filters start as blacklist"));
+                FF, "pass", "(ZLjava/lang/Object;)Z", "a0", -1, "species filter: an empty whitelist passes nothing"));
+        add("crazypants/enderio/machine/transceiver/TileTransceiver",
+            new Patch("<init>", "()V", Kind.BEFORE_RETURN, FF, "transceiverCreated", "(Ljava/lang/Object;)V", "a0", -1,
+                "dimensional transceiver: built-in filters start as blacklist"));
         add("ic2/core/block/TileEntityBlock",
             new Patch("connectRedstone", "(Lnet/minecraft/util/EnumFacing;)Z", Kind.FILTER_RETURN,
                 "com/itstwoam/aoeqol/ic2/SplitterRedstone", "connectRedstone", "(ZLjava/lang/Object;)Z", "a0", -1,
@@ -278,6 +274,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("mcjty.rftools.blocks.storagemonitor.StorageScannerTileEntity")
                      || transformedName.startsWith("crazypants.enderio.machine.capbank.")
                      || transformedName.startsWith("crazypants.enderio.conduit.item.filter.")
+                     || transformedName.equals("crazypants.enderio.machine.transceiver.TileTransceiver")
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
