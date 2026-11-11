@@ -10,18 +10,20 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec", ENDERIO = "enderio";
 
     public static Configuration config;
     public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
-            jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, rftoolsEmptyTag, ic2SplitNetworks, quitFreezeFix;
+            jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, rftoolsEmptyTag, ic2SplitNetworks, quitFreezeFix,
+            eioStrictFilters;
 
     /**
      * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
      * the property each time). On until the config is loaded; updated by {@link #sync()} whenever settings change.
      */
     public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true, ON_RFTOOLS_EMPTY_TAG = true,
-            ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true;
+            ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true,
+            ON_EIO_STRICT_FILTERS = true;
 
     private AoEQoLConfig() {}
 
@@ -86,6 +88,15 @@ public final class AoEQoLConfig {
               + "get their routes calculated right away. false: IC2's normal behaviour, where a split-off piece can stay\n"
               + "without power until something is placed in it or the world is reloaded.")
                 .setLanguageKey("aoeqol.config.fixSplitNetworks");
+        ConfigCategory eio = config.getCategory(ENDERIO);
+        eio.setComment("Ender IO: item filters.");
+        eio.setLanguageKey("aoeqol.config.enderio");
+        eioStrictFilters = config.get(ENDERIO, "filtersDoWhatTheirModeSays", true,
+                "Item, Mod and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets\n"
+              + "nothing through (Ender IO let everything through, like an empty blacklist), and new filters start as\n"
+              + "blacklist, so a filter nobody has set up still lets everything through. Filters already in the world keep\n"
+              + "their saved mode. false: Ender IO's normal behaviour (new filters start as whitelist).")
+                .setLanguageKey("aoeqol.config.filtersDoWhatTheirModeSays");
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");
         minecraft.setLanguageKey("aoeqol.config.minecraft");
@@ -115,5 +126,6 @@ public final class AoEQoLConfig {
         ON_IC2_SPLIT_NETWORKS = ic2SplitNetworks.getBoolean();
         ON_QUIT_FREEZE = quitFreezeFix.getBoolean();
         ON_MOUSE_JUMP = ignoreMouseJump.getBoolean();
+        ON_EIO_STRICT_FILTERS = eioStrictFilters.getBoolean();
     }
 }

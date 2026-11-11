@@ -34,6 +34,7 @@ public final class ConfigGuiFactory implements IModGuiFactory {
             List<IConfigElement> list = new ArrayList<IConfigElement>();
             list.add(section(AoEQoLConfig.MINECRAFT));
             if (BetterFpsFix.installed()) list.add(section(AoEQoLConfig.BETTERFPS));
+            if (Loader.isModLoaded("EnderIO")) list.add(section(AoEQoLConfig.ENDERIO));
             if (Loader.isModLoaded("IC2")) list.add(section(AoEQoLConfig.IC2));
             if (Loader.isModLoaded("je_calculation")) list.add(section(AoEQoLConfig.JEC));
             if (Loader.isModLoaded("rftools")) list.add(section(AoEQoLConfig.RFTOOLS));

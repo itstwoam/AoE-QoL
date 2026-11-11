@@ -14,6 +14,9 @@ Releases come out on Fridays and include everything since the previous release.
 - The Storage Scanner no longer counts the contents of vanilla double chests twice (64 clay dust showed as 128).
 - Brand-new IC2 electric items (e.g. an empty Re-Battery) can be taken out of the Storage Scanner; clicking one used to hand over nothing (setting: Take out brand-new items).
 
+### Ender IO
+- Item filters do what their mode says: an empty whitelist lets nothing through (before, it let everything through, like an empty blacklist; e.g. a Vacuum Chest with a blank whitelist filter picked up every item). New filters start as blacklist, so a filter nobody has set up still lets everything through; filters already in the world keep their saved mode. Applies to conduits, the Vacuum Chest and the Dimensional Transceiver (setting: Filters do what their mode says).
+
 ### Minecraft
 - The view-spin fix also catches jumps where the cursor moved a little just before the screen closed (one was missed by a single pixel on a 4K window).
 

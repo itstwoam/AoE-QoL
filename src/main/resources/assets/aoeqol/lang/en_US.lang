@@ -30,3 +30,7 @@ aoeqol.config.fixQuitFreeze=Fix freeze on Save and Quit
 aoeqol.config.fixQuitFreeze.tooltip="Save and Quit to Title" can freeze for good, more often after opening to LAN. On: once the built-in server has stopped, the game stops waiting for it. Off: Minecraft's normal behaviour.
 aoeqol.config.pageArrowsRightWayRound=Page arrows the right way round
 aoeqol.config.pageArrowsRightWayRound.tooltip=On the calculator, item picker and ore dictionary screens JEC's page arrows are swapped. On: "<" goes back a page and ">" goes forward, like the recipe list. Applies the next time a screen opens. Off: JEC's own arrows.
+aoeqol.config.enderio=Ender IO
+aoeqol.config.enderio.tooltip=Ender IO: item filters.
+aoeqol.config.filtersDoWhatTheirModeSays=Filters do what their mode says
+aoeqol.config.filtersDoWhatTheirModeSays.tooltip=Item, Mod and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets nothing through, and new filters start as blacklist, so a filter nobody has set up still lets everything through. Filters already in the world keep their saved mode. Off: Ender IO's normal behaviour, where an empty whitelist lets everything through.
