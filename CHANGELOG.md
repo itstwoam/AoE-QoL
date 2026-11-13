@@ -15,7 +15,7 @@ Releases come out on Fridays and include everything since the previous release.
 - Brand-new IC2 electric items (e.g. an empty Re-Battery) can be taken out of the Storage Scanner; clicking one used to hand over nothing (setting: Take out brand-new items).
 
 ### Advanced Solar Panels
-- The Molecular Transformer turns nether quartz into certus quartz. The recipe was in its recipe file but used ore dictionary names nothing in the pack registers, so it was skipped at startup.
+- The Molecular Transformer turns nether quartz into certus quartz. The recipe was in its recipe file but used ore dictionary names nothing in the pack registers, so it was skipped at startup (setting: Molecular Transformer: nether quartz to certus quartz; needs a restart).
 
 ### Ender IO
 - Item filters do what their mode says: an empty whitelist lets nothing through (before, it let everything through, like an empty blacklist; e.g. a Vacuum Chest with a blank whitelist filter picked up every item). New filter items still start as an empty whitelist, so they pass nothing until set up; a new Dimensional Transceiver's built-in filters start as blacklist, so it still passes everything until set up. Applies to conduits, the Vacuum Chest and the Dimensional Transceiver (setting: Filters do what their mode says).

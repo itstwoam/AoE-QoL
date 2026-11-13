@@ -10,12 +10,12 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec", ENDERIO = "enderio";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec", ENDERIO = "enderio", ADVSOLAR = "advsolar";
 
     public static Configuration config;
     public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
             jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, rftoolsEmptyTag, ic2SplitNetworks, quitFreezeFix,
-            eioStrictFilters;
+            eioStrictFilters, mtQuartzToCertus;
 
     /**
      * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
@@ -23,7 +23,7 @@ public final class AoEQoLConfig {
      */
     public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true, ON_RFTOOLS_EMPTY_TAG = true,
             ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true,
-            ON_EIO_STRICT_FILTERS = true;
+            ON_EIO_STRICT_FILTERS = true, ON_MT_QUARTZ_TO_CERTUS = true;
 
     private AoEQoLConfig() {}
 
@@ -97,6 +97,15 @@ public final class AoEQoLConfig {
               + "an empty whitelist. A new Dimensional Transceiver's built-in filters start as blacklist, so it still passes\n"
               + "everything until set up. false: Ender IO's normal behaviour.")
                 .setLanguageKey("aoeqol.config.filtersDoWhatTheirModeSays");
+        ConfigCategory asp = config.getCategory(ADVSOLAR);
+        asp.setComment("Advanced Solar Panels: Molecular Transformer recipes.");
+        asp.setLanguageKey("aoeqol.config.advsolar");
+        mtQuartzToCertus = config.get(ADVSOLAR, "transformerQuartzToCertus", true,
+                "Molecular Transformer turns nether quartz into certus quartz. The recipe is in ASP's recipe file but uses\n"
+              + "ore dictionary names nothing in the pack registers, so ASP skips it; true: those names are swapped for the\n"
+              + "ones the pack's mods register (gemQuartz, crystalCertusQuartz, dustQuartz). Recipes load at start-up, so a\n"
+              + "change needs a restart. false: ASP's normal behaviour.")
+                .setLanguageKey("aoeqol.config.transformerQuartzToCertus").setRequiresMcRestart(true);
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");
         minecraft.setLanguageKey("aoeqol.config.minecraft");
@@ -127,5 +136,6 @@ public final class AoEQoLConfig {
         ON_QUIT_FREEZE = quitFreezeFix.getBoolean();
         ON_MOUSE_JUMP = ignoreMouseJump.getBoolean();
         ON_EIO_STRICT_FILTERS = eioStrictFilters.getBoolean();
+        ON_MT_QUARTZ_TO_CERTUS = mtQuartzToCertus.getBoolean();
     }
 }

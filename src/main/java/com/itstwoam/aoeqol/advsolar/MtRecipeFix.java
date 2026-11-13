@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
  * Fix: before ASP decodes a line, each "OreDict:name" with no items registered is swapped for a known alias
  * that has items. Names that resolve are left alone, so a hand-edited config keeps working.
  *
+ * Setting: transformerQuartzToCertus (needs a restart, recipes load once).
+ *
  * Called at the start of ASP's Recipes.decodeLine(int, String[]) and replaces its parts argument.
  */
 public final class MtRecipeFix {
@@ -32,7 +34,7 @@ public final class MtRecipeFix {
 
     public static String[] fixLine(int line, String[] parts) {
         try {
-            if (parts == null) return parts;
+            if (parts == null || !com.itstwoam.aoeqol.AoEQoLConfig.ON_MT_QUARTZ_TO_CERTUS) return parts;
             for (int i = 0; i < parts.length && i < 2; i++) {
                 String fixed = fix(parts[i]);
                 if (fixed != null) {

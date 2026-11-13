@@ -120,7 +120,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ## Advanced Solar Panels
 
-* **Molecular Transformer: nether quartz to certus quartz.** The transformer's recipe file (`config/advanced_solar_panels_MTRecipes.cfg`) lists this recipe with ore dictionary names nothing in the pack registers (`gemNetherQuartz`, `gemCertusQuartz`), so Advanced Solar Panels skipped it at startup ("output cannot be resolved"). When a recipe line names an ore dictionary entry that has no items, AoE-QoL uses the name the pack's mods do register (`gemQuartz`, `crystalCertusQuartz` from AE2, `dustQuartz`). Names that resolve are left alone, so edits to the recipe file keep working. The recipe file itself is not changed. Applies where recipes load (game and server).
+* **Molecular Transformer: nether quartz to certus quartz.** The transformer's recipe file (`config/advanced_solar_panels_MTRecipes.cfg`) lists this recipe with ore dictionary names nothing in the pack registers (`gemNetherQuartz`, `gemCertusQuartz`), so Advanced Solar Panels skipped it at startup ("output cannot be resolved"). When a recipe line names an ore dictionary entry that has no items, AoE-QoL uses the name the pack's mods do register (`gemQuartz`, `crystalCertusQuartz` from AE2, `dustQuartz`). Names that resolve are left alone, so edits to the recipe file keep working. The recipe file itself is not changed. Applies where recipes load (game and server); changing the setting needs a restart (setting: Molecular Transformer: nether quartz to certus quartz).
 
 ---
 
@@ -148,7 +148,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ## Settings
 
-**Mods → AoE-QoL → Config** in game (changes apply without a restart), or `config/aoeqol.cfg`:
+**Mods → AoE-QoL → Config** in game (changes apply without a restart, except where noted), or `config/aoeqol.cfg`:
 
 | Setting | Default | |
 |---|---|---|
@@ -163,6 +163,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 | Sync Storage Scanner search with JEI (`syncStorageScannerWithJei`) | on | Storage Scanner and JEI share one search |
 | Take out brand-new items (`takeOutBrandNewItems`) | on | Storage Scanner hands over never-charged IC2 items (e.g. an empty Re-Battery) |
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
+| Molecular Transformer: nether quartz to certus quartz (`transformerQuartzToCertus`) | on | Advanced Solar Panels: the transformer's quartz recipe loads; needs a restart |
 | Filters do what their mode says (`filtersDoWhatTheirModeSays`) | on | Ender IO: an empty whitelist filter passes nothing; new transceivers' built-in filters start as blacklist |
 
 Crash fixes are always on, and new JEI pages and the fuller step list have no setting either. Everything that changes how something behaves can be turned off. A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).

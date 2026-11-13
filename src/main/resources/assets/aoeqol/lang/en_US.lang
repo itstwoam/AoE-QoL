@@ -34,3 +34,7 @@ aoeqol.config.enderio=Ender IO
 aoeqol.config.enderio.tooltip=Ender IO: item filters.
 aoeqol.config.filtersDoWhatTheirModeSays=Filters do what their mode says
 aoeqol.config.filtersDoWhatTheirModeSays.tooltip=Item and Species filters (conduits, Vacuum Chest, Dimensional Transceiver): an empty whitelist lets nothing through. New filter items still start as an empty whitelist, so they pass nothing until you add items or switch to blacklist. A new Dimensional Transceiver's built-in filters start as blacklist, so it still passes everything until set up. Off: Ender IO's normal behaviour, where an empty whitelist lets everything through.
+aoeqol.config.advsolar=Advanced Solar Panels
+aoeqol.config.advsolar.tooltip=Advanced Solar Panels: Molecular Transformer recipes.
+aoeqol.config.transformerQuartzToCertus=Molecular Transformer: nether quartz to certus quartz
+aoeqol.config.transformerQuartzToCertus.tooltip=The recipe is in Advanced Solar Panels' recipe file but uses ore dictionary names nothing in the pack registers, so it was skipped. On: the names the pack's mods use are taken instead. Needs a restart. Off: Advanced Solar Panels' normal behaviour.
