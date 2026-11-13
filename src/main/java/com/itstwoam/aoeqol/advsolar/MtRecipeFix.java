@@ -2,6 +2,7 @@ package com.itstwoam.aoeqol.advsolar;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.item.Item;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,8 +14,10 @@ import org.apache.logging.log4j.Logger;
  * crystal is "crystalCertusQuartz". ASP then skips the line ("output cannot be resolved") and nether quartz
  * can't be turned into certus quartz.
  *
- * Fix: before ASP decodes a line, each "OreDict:name" with no items registered is swapped for a known alias
- * that has items. Names that resolve are left alone, so a hand-edited config keeps working.
+ * Fix: before ASP decodes a line, each "OreDict:name" with no items registered is swapped for the first known
+ * alias that resolves: another ore name with items, else the item itself. The item fallback matters because ASP
+ * loads these recipes before AE2's init, where AE2 registers "crystalCertusQuartz", and ASP needs the output
+ * there and then. Names that resolve are left alone, so a hand-edited config keeps working.
  *
  * Setting: transformerQuartzToCertus (needs a restart, recipes load once).
  *
@@ -23,11 +26,11 @@ import org.apache.logging.log4j.Logger;
 public final class MtRecipeFix {
     private static final Logger LOG = LogManager.getLogger("AoE-QoL");
     private static final String PREFIX = "OreDict:";
-    private static final Map<String, String> ALIASES = new HashMap<String, String>();
+    private static final Map<String, String[]> ALIASES = new HashMap<String, String[]>();
     static {
-        ALIASES.put("gemNetherQuartz", "gemQuartz");
-        ALIASES.put("gemCertusQuartz", "crystalCertusQuartz");
-        ALIASES.put("dustNetherQuartz", "dustQuartz");
+        ALIASES.put("gemNetherQuartz", new String[] {PREFIX + "gemQuartz", "minecraft:quartz"});
+        ALIASES.put("gemCertusQuartz", new String[] {PREFIX + "crystalCertusQuartz", "appliedenergistics2:material@0"});
+        ALIASES.put("dustNetherQuartz", new String[] {PREFIX + "dustQuartz"});
     }
 
     private MtRecipeFix() {}
@@ -57,9 +60,19 @@ public final class MtRecipeFix {
         int star = rest.indexOf('*');
         String name = (star < 0 ? rest : rest.substring(0, star)).trim();
         String amount = star < 0 ? "" : rest.substring(star);
-        String alias = ALIASES.get(name);
-        if (alias == null || hasOres(name) || !hasOres(alias)) return null;
-        return PREFIX + alias + amount;
+        String[] aliases = ALIASES.get(name);
+        if (aliases == null || hasOres(name)) return null;
+        for (String alias : aliases) {
+            if (alias.startsWith(PREFIX) ? hasOres(alias.substring(PREFIX.length())) : itemExists(alias)) {
+                return alias + amount;
+            }
+        }
+        return null;
+    }
+
+    private static boolean itemExists(String entry) {
+        int at = entry.indexOf('@');
+        return Item.getByNameOrId(at < 0 ? entry : entry.substring(0, at)) != null;
     }
 
     private static boolean hasOres(String name) {
