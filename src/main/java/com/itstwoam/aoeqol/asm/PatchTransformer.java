@@ -196,6 +196,10 @@ public class PatchTransformer implements IClassTransformer {
         add("crazypants/enderio/machine/transceiver/TileTransceiver",
             new Patch("<init>", "()V", Kind.BEFORE_RETURN, FF, "transceiverCreated", "(Ljava/lang/Object;)V", "a0", -1,
                 "dimensional transceiver: built-in filters start as blacklist"));
+        add("com/chocohead/advsolar/Recipes",
+            new Patch("decodeLine", "(I[" + STRING + ")Z", Kind.PREPEND_ASSIGN,
+                "com/itstwoam/aoeqol/advsolar/MtRecipeFix", "fixLine", "(I[" + STRING + ")[" + STRING, "i0,a1", 1,
+                "Molecular Transformer recipes: missing ore names use their aliases (nether quartz to certus quartz)"));
         add("ic2/core/block/TileEntityBlock",
             new Patch("connectRedstone", "(Lnet/minecraft/util/EnumFacing;)Z", Kind.FILTER_RETURN,
                 "com/itstwoam/aoeqol/ic2/SplitterRedstone", "connectRedstone", "(ZLjava/lang/Object;)Z", "a0", -1,
@@ -276,6 +280,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.startsWith("crazypants.enderio.conduit.item.filter.")
                      || transformedName.equals("crazypants.enderio.machine.transceiver.TileTransceiver")
                      || transformedName.equals("ic2.core.block.wiring.TileEntityElectricBlock")
+                     || transformedName.equals("com.chocohead.advsolar.Recipes")
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")

@@ -15,6 +15,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it, double chests counted once |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
+| [Advanced Solar Panels](#advanced-solar-panels) | Advanced Solar Panels 4.0.4 (+ AE2) | Molecular Transformer turns nether quartz into certus quartz |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -117,6 +118,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Advanced Solar Panels
+
+* **Molecular Transformer: nether quartz to certus quartz.** The transformer's recipe file (`config/advanced_solar_panels_MTRecipes.cfg`) lists this recipe with ore dictionary names nothing in the pack registers (`gemNetherQuartz`, `gemCertusQuartz`), so Advanced Solar Panels skipped it at startup ("output cannot be resolved"). When a recipe line names an ore dictionary entry that has no items, AoE-QoL uses the name the pack's mods do register (`gemQuartz`, `crystalCertusQuartz` from AE2, `dustQuartz`). Names that resolve are left alone, so edits to the recipe file keep working. The recipe file itself is not changed. Applies where recipes load (game and server).
+
+---
+
 ## Ender IO
 
 * **Item filters do what their mode says.** Ender IO treated an empty Item or Species filter as no filter at all, so an empty whitelist let everything through, the same as an empty blacklist. A Vacuum Chest with a blank whitelist filter still picked up every item, and the same went for item conduits and the Dimensional Transceiver. Now an empty whitelist lets nothing through. New filter items still start as an empty whitelist (Ender IO's default), so they pass nothing until you add items or switch them to blacklist. A new Dimensional Transceiver's built-in filters start as blacklist, so a transceiver still passes everything until you set it up. Filters already in your world keep the mode they were saved with. Covers the Basic, Advanced, Limited and Species filters; the Mod filter already worked this way (setting: Filters do what their mode says).
@@ -202,4 +209,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, Advanced Solar Panels by Chocohead, Applied Energistics 2 by the AE2 team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
