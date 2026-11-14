@@ -15,6 +15,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it, double chests counted once |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
+| [Extra Utilities 2](#extra-utilities-2) | Extra Utilities 2 1.2.0 | No crash when a Mechanical Crafter searches for its recipe while another mod changes the recipe list |
 | [Advanced Solar Panels](#advanced-solar-panels) | Advanced Solar Panels 4.0.4 (+ AE2) | Molecular Transformer turns nether quartz into certus quartz |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
@@ -118,6 +119,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Extra Utilities 2
+
+* **Crash: Mechanical Crafter searching for its recipe.** After a world loads, a Mechanical Crafter searches the whole crafting recipe list for the recipe its grid makes. In single player the game and the built-in server share that list, and mods change it while a world is being joined (more so when you open a second world in the same session). If it changed during the search, the game crashed ("Ticking block entity", ConcurrentModificationException in `TileCrafter.preOperate`). Now an interrupted search is thrown away and the crafter tries again next tick on the settled list, so it never keeps a recipe that was just removed. After three interrupted searches in a row it searches a copy of the list instead. Each retry is noted in the log.
+
+---
+
 ## Advanced Solar Panels
 
 * **Molecular Transformer: nether quartz to certus quartz.** The transformer's recipe file (`config/advanced_solar_panels_MTRecipes.cfg`) lists this recipe with ore dictionary names nothing in the pack registers (`gemNetherQuartz`, `gemCertusQuartz`), so Advanced Solar Panels skipped it at startup ("output cannot be resolved"). When a recipe line names an ore dictionary entry that has no items, AoE-QoL uses the name the pack's mods do register (`gemQuartz`, `crystalCertusQuartz` from AE2, `dustQuartz`), or the item itself when that name is not registered yet (AE2 registers certus quartz after the transformer recipes load). Names that resolve are left alone, so edits to the recipe file keep working. The recipe file itself is not changed. Applies where recipes load (game and server); changing the setting needs a restart (setting: Molecular Transformer: nether quartz to certus quartz).
@@ -201,7 +208,7 @@ JEI, IC2 and JEC are compile-only dependencies; none of them is included in the 
 
 ## Testing
 
-Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the comparator fix is run against the real Extra Utilities 2 Scanner (it crashes without the fix), the mouse fix is run against recorded jumps, real movement and the setting turned off, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
+Every fix is tested outside the game: the transformer is run over the unmodified JEC, RFTools, Ender IO and IC2 jars, the Turkish fix is run under Turkish, Azerbaijani and English locales, the IC2 network split is replayed on IC2's real energy-net classes (one half goes dead without the fix, both stay powered with it), the quit fix is run against a server that stops early and one that doesn't, the comparator fix is run against the real Extra Utilities 2 Scanner (it crashes without the fix), the Mechanical Crafter fix is run against the patched Extra Utilities 2 classes and a crafter whose search is interrupted (it tries again next tick, switches to a copy after three interruptions, and other machines' errors still pass through), the mouse fix is run against recorded jumps, real movement and the setting turned off, the BetterFPS change is run against BetterFPS's real config code (only the intended methods change, and the patched classes pass type-checking bytecode verification against the real libraries), and the new code runs against stand-in Minecraft classes under full JVM verification, with and without the other mods installed. Every Minecraft method and field the jar uses is checked against the MCP mappings for Forge 12.18.3.2511.
 
 ## License
 

@@ -17,6 +17,9 @@ Releases come out on Fridays and include everything since the previous release.
 ### Advanced Solar Panels
 - The Molecular Transformer turns nether quartz into certus quartz. The recipe was in its recipe file but used ore dictionary names nothing in the pack registers, so it was skipped at startup (setting: Molecular Transformer: nether quartz to certus quartz; needs a restart).
 
+### Extra Utilities 2
+- Fixed a crash when a Mechanical Crafter searches for its recipe (right after a world loads) while another mod changes the recipe list. The crafter now tries again next tick.
+
 ### Ender IO
 - Item filters do what their mode says: an empty whitelist lets nothing through (before, it let everything through, like an empty blacklist; e.g. a Vacuum Chest with a blank whitelist filter picked up every item). New filter items still start as an empty whitelist, so they pass nothing until set up; a new Dimensional Transceiver's built-in filters start as blacklist, so it still passes everything until set up. Applies to conduits, the Vacuum Chest and the Dimensional Transceiver (setting: Filters do what their mode says).
 

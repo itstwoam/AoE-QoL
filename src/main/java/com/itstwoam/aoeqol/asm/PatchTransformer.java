@@ -232,6 +232,14 @@ public class PatchTransformer implements IClassTransformer {
         add("com/rwtema/extrautils2/tile/XUTile",
             new Patch("getComparatorLevel", "()I", Kind.REPLACE, "com/itstwoam/aoeqol/misc/ComparatorRead", "none", "()I", "", -1,
                 "blocks without a comparator value answer 0 instead of crashing"));
+        add("com/rwtema/extrautils2/tile/TileAdvInteractor",
+            redirect("func_73660_a", "()V", "com/rwtema/extrautils2/tile/TileAdvInteractor", "preOperate", "()Z",
+                "com/itstwoam/aoeqol/misc/CrafterRecipeSearch", "preOperate", "(Ljava/lang/Object;)Z",
+                "Mechanical Crafter: recipe search interrupted by a recipe list change tries again next tick"));
+        add("com/rwtema/extrautils2/tile/TileCrafter",
+            redirect("preOperate", "()Z", "net/minecraft/item/crafting/CraftingManager", "func_77592_b", "()Ljava/util/List;",
+                "com/itstwoam/aoeqol/misc/CrafterRecipeSearch", "recipeList", "(Ljava/lang/Object;)Ljava/util/List;",
+                "Mechanical Crafter: recipe list copy after repeated interrupted searches"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -286,6 +294,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("net.minecraft.util.MouseHelper")
                      || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")
                      || transformedName.equals("com.rwtema.extrautils2.tile.XUTile")
+                     || transformedName.equals("com.rwtema.extrautils2.tile.TileAdvInteractor")
+                     || transformedName.equals("com.rwtema.extrautils2.tile.TileCrafter")
                      || transformedName.equals("org.cyclops.integrateddynamics.capability.cable.CableDefault")
                      || transformedName.equals("QuantumStorage.tile.TileQuantumTank")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
