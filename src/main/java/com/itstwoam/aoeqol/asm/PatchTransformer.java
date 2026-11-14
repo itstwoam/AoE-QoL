@@ -260,6 +260,12 @@ public class PatchTransformer implements IClassTransformer {
             redirect("<clinit>", "()V", "net/minecraftforge/common/EnumPlantType", "values", "()[Lnet/minecraftforge/common/EnumPlantType;",
                 "com/itstwoam/aoeqol/misc/PlantTypeSwitch", "values", "()[Lnet/minecraftforge/common/EnumPlantType;",
                 "canSustainPlant: room for plant types added by mods (no crash on an Ender Lily)"));
+        String NTH = "com/teambrmodding/neotech/registries/AbstractRecipeHandler", NTR = "com/itstwoam/aoeqol/neotech/RecipeFileReset";
+        add(NTH,
+            new Patch("loadHandler", "()L" + NTH + ";", Kind.PREPEND, NTR, "beforeLoad", "(Ljava/lang/Object;)V", "a0", -1,
+                "recipe files naming items or fluids that aren't installed are reset to NeoTech's defaults"),
+            new Patch("loadHandler", "()L" + NTH + ";", Kind.BEFORE_RETURN, NTR, "afterLoad", "(Ljava/lang/Object;)V", "a0", -1,
+                "freshly generated recipe files remembered"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -312,6 +318,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("com.teambrmodding.neotech.registries.AbstractRecipeHandler")
                      || transformedName.equals("com.vanhal.progressiveautomation.compat.mods.Vanilla")
                      || transformedName.equals("net.minecraft.block.Block$3")
                      || transformedName.equals("com.feed_the_beast.ftbu.gui.Guides")

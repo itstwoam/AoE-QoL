@@ -24,6 +24,9 @@ Releases come out on Fridays and include everything since the previous release.
 ### Progressive Automation
 - Fixed a server crash when a Planter plants Extra Utilities 2 Ender Lilies. The Planter tilled the ground first, and the lily on dry farmland crashed Forge's plant-type check once the farmland dried out. The Planter now only tills for crops that need farmland, and Forge's check has room for plant types added by mods.
 
+### NeoTech
+- Fixed a server crash when a NeoTech machine gets something it can't process while its recipe file names an input item or fluid that isn't installed (a file left over from another mod setup). Such a recipe file now resets itself to NeoTech's defaults at startup, instead of you having to delete the NeoTech config; the old file is kept as `<name>Recipes-stale-<date>.json`.
+
 ### Extra Utilities 2
 - Fixed a crash when a Mechanical Crafter searches for its recipe (right after a world loads) while another mod changes the recipe list. The crafter now tries again next tick.
 
