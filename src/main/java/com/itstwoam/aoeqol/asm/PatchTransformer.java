@@ -240,6 +240,18 @@ public class PatchTransformer implements IClassTransformer {
             redirect("preOperate", "()Z", "net/minecraft/item/crafting/CraftingManager", "func_77592_b", "()Ljava/util/List;",
                 "com/itstwoam/aoeqol/misc/CrafterRecipeSearch", "recipeList", "(Ljava/lang/Object;)Ljava/util/List;",
                 "Mechanical Crafter: recipe list copy after repeated interrupted searches"));
+        String CT = "com/itstwoam/aoeqol/calculator/ChanceText", DRAW_INFO = "(Lnet/minecraft/client/Minecraft;IIII)V";
+        add("com/feed_the_beast/ftbu/gui/Guides",
+            new Patch("replaceSubstitutes", "(Ljava/lang/CharSequence;)" + STRING, Kind.FILTER_RETURN,
+                CT, "guide", "(" + STRING + ")" + STRING, "", -1, "modpack guide: Extraction Chamber chance 11.1%"));
+        add("sonar/calculator/mod/integration/jei/Recipes$Extraction",
+            redirect("drawInfo", DRAW_INFO, "net/minecraft/client/gui/FontRenderer", "func_78276_b", "(" + STRING + "III)I",
+                CT, "extractionText", "(Lnet/minecraft/client/gui/FontRenderer;" + STRING + "III)I",
+                "JEI Extraction Chamber: chance 11.1%"));
+        add("sonar/calculator/mod/integration/jei/Recipes$Analysing",
+            gated("OK_CALC_ANALYSING_JEI", new Patch("drawInfo", DRAW_INFO, Kind.REPLACE,
+                CT, "analysingInfo", "(Ljava/lang/Object;Lnet/minecraft/client/Minecraft;IIII)V", "a0,a1,i2,i3,i4,i5", -1,
+                "JEI Analysing Chamber: real extract chances")));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -292,6 +304,9 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("com.feed_the_beast.ftbu.gui.Guides")
+                     || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Extraction")
+                     || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Analysing")
                      || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")
                      || transformedName.equals("com.rwtema.extrautils2.tile.XUTile")
                      || transformedName.equals("com.rwtema.extrautils2.tile.TileAdvInteractor")

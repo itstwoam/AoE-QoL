@@ -17,6 +17,10 @@ Releases come out on Fridays and include everything since the previous release.
 ### Advanced Solar Panels
 - The Molecular Transformer turns nether quartz into certus quartz. The recipe was in its recipe file but used ore dictionary names nothing in the pack registers, so it was skipped at startup (setting: Molecular Transformer: nether quartz to certus quartz; needs a restart).
 
+### Calculator
+- The Extraction Chamber's circuit chance shows as 11.1% (1 in 9), in JEI and in the pack guide (Age 4). It said 12.5%. Same odds for dirt and cobblestone.
+- The Analysing Chamber's JEI page shows the real chance of each item: 2%, 1%, 0.1%, 0.05%, 0.01% by row (rows 1, 2 and 4 showed 6.0, 0.2 and 0.02 %).
+
 ### Extra Utilities 2
 - Fixed a crash when a Mechanical Crafter searches for its recipe (right after a world loads) while another mod changes the recipe list. The crafter now tries again next tick.
 

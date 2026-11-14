@@ -25,6 +25,9 @@ public final class AoEQoLConfig {
             ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true,
             ON_EIO_STRICT_FILTERS = true, ON_MT_QUARTZ_TO_CERTUS = true;
 
+    /** Not a setting: cleared by calculator.ChanceText if SonarCore's recipe classes can't be read, so Calculator draws its own text again. */
+    public static volatile boolean OK_CALC_ANALYSING_JEI = true;
+
     private AoEQoLConfig() {}
 
     public static void init(File configDir) {
