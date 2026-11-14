@@ -21,6 +21,9 @@ Releases come out on Fridays and include everything since the previous release.
 - The Extraction Chamber's circuit chance shows as 11.1% (1 in 9), in JEI and in the pack guide (Age 4). It said 12.5%. Same odds for dirt and cobblestone.
 - The Analysing Chamber's JEI page shows the real chance of each item: 2%, 1%, 0.1%, 0.05%, 0.01% by row (rows 1, 2 and 4 showed 6.0, 0.2 and 0.02 %).
 
+### Progressive Automation
+- Fixed a server crash when a Planter plants Extra Utilities 2 Ender Lilies. The Planter tilled the ground first, and the lily on dry farmland crashed Forge's plant-type check once the farmland dried out. The Planter now only tills for crops that need farmland, and Forge's check has room for plant types added by mods.
+
 ### Extra Utilities 2
 - Fixed a crash when a Mechanical Crafter searches for its recipe (right after a world loads) while another mod changes the recipe list. The crafter now tries again next tick.
 

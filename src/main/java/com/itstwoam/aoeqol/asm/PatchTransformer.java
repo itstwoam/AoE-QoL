@@ -252,6 +252,14 @@ public class PatchTransformer implements IClassTransformer {
             gated("OK_CALC_ANALYSING_JEI", new Patch("drawInfo", DRAW_INFO, Kind.REPLACE,
                 CT, "analysingInfo", "(Ljava/lang/Object;Lnet/minecraft/client/Minecraft;IIII)V", "a0,a1,i2,i3,i4,i5", -1,
                 "JEI Analysing Chamber: real extract chances")));
+        add("com/vanhal/progressiveautomation/compat/mods/Vanilla",
+            new Patch("shouldHoe", "(" + ITEMSTACK + ")Z", Kind.FILTER_RETURN,
+                "com/itstwoam/aoeqol/progressiveautomation/PlanterTill", "shouldHoe", "(ZLjava/lang/Object;)Z", "a1", -1,
+                "Planter: only tills for crops that need farmland"));
+        add("net/minecraft/block/Block$3",
+            redirect("<clinit>", "()V", "net/minecraftforge/common/EnumPlantType", "values", "()[Lnet/minecraftforge/common/EnumPlantType;",
+                "com/itstwoam/aoeqol/misc/PlantTypeSwitch", "values", "()[Lnet/minecraftforge/common/EnumPlantType;",
+                "canSustainPlant: room for plant types added by mods (no crash on an Ender Lily)"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -304,6 +312,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("com.vanhal.progressiveautomation.compat.mods.Vanilla")
+                     || transformedName.equals("net.minecraft.block.Block$3")
                      || transformedName.equals("com.feed_the_beast.ftbu.gui.Guides")
                      || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Extraction")
                      || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Analysing")

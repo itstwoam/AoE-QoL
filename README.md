@@ -18,6 +18,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [Extra Utilities 2](#extra-utilities-2) | Extra Utilities 2 1.2.0 | No crash when a Mechanical Crafter searches for its recipe while another mod changes the recipe list |
 | [Advanced Solar Panels](#advanced-solar-panels) | Advanced Solar Panels 4.0.4 (+ AE2) | Molecular Transformer turns nether quartz into certus quartz |
 | [Calculator](#calculator) | Calculator 3.2.5 (+ JEI, FTB Utilities) | Right circuit odds in JEI and the pack guide (Extraction Chamber 11.1%, Analysing Chamber per item) |
+| [Progressive Automation](#progressive-automation) | Progressive Automation 1.7.4 (+ Extra Utilities 2) | No server crash when a Planter plants Ender Lilies; the Planter only tills for crops that need farmland |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
@@ -138,6 +139,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Progressive Automation
+
+* **Crash: Planter and Ender Lilies.** The Planter turned dirt or grass into farmland before planting any seed, so Extra Utilities 2's Ender Lily (which grows on end stone, dirt or grass) ended up on dry farmland. When that farmland dried out, Forge asked whether the lily could grow there and crashed the server: Forge's plant-type lookup had no room for the "ender" type Extra Utilities 2 adds while it loads. Now the Planter only tills for crops that need farmland (wheat, carrots, potatoes and the like) and plants everything else on the ground as it is, like a player would; and Forge's lookup has room for plant types added by mods, so a lily already sitting on farmland gets Forge's normal "can't grow here" instead of a crash. Server side (single player: your game), no setting.
+
+---
+
 ## Ender IO
 
 * **Item filters do what their mode says.** Ender IO treated an empty Item or Species filter as no filter at all, so an empty whitelist let everything through, the same as an empty blacklist. A Vacuum Chest with a blank whitelist filter still picked up every item, and the same went for item conduits and the Dimensional Transceiver. Now an empty whitelist lets nothing through. New filter items still start as an empty whitelist (Ender IO's default), so they pass nothing until you add items or switch them to blacklist. A new Dimensional Transceiver's built-in filters start as blacklist, so a transceiver still passes everything until you set it up. Filters already in your world keep the mode they were saved with. Covers the Basic, Advanced, Limited and Species filters; the Mod filter already worked this way (setting: Filters do what their mode says).
@@ -224,4 +231,4 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, Advanced Solar Panels by Chocohead, Calculator and SonarCore by Ollie Lansdell, FTB Utilities by LatvianModder and the FTB team, Applied Energistics 2 by the AE2 team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
+* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, Advanced Solar Panels by Chocohead, Calculator and SonarCore by Ollie Lansdell, Progressive Automation by Vanhal, FTB Utilities by LatvianModder and the FTB team, Applied Energistics 2 by the AE2 team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
