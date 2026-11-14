@@ -266,6 +266,10 @@ public class PatchTransformer implements IClassTransformer {
                 "recipe files naming items or fluids that aren't installed are reset to NeoTech's defaults"),
             new Patch("loadHandler", "()L" + NTH + ";", Kind.BEFORE_RETURN, NTR, "afterLoad", "(Ljava/lang/Object;)V", "a0", -1,
                 "freshly generated recipe files remembered"));
+        add("com/rwtema/extrautils2/items/ItemBagOfHolding",
+            new Patch("getNBTShareTag", "(" + ITEMSTACK + ")" + NBT, Kind.REPLACE,
+                "com/itstwoam/aoeqol/misc/BagShareTag", "shareTag", "(" + ITEMSTACK + ")" + NBT, "a1", -1,
+                "Bag of Holding: clients get its real contents (up to what a client accepts), so Creative mode can't empty it"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -318,6 +322,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("com.rwtema.extrautils2.items.ItemBagOfHolding")
                      || transformedName.equals("com.teambrmodding.neotech.registries.AbstractRecipeHandler")
                      || transformedName.equals("com.vanhal.progressiveautomation.compat.mods.Vanilla")
                      || transformedName.equals("net.minecraft.block.Block$3")

@@ -15,7 +15,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [RFTools](#rftools) | RFTools 1.1x-5.92 | Crafting grid and Crafter find charged/worn items, the right variant, and other mods' equivalents; Storage Scanner search synced with JEI, brand-new IC2 items can be taken out of it, double chests counted once |
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
-| [Extra Utilities 2](#extra-utilities-2) | Extra Utilities 2 1.2.0 | No crash when a Mechanical Crafter searches for its recipe while another mod changes the recipe list |
+| [Extra Utilities 2](#extra-utilities-2) | Extra Utilities 2 1.2.0 | No crash when a Mechanical Crafter searches for its recipe while another mod changes the recipe list; a Bag of Holding no longer empties on a server after Creative mode |
 | [Advanced Solar Panels](#advanced-solar-panels) | Advanced Solar Panels 4.0.4 (+ AE2) | Molecular Transformer turns nether quartz into certus quartz |
 | [Calculator](#calculator) | Calculator 3.2.5 (+ JEI, FTB Utilities) | Right circuit odds in JEI and the pack guide (Extraction Chamber 11.1%, Analysing Chamber per item) |
 | [Progressive Automation](#progressive-automation) | Progressive Automation 1.7.4 (+ Extra Utilities 2) | No server crash when a Planter plants Ender Lilies; the Planter only tills for crops that need farmland |
@@ -125,6 +125,8 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 ## Extra Utilities 2
 
 * **Crash: Mechanical Crafter searching for its recipe.** After a world loads, a Mechanical Crafter searches the whole crafting recipe list for the recipe its grid makes. In single player the game and the built-in server share that list, and mods change it while a world is being joined (more so when you open a second world in the same session). If it changed during the search, the game crashed ("Ticking block entity", ConcurrentModificationException in `TileCrafter.preOperate`). Now an interrupted search is thrown away and the crafter tries again next tick on the settled list, so it never keeps a recipe that was just removed. After three interrupted searches in a row it searches a copy of the list instead. Each retry is noted in the log.
+
+* **Bag of Holding emptied on servers.** The bag keeps its contents in the item's data, but Extra Utilities 2 sends clients an empty copy. In Creative mode Minecraft trusts the client with the inventory and writes the client's copy back, so on a server the bag lost everything (e.g. after browsing a creative tab and moving the bag; single player wasn't affected). The bag now sends its real data, as long as a client would accept it (Minecraft reads at most about 2 MB of data per item); a bag stuffed beyond that is sent the old way. Server side, no setting.
 
 ---
 
