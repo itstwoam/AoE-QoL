@@ -240,4 +240,3 @@ Every fix is tested outside the game: the transformer is run over the unmodified
 ## Credits
 
 * Written by Itstwoam with Claude (Anthropic).
-* [Just Enough Calculation](https://github.com/Towdium/JustEnoughCalculation) by Towdium, [IndustrialCraft 2](https://www.curseforge.com/minecraft/mc-mods/industrial-craft) by the IC2 team, [JEI](https://github.com/mezz/JustEnoughItems) by mezz, RFTools by McJty, Ender IO by the Ender IO team, [Integrated Dynamics](https://github.com/CyclopsMC/IntegratedDynamics) by kroeser, Extra Utilities 2 by RWTema, QuantumStorage by Gigabit101, Advanced Solar Panels by Chocohead, Calculator and SonarCore by Ollie Lansdell, Progressive Automation by Vanhal, NeoTech by TeamBR, FTB Utilities by LatvianModder and the FTB team, Applied Energistics 2 by the AE2 team, BetterFPS by Guichaguri, and Age of Engineering by davqvist. This project is not affiliated with any of them.
