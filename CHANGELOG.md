@@ -2,6 +2,11 @@
 
 Releases come out on Fridays and include everything since the previous release.
 
+## 1.2.1 (unreleased)
+
+### Mekanism
+- Fixed a crash in single player right after a world loads ("Ticking block entity", ConcurrentModificationException in CraftingManager, e.g. from an Ender IO Killer Joe). Mekanism's config sync rewrote the crafting recipe list on a network thread while the built-in server was using it. In single player the game now leaves the list alone (the server already has the same recipes); connected to a server, the rewrite runs on the game's main thread.
+
 ## 1.2.0 (Saturday 2026-11-14)
 
 ### Just Enough Calculation

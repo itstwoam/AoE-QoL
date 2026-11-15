@@ -240,6 +240,15 @@ public class PatchTransformer implements IClassTransformer {
             redirect("preOperate", "()Z", "net/minecraft/item/crafting/CraftingManager", "func_77592_b", "()Ljava/util/List;",
                 "com/itstwoam/aoeqol/misc/CrafterRecipeSearch", "recipeList", "(Ljava/lang/Object;)Ljava/util/List;",
                 "Mechanical Crafter: recipe list copy after repeated interrupted searches"));
+        String TCM = "mekanism/common/config/TypeConfigManager", TCM_DESC = "(Ljava/util/List;L" + TCM + ";)V",
+               RS = "com/itstwoam/aoeqol/mekanism/RecipeSync", RS_DESC = "(Ljava/util/List;Ljava/lang/Object;)V";
+        add("mekanism/common/CommonProxy",
+            redirect("onConfigSync", "(Z)V", TCM, "updateConfigRecipes", TCM_DESC, RS, "updateConfigRecipes", RS_DESC,
+                "Mekanism config sync leaves the shared recipe list alone in single player"));
+        add("mekanism/generators/common/MekanismGenerators",
+            redirect("onConfigChanged", "(Lnet/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent;)V",
+                TCM, "updateConfigRecipes", TCM_DESC, RS, "updateConfigRecipes", RS_DESC,
+                "Mekanism Generators config change leaves the shared recipe list alone in single player"));
         String CT = "com/itstwoam/aoeqol/calculator/ChanceText", DRAW_INFO = "(Lnet/minecraft/client/Minecraft;IIII)V";
         add("com/feed_the_beast/ftbu/gui/Guides",
             new Patch("replaceSubstitutes", "(Ljava/lang/CharSequence;)" + STRING, Kind.FILTER_RETURN,
@@ -327,6 +336,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("com.vanhal.progressiveautomation.compat.mods.Vanilla")
                      || transformedName.equals("net.minecraft.block.Block$3")
                      || transformedName.equals("com.feed_the_beast.ftbu.gui.Guides")
+                     || transformedName.equals("mekanism.common.CommonProxy")
+                     || transformedName.equals("mekanism.generators.common.MekanismGenerators")
                      || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Extraction")
                      || transformedName.equals("sonar.calculator.mod.integration.jei.Recipes$Analysing")
                      || transformedName.equals("org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders$Redstone$2")

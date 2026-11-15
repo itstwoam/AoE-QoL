@@ -161,6 +161,12 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ---
 
+## Mekanism
+
+* **Crash in single player right after a world loads.** When you join a world, Mekanism sends its config from the server to the game, and the game then removes and re-adds Mekanism's machine recipes in Minecraft's crafting recipe list. In single player the game and the built-in server share that one list, and the game did this on a network thread while the server was already ticking machines that look up recipes (Ender IO machines like the Killer Joe, the Mechanical Crafter and others). The game crashed ("Ticking block entity", ConcurrentModificationException in `CraftingManager`), most often on the second world opened in a session. Now, while a built-in server runs, the game leaves the list alone: the server already set up the same recipes from the same config. Connected to another server, the rewrite still happens, on the game's main thread. Machine on/off changes made in Mekanism's in-game config screen during single player apply after a restart.
+
+---
+
 ## Minecraft
 
 * **View spinning when a screen closes.** Now and then (about 1 close in 50, any screen, vanilla included), closing an inventory, chest or machine spins your view by however far the cursor was from the middle of the window, up to 150 degrees on a large window. When a screen closes, Minecraft captures the mouse and moves the hidden cursor back to the middle, but occasionally Windows still delivers one last cursor position from before the move, and the gap is read as one huge mouse movement. AoE-QoL remembers where the cursor was when the screen closed and ignores that one matching reading in the next few frames; all other mouse movement passes through unchanged (setting: *Ignore leftover mouse jump*).
