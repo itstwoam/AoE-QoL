@@ -21,6 +21,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [Progressive Automation](#progressive-automation) | Progressive Automation 1.7.4 (+ Extra Utilities 2) | No server crash when a Planter plants Ender Lilies; the Planter only tills for crops that need farmland |
 | [NeoTech](#neotech) | NeoTech 3.3.0 | No server crash from recipe files left over from another mod setup: they reset themselves to NeoTech's defaults |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
+| [Mekanism](#mekanism) | Mekanism 1.10.2-9.2.4.103 (+ Mekanism Generators) | No crash in single player right after a world loads (Mekanism rewrote the shared recipe list while machines looked up recipes) |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
