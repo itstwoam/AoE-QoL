@@ -7,6 +7,9 @@ Releases come out on Fridays and include everything since the previous release.
 ### Extra Utilities 2 / Applied Energistics 2
 - The Golden Lasso (and other Extra Utilities 2 recipes that cost XP) can be crafted in the AE2 crafting terminal and the Wireless Crafting Terminal. The result slot stayed empty because Extra Utilities 2 couldn't find the crafting player there. The player using the terminal is checked and pays the levels.
 
+### Applied Energistics 2 / The One Probe
+- The block Interface, ME Drive, ME Chest, IO Port, Security Station, Spatial IO Port and Spatial Pylon show "Device Online", "Device Missing Channel" or "Device Offline" in The One Probe, like AE2 parts. They need a channel but showed nothing.
+
 ## 1.2.1 (Sunday 2026-11-15)
 
 ### Mekanism

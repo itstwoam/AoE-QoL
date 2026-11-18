@@ -298,6 +298,12 @@ public class PatchTransformer implements IClassTransformer {
                 "(Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Lnet/minecraft/item/crafting/IRecipe;",
                 TC, "findMatchingRecipe", "(Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Lnet/minecraft/item/crafting/IRecipe;",
                 "crafting terminal craft: nothing taken for an XP recipe the player can't pay"));
+        add("appeng/integration/modules/theoneprobe/tile/PowerStateInfoProvider",
+            new Patch("addProbeInfo", "(Lappeng/tile/AEBaseTile;Lmcjty/theoneprobe/api/ProbeMode;Lmcjty/theoneprobe/api/IProbeInfo;"
+                    + "Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/block/state/IBlockState;"
+                    + "Lmcjty/theoneprobe/api/IProbeHitData;)V", Kind.PREPEND,
+                "com/itstwoam/aoeqol/ae2/TopChannelState", "addState", "(Ljava/lang/Object;Ljava/lang/Object;)V", "a1,a3", -1,
+                "The One Probe: channel status (online / missing channel) for Interfaces, ME Drives and other channel blocks"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
@@ -373,6 +379,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("appeng.container.slot.SlotCraftingTerm")
                      || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
                      || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
+                     || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }
