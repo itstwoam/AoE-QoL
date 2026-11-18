@@ -279,6 +279,29 @@ public class PatchTransformer implements IClassTransformer {
             new Patch("getNBTShareTag", "(" + ITEMSTACK + ")" + NBT, Kind.REPLACE,
                 "com/itstwoam/aoeqol/misc/BagShareTag", "shareTag", "(" + ITEMSTACK + ")" + NBT, "a1", -1,
                 "Bag of Holding: clients get its real contents (up to what a client accepts), so Creative mode can't empty it"));
+        String TC = "com/itstwoam/aoeqol/ae2/TerminalCrafter", IINV = "(Lnet/minecraft/inventory/IInventory;)V";
+        for (String term : new String[] {"appeng/container/implementations/ContainerCraftingTerm", "p455w0rd/wct/container/ContainerWCT"}) {
+            add(term,
+                new Patch("func_75130_a", IINV, Kind.PREPEND, TC, "beginContainer", "(Ljava/lang/Object;)V", "a0", -1,
+                    "crafting terminal: XP recipes (Golden Lasso) know the player (start)"),
+                new Patch("func_75130_a", IINV, Kind.BEFORE_RETURN, TC, "end", "()V", "", -1,
+                    "crafting terminal: XP recipes know the player (end)"));
+        }
+        String CRAFT_ITEM = "(Lnet/minecraft/entity/player/EntityPlayer;" + ITEMSTACK
+            + "Lappeng/api/storage/IMEMonitor;Lappeng/api/storage/data/IItemList;)" + ITEMSTACK;
+        add("appeng/container/slot/SlotCraftingTerm",
+            new Patch("craftItem", CRAFT_ITEM, Kind.PREPEND, TC, "beginCraft", "(Ljava/lang/Object;)V", "a1", -1,
+                "crafting terminal craft: XP recipes charge the crafting player (start)"),
+            new Patch("craftItem", CRAFT_ITEM, Kind.BEFORE_RETURN, TC, "end", "()V", "", -1,
+                "crafting terminal craft: XP recipes charge the crafting player (end)"),
+            redirect("craftItem", CRAFT_ITEM, "appeng/util/Platform", "findMatchingRecipe",
+                "(Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Lnet/minecraft/item/crafting/IRecipe;",
+                TC, "findMatchingRecipe", "(Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Lnet/minecraft/item/crafting/IRecipe;",
+                "crafting terminal craft: nothing taken for an XP recipe the player can't pay"));
+        add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
+            new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
+                TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
+                "XP recipes (Golden Lasso) work in AE2 crafting terminals"));
         add("net/minecraft/util/MouseHelper",
             new Patch("func_74372_a", "()V", Kind.PREPEND, "com/itstwoam/aoeqol/client/MouseFix", "beforeGrab", "()V", "", -1,
                 "mouse capture: remember the cursor position"),
@@ -346,6 +369,10 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("com.rwtema.extrautils2.tile.TileCrafter")
                      || transformedName.equals("org.cyclops.integrateddynamics.capability.cable.CableDefault")
                      || transformedName.equals("QuantumStorage.tile.TileQuantumTank")
+                     || transformedName.equals("appeng.container.implementations.ContainerCraftingTerm")
+                     || transformedName.equals("appeng.container.slot.SlotCraftingTerm")
+                     || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
+                     || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
             return basicClass;
         }

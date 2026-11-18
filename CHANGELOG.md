@@ -2,6 +2,11 @@
 
 Releases come out on Fridays and include everything since the previous release.
 
+## 1.2.2 (unreleased)
+
+### Extra Utilities 2 / Applied Energistics 2
+- The Golden Lasso (and other Extra Utilities 2 recipes that cost XP) can be crafted in the AE2 crafting terminal and the Wireless Crafting Terminal. The result slot stayed empty because Extra Utilities 2 couldn't find the crafting player there. The player using the terminal is checked and pays the levels.
+
 ## 1.2.1 (Sunday 2026-11-15)
 
 ### Mekanism

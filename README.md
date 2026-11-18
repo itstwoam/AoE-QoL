@@ -129,6 +129,8 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 * **Bag of Holding emptied on servers.** The bag keeps its contents in the item's data, but Extra Utilities 2 sends clients an empty copy. In Creative mode Minecraft trusts the client with the inventory and writes the client's copy back, so on a server the bag lost everything (e.g. after browsing a creative tab and moving the bag; single player wasn't affected). The bag now sends its real data, as long as a client would accept it (Minecraft reads at most about 2 MB of data per item); a bag stuffed beyond that is sent the old way. Server side, no setting.
 
+* **Golden Lasso missing from AE2 crafting terminals.** Extra Utilities 2 recipes that cost XP (the Golden Lasso: 8 levels) look for the crafting player by checking whether the crafting grid belongs to the screen a player has open. AE2's crafting terminal and the Wireless Crafting Terminal work recipes out in a separate grid with no owner, so the result slot stayed empty even with the ingredients and the levels. Now the player using the terminal is checked and pays the levels, like at a crafting table. AE2's security (opening the terminal, taking items) is unchanged. Molecular Assemblers have no player, so these recipes still can't be autocrafted.
+
 ---
 
 ## Advanced Solar Panels
