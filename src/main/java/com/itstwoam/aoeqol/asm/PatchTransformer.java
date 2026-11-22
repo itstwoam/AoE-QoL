@@ -304,6 +304,11 @@ public class PatchTransformer implements IClassTransformer {
                     + "Lmcjty/theoneprobe/api/IProbeHitData;)V", Kind.PREPEND,
                 "com/itstwoam/aoeqol/ae2/TopChannelState", "addState", "(Ljava/lang/Object;Ljava/lang/Object;)V", "a1,a3", -1,
                 "The One Probe: channel status (online / missing channel) for Interfaces, ME Drives and other channel blocks"));
+        add("appeng/items/parts/ItemFacade",
+            new Patch("getTextureBlockState", "(" + ITEMSTACK + ")Lnet/minecraft/block/state/IBlockState;", Kind.FILTER_RETURN,
+                "com/itstwoam/aoeqol/ae2/FacadeRotate", "textureState",
+                "(Lnet/minecraft/block/state/IBlockState;Ljava/lang/Object;)Lnet/minecraft/block/state/IBlockState;", "a1", -1,
+                "AE2 facades turned with a wrench keep their direction (hay bale, bone block, purpur pillar)"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
@@ -377,6 +382,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("QuantumStorage.tile.TileQuantumTank")
                      || transformedName.equals("appeng.container.implementations.ContainerCraftingTerm")
                      || transformedName.equals("appeng.container.slot.SlotCraftingTerm")
+                     || transformedName.equals("appeng.items.parts.ItemFacade")
                      || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
                      || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
                      || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")

@@ -10,12 +10,12 @@ import net.minecraftforge.common.config.Property;
  * (The Just Enough Calculation lists live in JEC's own config file.)
  */
 public final class AoEQoLConfig {
-    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec", ENDERIO = "enderio", ADVSOLAR = "advsolar";
+    public static final String BETTERFPS = "betterfps", RFTOOLS = "rftools", IC2 = "ic2", LOCALE = "locale", MINECRAFT = "minecraft", JEC = "jec", ENDERIO = "enderio", ADVSOLAR = "advsolar", AE2 = "ae2";
 
     public static Configuration config;
     public static Property preventAsyncSearch, noticeShown, scannerJeiSync, splitterRedstone, localeNoticeShown, ignoreMouseJump,
             jecConditionTags, jecOreUnify, jecPageArrows, rftoolsMatching, rftoolsEmptyTag, ic2SplitNetworks, quitFreezeFix,
-            eioStrictFilters, mtQuartzToCertus;
+            eioStrictFilters, mtQuartzToCertus, ae2RotateFacades;
 
     /**
      * Current values, read by the patched code (some of it runs very often, so it reads a field rather than parsing
@@ -23,7 +23,7 @@ public final class AoEQoLConfig {
      */
     public static volatile boolean ON_JEC_CONDITION_TAGS = true, ON_JEC_ORE_UNIFY = true, ON_JEC_PAGE_ARROWS = true, ON_RFTOOLS_MATCHING = true, ON_RFTOOLS_EMPTY_TAG = true,
             ON_IC2_SPLIT_NETWORKS = true, ON_QUIT_FREEZE = true, ON_MOUSE_JUMP = true,
-            ON_EIO_STRICT_FILTERS = true, ON_MT_QUARTZ_TO_CERTUS = true;
+            ON_EIO_STRICT_FILTERS = true, ON_MT_QUARTZ_TO_CERTUS = true, ON_AE2_ROTATE_FACADES = true;
 
     /** Not a setting: cleared by calculator.ChanceText if SonarCore's recipe classes can't be read, so Calculator draws its own text again. */
     public static volatile boolean OK_CALC_ANALYSING_JEI = true;
@@ -109,6 +109,15 @@ public final class AoEQoLConfig {
               + "ones the pack's mods register (gemQuartz, crystalCertusQuartz, dustQuartz). Recipes load at start-up, so a\n"
               + "change needs a restart. false: ASP's normal behaviour.")
                 .setLanguageKey("aoeqol.config.transformerQuartzToCertus").setRequiresMcRestart(true);
+        ConfigCategory ae2 = config.getCategory(AE2);
+        ae2.setComment("Applied Energistics 2: facades.");
+        ae2.setLanguageKey("aoeqol.config.ae2");
+        ae2RotateFacades = config.get(AE2, "wrenchTurnsFacades", true,
+                "Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it: logs go standing,\n"
+              + "east-west, north-south, then bark on all sides; other blocks with a direction (hay bale, bone block, pillars)\n"
+              + "step through theirs. The facade keeps its direction when broken and placed again. Left-click with anything\n"
+              + "else works as usual. Needs AoE-QoL on the server too. false: left-click with those tools works as usual.")
+                .setLanguageKey("aoeqol.config.wrenchTurnsFacades");
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");
         minecraft.setLanguageKey("aoeqol.config.minecraft");
@@ -140,5 +149,6 @@ public final class AoEQoLConfig {
         ON_MOUSE_JUMP = ignoreMouseJump.getBoolean();
         ON_EIO_STRICT_FILTERS = eioStrictFilters.getBoolean();
         ON_MT_QUARTZ_TO_CERTUS = mtQuartzToCertus.getBoolean();
+        ON_AE2_ROTATE_FACADES = ae2RotateFacades.getBoolean();
     }
 }

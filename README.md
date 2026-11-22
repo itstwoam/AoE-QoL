@@ -16,6 +16,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [Integrated Dynamics and Extra Utilities 2](#integrated-dynamics-and-extra-utilities-2) | Integrated Dynamics 0.7.14, Extra Utilities 2 1.2.0 | No server crash when a Redstone Reader faces an Extra Utilities 2 block; logic cables drawn right after connecting |
 | [QuantumStorage](#quantumstorage) | QuantumStorage 3.3.6 | No server crash when an Extra Utilities 2 node connects to a Quantum Tank |
 | [Extra Utilities 2](#extra-utilities-2) | Extra Utilities 2 1.2.0 | No crash when a Mechanical Crafter searches for its recipe while another mod changes the recipe list; a Bag of Holding no longer empties on a server after Creative mode |
+| [Applied Energistics 2](#applied-energistics-2) | AE2 rv4-stable-1 (+ The One Probe) | A wrench or Network Tool turns facades (log bark on top); channel status for Interfaces, ME Drives and other channel blocks in The One Probe |
 | [Advanced Solar Panels](#advanced-solar-panels) | Advanced Solar Panels 4.0.4 (+ AE2) | Molecular Transformer turns nether quartz into certus quartz |
 | [Calculator](#calculator) | Calculator 3.2.5 (+ JEI, FTB Utilities) | Right circuit odds in JEI and the pack guide (Extraction Chamber 11.1%, Analysing Chamber per item) |
 | [Progressive Automation](#progressive-automation) | Progressive Automation 1.7.4 (+ Extra Utilities 2) | No server crash when a Planter plants Ender Lilies; the Planter only tills for crops that need farmland |
@@ -135,6 +136,8 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 
 ## Applied Energistics 2
 
+* **Turn facades with a wrench.** A facade shows its block standing, so a log facade always has rings on top. Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it one step: logs go standing, lying east-west, lying north-south, then bark on all sides; other blocks with a direction step through theirs (hay bale, bone block, purpur and quartz pillars, pumpkin). Blocks without a direction (stone, planks) don't change. The facade doesn't break, holding the button turns it only once, and the facade keeps its direction when broken, picked up or placed again. Left-click with anything else works as usual, and so does left-clicking a cable or part with those tools. Only directions the block can store are used, and AE2's own facade rules still decide which blocks can be facades. Needs AoE-QoL on the server as well (setting: Wrench turns facades).
+
 * **Channel status for Interfaces, ME Drives and other channel blocks in The One Probe.** AE2 shows "Device Online", "Device Missing Channel" or "Device Offline" only for parts and a few blocks. The block Interface, ME Drive, ME Chest, IO Port, Security Station, Spatial IO Port and Spatial Pylon need a channel too but showed nothing, so a missing channel was invisible. Now they show the same line, worked out from their network connection on the server. Display only, no setting.
 
 ---
@@ -210,6 +213,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 | EU-Splitter Cable connects to redstone (`splitterCableConnectsRedstone`) | on | Redstone dust and conduits connect to the splitter cable |
 | Molecular Transformer: nether quartz to certus quartz (`transformerQuartzToCertus`) | on | Advanced Solar Panels: the transformer's quartz recipe loads; needs a restart |
 | Filters do what their mode says (`filtersDoWhatTheirModeSays`) | on | Ender IO: an empty whitelist filter passes nothing; new transceivers' built-in filters start as blacklist |
+| Wrench turns facades (`wrenchTurnsFacades`) | on | AE2: left-click a facade with a wrench or Network Tool to turn it (needs AoE-QoL on the server too) |
 
 Crash fixes are always on, and new JEI pages and the fuller step list have no setting either. Everything that changes how something behaves can be turned off. A section only shows in game when the mod it's about is installed. The Just Enough Calculation lists live in JEC's own config (Mods → Just Enough Calculation → Config).
 

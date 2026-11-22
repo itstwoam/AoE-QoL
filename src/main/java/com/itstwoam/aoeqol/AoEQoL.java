@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
  *   <li>BetterFPS "Async" creative search switched to "On" (crashes): {@link com.itstwoam.aoeqol.client.BetterFpsFix}.</li>
  *   <li>Turkish/Azerbaijani system language no longer crashes startup: {@link com.itstwoam.aoeqol.asm.TurkishLocaleFix}.</li>
  *   <li>Storage Scanner search synced with JEI: {@link com.itstwoam.aoeqol.client.ScannerJeiSync}.</li>
+ *   <li>AE2 facades turned with a wrench or Network Tool: {@link com.itstwoam.aoeqol.ae2.FacadeRotate}.</li>
  *   <li>Settings: {@link AoEQoLConfig}, in game through {@link com.itstwoam.aoeqol.client.ConfigGuiFactory}.</li>
  * </ul>
  * Every part switches itself off when the mod it works with isn't installed.
@@ -43,10 +44,14 @@ public class AoEQoL {
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.JecServerSwitchFix());
         }
         AoEQoLConfig.init(event.getModConfigurationDirectory());
+        if (Loader.isModLoaded("appliedenergistics2")) com.itstwoam.aoeqol.ae2.FacadeRotate.init();
         if (event.getSide().isClient()) {
             com.itstwoam.aoeqol.client.BetterFpsFix.init();
             com.itstwoam.aoeqol.client.LocaleNotice.init();
             MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ConfigGuiFactory.ChangeHandler());
+            if (Loader.isModLoaded("appliedenergistics2")) {
+                MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.ae2.FacadeRotateClient());
+            }
             if (Loader.isModLoaded("rftools") && Loader.isModLoaded("JEI")) {
                 MinecraftForge.EVENT_BUS.register(new com.itstwoam.aoeqol.client.ScannerJeiSync());
             }

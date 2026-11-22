@@ -34,6 +34,7 @@ public final class ConfigGuiFactory implements IModGuiFactory {
             List<IConfigElement> list = new ArrayList<IConfigElement>();
             list.add(section(AoEQoLConfig.MINECRAFT));
             if (Loader.isModLoaded("advanced_solar_panels")) list.add(section(AoEQoLConfig.ADVSOLAR));
+            if (Loader.isModLoaded("appliedenergistics2")) list.add(section(AoEQoLConfig.AE2));
             if (BetterFpsFix.installed()) list.add(section(AoEQoLConfig.BETTERFPS));
             if (Loader.isModLoaded("EnderIO")) list.add(section(AoEQoLConfig.ENDERIO));
             if (Loader.isModLoaded("IC2")) list.add(section(AoEQoLConfig.IC2));

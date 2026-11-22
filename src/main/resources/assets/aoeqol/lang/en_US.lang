@@ -38,3 +38,7 @@ aoeqol.config.advsolar=Advanced Solar Panels
 aoeqol.config.advsolar.tooltip=Advanced Solar Panels: Molecular Transformer recipes.
 aoeqol.config.transformerQuartzToCertus=Molecular Transformer: nether quartz to certus quartz
 aoeqol.config.transformerQuartzToCertus.tooltip=The recipe is in Advanced Solar Panels' recipe file but uses ore dictionary names nothing in the pack registers, so it was skipped. On: the names the pack's mods use are taken instead. Needs a restart. Off: Advanced Solar Panels' normal behaviour.
+aoeqol.config.ae2=Applied Energistics 2
+aoeqol.config.ae2.tooltip=Applied Energistics 2: facades.
+aoeqol.config.wrenchTurnsFacades=Wrench turns facades
+aoeqol.config.wrenchTurnsFacades.tooltip=Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it: logs go standing, east-west, north-south, then bark on all sides; other blocks with a direction step through theirs. Left-click with anything else works as usual. Needs AoE-QoL on the server too. Off: left-click with those tools works as usual.
