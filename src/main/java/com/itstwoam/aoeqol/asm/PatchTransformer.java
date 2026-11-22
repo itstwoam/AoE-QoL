@@ -309,6 +309,22 @@ public class PatchTransformer implements IClassTransformer {
                 "com/itstwoam/aoeqol/ae2/FacadeRotate", "textureState",
                 "(Lnet/minecraft/block/state/IBlockState;Ljava/lang/Object;)Lnet/minecraft/block/state/IBlockState;", "a1", -1,
                 "AE2 facades turned with a wrench keep their direction (hay bale, bone block, purpur pillar)"));
+        add("appeng/facade/FacadeContainer",
+            new Patch("readFromStream", "(Lio/netty/buffer/ByteBuf;)Z", Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRotate", "beforeStreamRead", "(Ljava/lang/Object;)V", "a0", -1,
+                "AE2 facades: a facade swapped for another one is redrawn (start)"),
+            new Patch("readFromStream", "(Lio/netty/buffer/ByteBuf;)Z", Kind.FILTER_RETURN, "com/itstwoam/aoeqol/ae2/FacadeRotate", "afterStreamRead", "(ZLjava/lang/Object;)Z", "a0", -1,
+                "AE2 facades: a facade swapped for another one is redrawn (end)"));
+        String ADD_FACADE = "(Lnet/minecraft/util/BlockRenderLayer;Ljava/util/Map;Lnet/minecraft/util/EnumFacing;Lappeng/api/util/AEAxisAlignedBB;ZZJLappeng/client/render/cablebus/CubeBuilder;)V";
+        add("appeng/client/render/cablebus/FacadeBuilder",
+            new Patch("getSprite", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/EnumFacing;J)Lappeng/client/render/cablebus/FacadeBuilder$TextureAtlasAndTint;",
+                Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRender", "remember", "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;J)V", "a0,a1,a2,j3", -1,
+                "AE2 facades: texture direction from the block's model (lookup)"),
+            redirect("addFacade", ADD_FACADE, "appeng/client/render/cablebus/CubeBuilder", "setTexture", "(Lnet/minecraft/util/EnumFacing;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
+                "com/itstwoam/aoeqol/ae2/FacadeRender", "setTexture", "(Ljava/lang/Object;Lnet/minecraft/util/EnumFacing;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
+                "AE2 facades: texture direction from the block's model (faces)"),
+            redirect("addFacade", ADD_FACADE, "appeng/client/render/cablebus/CubeBuilder", "setTexture", "(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
+                "com/itstwoam/aoeqol/ae2/FacadeRender", "setTextureAll", "(Ljava/lang/Object;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
+                "AE2 facades: texture direction from the block's model (stilt reset)"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
@@ -383,6 +399,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("appeng.container.implementations.ContainerCraftingTerm")
                      || transformedName.equals("appeng.container.slot.SlotCraftingTerm")
                      || transformedName.equals("appeng.items.parts.ItemFacade")
+                     || transformedName.equals("appeng.facade.FacadeContainer")
+                     || transformedName.equals("appeng.client.render.cablebus.FacadeBuilder")
                      || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
                      || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
                      || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")

@@ -263,6 +263,54 @@ public final class FacadeRotate {
         }
     }
 
+    private static final ThreadLocal<String> BEFORE = new ThreadLocal<String>();
+    private static volatile boolean streamBroken;
+    private static Method fcGetFacade, fpGetItem, fpGetDamage, locFromOrdinal;
+
+    /**
+     * Start of AE2's FacadeContainer.readFromStream (client, cable bus update): remembers which facades it had.
+     * AE2 only redraws the cable when a facade appears or disappears, so a facade swapped for another one (turned
+     * with the wrench) kept its old look until something else redrew the block.
+     */
+    public static void beforeStreamRead(Object fc) {
+        BEFORE.set(facadeKey(fc));
+    }
+
+    /** End of FacadeContainer.readFromStream: "changed" also when a facade became a different one. */
+    public static boolean afterStreamRead(boolean changed, Object fc) {
+        if (changed) { BEFORE.remove(); return true; }
+        String before = BEFORE.get();
+        BEFORE.remove();
+        if (before == null) return false;
+        String now = facadeKey(fc);
+        return now != null && !now.equals(before);
+    }
+
+    private static String facadeKey(Object fc) {
+        if (streamBroken || fc == null) return null;
+        try {
+            if (fcGetFacade == null) {
+                ClassLoader cl = FacadeRotate.class.getClassLoader();
+                Class<?> loc = Class.forName("appeng.api.util.AEPartLocation", false, cl);
+                Class<?> fp = Class.forName("appeng.api.parts.IFacadePart", false, cl);
+                fpGetItem = fp.getMethod("getItem");
+                fpGetDamage = fp.getMethod("getItemDamage");
+                locFromOrdinal = loc.getMethod("fromOrdinal", int.class);
+                fcGetFacade = Class.forName("appeng.api.parts.IFacadeContainer", false, cl).getMethod("getFacade", loc);
+            }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 6; i++) {
+                Object part = fcGetFacade.invoke(fc, locFromOrdinal.invoke(null, i));
+                if (part == null) { sb.append('-'); continue; }
+                sb.append(System.identityHashCode(fpGetItem.invoke(part))).append(':').append(fpGetDamage.invoke(part)).append(';');
+            }
+            return sb.toString();
+        } catch (Throwable t) {
+            streamBroken = true;
+            return null;
+        }
+    }
+
     /** Client -> server: turn the facade on {@code side} of the cable bus at {@code pos}. */
     public static final class RotateMsg implements IMessage {
         BlockPos pos;
