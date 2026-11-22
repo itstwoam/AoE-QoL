@@ -4,19 +4,13 @@ import com.itstwoam.aoeqol.AoEQoL;
 import com.itstwoam.aoeqol.AoEQoLConfig;
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -34,21 +28,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 /**
- * Left-click an AE2 facade with a Certus/Nether Quartz Wrench or Network Tool to turn it: logs step through standing,
- * lying east-west, lying north-south and bark on all sides; other blocks with an axis or facing step through theirs
- * (hay bale, bone block, purpur pillar, quartz pillar, pumpkin...). Blocks without a direction don't change.
- *
- * A facade only stores the source item and its damage, and AE2 draws it from block.getStateFromMeta(damage). This
- * steps the block's own direction property, keeps only states that survive the state -> meta -> state round trip,
- * and lets AE2's own createFacadeForItem accept the result before swapping the facade, so it can't make a facade AE2
- * would refuse. The rotated facade keeps its direction when broken, picked or placed again.
+ * Left-click an AE2 facade with a Certus/Nether Quartz Wrench or Network Tool to turn the face it shows a quarter
+ * turn; sneak + left-click to show the source block's next face (top, bottom, north, south, west, east), keeping the
+ * quarters. Works for any facade. The turn is stored with the placed facade ({@link FacadeTurn}) and drawn by
+ * {@link FacadeRender}; broken, wrenched or picked facades come back as the plain facade, so they stack.
  *
  * Client: {@link FacadeRotateClient} cancels the click (so nothing starts breaking) and sends {@link RotateMsg}.
  * Server: checks reach, held item and the facade, then swaps it. The client only does this when the server said it
  * has the feature on ({@link HelloMsg} at login), so on a server without AoE-QoL left-click stays normal.
- *
- * Blocks whose item doesn't keep its damage (hay bale, bone block, purpur pillar: plain ItemBlock) would always draw
- * standing, so {@link #textureState} (end of ItemFacade.getTextureBlockState) uses the stored damage for those.
  */
 public final class FacadeRotate {
     private FacadeRotate() {}
@@ -60,7 +47,7 @@ public final class FacadeRotate {
     private static volatile boolean broken;
     private static Class<?> partHost, facadeItem;
     private static Method selectPart, getFacadeContainer, getFacade, removeFacade, addFacade, markForUpdate, markForSave,
-            getTextureItem, getItemStack, createFacadeForItem, createPartFromItemStack, fromOrdinal;
+            getTextureItem, getItemStack, createPartFromItemStack, fromOrdinal;
     private static java.lang.reflect.Field spFacade, spPart, spSide;
 
     private static final String[] TOOLS = {"appliedenergistics2:certus_quartz_wrench", "appliedenergistics2:nether_quartz_wrench",
@@ -93,7 +80,6 @@ public final class FacadeRotate {
             addFacade = fc.getMethod("addFacade", fp);
             getTextureItem = fp.getMethod("getTextureItem");
             getItemStack = fp.getMethod("getItemStack");
-            createFacadeForItem = facadeItem.getMethod("createFacadeForItem", ItemStack.class, boolean.class);
             createPartFromItemStack = facadeItem.getMethod("createPartFromItemStack", ItemStack.class, loc);
             fromOrdinal = loc.getMethod("fromOrdinal", int.class);
             spFacade = sp.getField("facade");
@@ -148,9 +134,13 @@ public final class FacadeRotate {
             ItemStack facadeStack = (ItemStack) getItemStack.invoke(part);
             ItemStack base = (ItemStack) getTextureItem.invoke(part);
             if (facadeStack == null || base == null || !facadeItem.isInstance(facadeStack.getItem())) return;
+            NBTTagCompound tag = facadeStack.getTagCompound();
+            if (tag == null || !tag.hasKey("damage")) return;
             Object fi = facadeStack.getItem();
-            ItemStack next = nextFacade(fi, base);
-            if (next == null) return;
+            int damage = tag.getInteger("damage");
+            int turn = FacadeTurn.step(FacadeTurn.turnOf(damage), side, player.isSneaking());
+            ItemStack next = facadeStack.copy();
+            next.getTagCompound().setInteger("damage", FacadeTurn.plain(damage) | (turn << FacadeTurn.SHIFT));
             Object newPart = createPartFromItemStack.invoke(fi, next, loc);
             if (newPart == null) return;
             removeFacade.invoke(fc, te, loc);
@@ -161,105 +151,26 @@ public final class FacadeRotate {
             markForSave.invoke(te);
             markForUpdate.invoke(te);
             Block b = Block.getBlockFromItem(base.getItem());
-            if (b != null) world.playSound(null, pos, b.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 0.6F, 1.1F);
+            if (b != null) world.playSound(null, pos, b.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, 0.5F, 1.2F);
         } catch (Throwable t) {
             AoEQoL.LOG.warn("Couldn't turn the AE2 facade at {}: {}", pos, t.toString());
         }
     }
 
-    /** The facade item for the next direction of the base block, or null if it has none. */
-    private static ItemStack nextFacade(Object facadeItemObj, ItemStack base) throws Exception {
-        Item item = base.getItem();
-        Block block = Block.getBlockFromItem(item);
-        if (block == null) return null;
-        int meta = stateMeta(item, base.getItemDamage());
-        IBlockState state = block.getStateFromMeta(meta);
-        for (IProperty<?> prop : state.getPropertyNames()) {
-            List<Object> values = directionValues(prop, state.getValue(prop));
-            if (values == null || values.size() < 2) continue;
-            int at = values.indexOf(state.getValue(prop));
-            for (int step = 1; step < values.size(); step++) {
-                IBlockState ns = with(state, prop, values.get((at + step) % values.size()));
-                int nm = block.getMetaFromState(ns);
-                if (nm < 0 || nm > 15 || block.getStateFromMeta(nm) != ns) continue;
-                ItemStack nb = new ItemStack(item, 1, nm);
-                if (stateMeta(item, nm) != nm) continue;
-                Object f = createFacadeForItem.invoke(facadeItemObj, nb, false);
-                if (f instanceof ItemStack) return (ItemStack) f;
-            }
-        }
-        return null;
+    /** Patched over Item.getMetadata(stack) in ItemFacade.getTextureBlockState: the block meta without the turn. */
+    public static int plainMeta(Item item, ItemStack stack) {
+        if (stack == null || FacadeTurn.plain(stack.getItemDamage()) == stack.getItemDamage()) return item.getMetadata(stack);
+        ItemStack c = stack.copy();
+        c.setItemDamage(FacadeTurn.plain(stack.getItemDamage()));
+        return item.getMetadata(c);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static IBlockState with(IBlockState s, IProperty p, Object v) {
-        return s.withProperty(p, (Comparable) v);
-    }
-
-    /**
-     * The values of a direction property, in turning order, or null if it isn't one. Axis properties go standing,
-     * east-west, north-south, then all-bark/none; facing goes in its own order. A "variant" holding pillar values
-     * (quartz pillar: lines_y/x/z) counts with just those values.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static List<Object> directionValues(IProperty prop, Object current) {
-        Collection<?> all = prop.getAllowedValues();
-        Class<?> vc = prop.getValueClass();
-        String name = prop.getName();
-        boolean axis = vc == EnumFacing.Axis.class || "axis".equals(name)
-                || (vc.isEnum() && vc.getName().equals("net.minecraft.block.BlockLog$EnumAxis"));
-        boolean facing = vc == EnumFacing.class || "facing".equals(name);
-        List<Object> out = new ArrayList<Object>();
-        if (axis) {
-            for (String n : new String[] {"y", "x", "z", "none"})
-                for (Object v : all) if (n.equals(prop.getName((Comparable) v))) out.add(v);
-            for (Object v : all) if (!out.contains(v)) out.add(v);
-            return out;
-        }
-        if (facing) {   // turning round: north, east, south, west, then up and down
-            for (String n : new String[] {"north", "east", "south", "west", "up", "down"})
-                for (Object v : all) if (n.equals(prop.getName((Comparable) v))) out.add(v);
-            for (Object v : all) if (!out.contains(v)) out.add(v);
-            return out;
-        }
-        String cur = prop.getName((Comparable) current);
-        if (cur != null && cur.startsWith("lines_")) {
-            for (String n : new String[] {"lines_y", "lines_x", "lines_z"})
-                for (Object v : all) if (n.equals(prop.getName((Comparable) v))) out.add(v);
-            return out;
-        }
-        return null;
-    }
-
-    /**
-     * The block meta a facade of this item and damage stands for. AE2 uses item.getMetadata(damage); for an item that
-     * doesn't keep its damage (plain ItemBlock) the damage itself, so turned hay/bone/purpur facades keep their axis.
-     */
-    private static int stateMeta(Item item, int damage) {
-        int m = item.getMetadata(damage);
-        return (m != damage && damage >= 0 && damage <= 15 && !item.getHasSubtypes()) ? damage : m;
-    }
-
-    /**
-     * Patched in at the end of AE2's ItemFacade.getTextureBlockState: for a facade of an item that drops its damage
-     * (hay bale, bone block, purpur pillar), the state for the stored damage instead of the standing one. Only
-     * facades turned with the wrench have such a damage; every other facade comes back unchanged.
-     */
-    public static IBlockState textureState(IBlockState ret, Object stack) {
+    /** Patched over IFacadePart.getItemStack() where AE2 hands a facade out (drops, wrench, pick block): no turn. */
+    public static ItemStack dropStack(Object part) {
         try {
-            if (ret == null || !(stack instanceof ItemStack)) return ret;
-            NBTTagCompound tag = ((ItemStack) stack).getTagCompound();
-            if (tag == null || !tag.hasKey("damage")) return ret;
-            int damage = tag.getInteger("damage");
-            if (damage <= 0 || damage > 15) return ret;
-            Item item = Item.getByNameOrId(tag.getString("item"));
-            if (item == null || item.getHasSubtypes() || item.getMetadata(damage) == damage) return ret;
-            Block block = Block.getBlockFromItem(item);
-            if (block == null || ret.getBlock() != block) return ret;
-            IBlockState s = block.getStateFromMeta(damage);
-            return block.getMetaFromState(s) == damage ? s : ret;
+            return FacadeTurn.plainStack((ItemStack) getItemStack.invoke(part));
         } catch (Throwable t) {
-            return ret;
+            try { return (ItemStack) part.getClass().getMethod("getItemStack").invoke(part); } catch (Throwable u) { return null; }
         }
     }
 

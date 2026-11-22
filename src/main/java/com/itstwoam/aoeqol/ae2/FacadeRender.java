@@ -1,173 +1,173 @@
 package com.itstwoam.aoeqol.ae2;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 /**
- * AE2 facades drawn with their block's texture direction (client only).
+ * Draws AE2 facades as a real (turned) block would look (client only).
  *
- * AE2's FacadeBuilder takes only the sprite of each face from the block's model and puts it on its own cube with
- * fixed texture directions, so a rotated model (a log lying east-west vs north-south, a quartz pillar on its side)
- * loses its rotation. Patched in:
- * - start of FacadeBuilder.getSprite: {@link #remember} keeps the model and state being looked up;
- * - FacadeBuilder.addFacade's calls to CubeBuilder.setTexture: {@link #setTexture} also sets the face's texture
- *   rotation (CubeBuilder.setUvRotation, 0-3) to the one that matches the model's own quad for that face, and
- *   {@link #setTextureAll} (the stilt) resets the rotations to 0.
- * The matching rotation is found by comparing which way u and v run across the face on the model's quad with
- * quads AE2's own CubeBuilder makes for each rotation, so it follows AE2's conventions rather than guessing them.
- * Any problem: rotation 0, as before.
+ * AE2's FacadeBuilder.addFacade takes one sprite per face from the block's model and lays it on its own cube with
+ * fixed texture directions: rotated models lose their rotation, and three faces come out mirrored. Patched in at
+ * the start ({@link #begin}) and every return ({@link #end}) of addFacade: every quad AE2 added for the facade is
+ * given the sprite, texture coordinates and tint of the block's own model face it should show. Which face that is
+ * comes from the facade's turn ({@link FacadeTurn}): no turn = the block as placed normally; a turn shows the chosen
+ * source face on the facade's outward side, turned in 90 degree steps, with the other faces following as if the
+ * whole block were turned. Texture coordinates are read off the model's quad at the same spot of the face, so the
+ * facade's thin edges and any cut-outs line up too. Model faces that aren't a full square, AE2's own facade texture
+ * and any error: AE2's quad is left as it was.
  */
 public final class FacadeRender {
     private FacadeRender() {}
 
-    private static final ThreadLocal<Object[]> LOOKUP = new ThreadLocal<Object[]>();
+    private static final ThreadLocal<Object[]> CTX = new ThreadLocal<Object[]>();
     private static volatile boolean broken;
-    private static Method setTexFace, setTexAll, setUvRotation, setDrawFaces, addCube, getOutput;
-    private static Constructor<?> newBuilder;
-    /** [face][rotation] -> signature of CubeBuilder's own quad; filled lazily. */
-    private static final int[][][] TABLE = new int[6][][];
+    private static Method getOutput, getSourceBlock, resolveTint;
+    private static Field textureItem, facadeTexture;
 
-    /** Start of FacadeBuilder.getSprite(model, state, facing, rand). */
-    public static void remember(Object model, Object state, Object facing, long rand) {
-        LOOKUP.set(new Object[] {model, state, rand});
-    }
-
-    /** Replaces builder.setTexture(facing, sprite) in FacadeBuilder.addFacade. */
-    public static void setTexture(Object builder, EnumFacing facing, TextureAtlasSprite sprite) throws Throwable {
-        if (!ready(builder)) {
-            builder.getClass().getMethod("setTexture", EnumFacing.class, TextureAtlasSprite.class).invoke(builder, facing, sprite);
-            return;
-        }
-        setTexFace.invoke(builder, facing, sprite);
-        int rot = 0;
+    /** Start of FacadeBuilder.addFacade(layer, facades, side, busBounds, thin, stilt, rand, builder). */
+    public static void begin(Object facadeBuilder, Object facades, Object side, Object builder) {
+        CTX.remove();
+        if (broken || !(facades instanceof Map) || !(side instanceof EnumFacing) || builder == null) return;
         try {
-            Object[] l = LOOKUP.get();
-            if (l != null && facing != null && sprite != null) rot = rotationFor((IBakedModel) l[0], (IBlockState) l[1], (Long) l[2], facing, sprite);
-        } catch (Throwable t) {
-            rot = 0;
-        }
-        setUvRotation.invoke(builder, facing, rot);
-    }
-
-    /** Replaces builder.setTexture(sprite) in FacadeBuilder.addFacade (the stilt): all faces back to rotation 0. */
-    public static void setTextureAll(Object builder, TextureAtlasSprite sprite) throws Throwable {
-        if (!ready(builder)) {
-            builder.getClass().getMethod("setTexture", TextureAtlasSprite.class).invoke(builder, sprite);
-            return;
-        }
-        setTexAll.invoke(builder, sprite);
-        for (EnumFacing f : EnumFacing.values()) setUvRotation.invoke(builder, f, 0);
-    }
-
-    private static boolean ready(Object builder) {
-        if (broken || builder == null) return false;
-        if (setUvRotation != null) return true;
-        try {
-            Class<?> c = builder.getClass();
-            setTexFace = c.getMethod("setTexture", EnumFacing.class, TextureAtlasSprite.class);
-            setTexAll = c.getMethod("setTexture", TextureAtlasSprite.class);
-            setDrawFaces = c.getMethod("setDrawFaces", EnumSet.class);
-            addCube = c.getMethod("addCube", float.class, float.class, float.class, float.class, float.class, float.class);
-            getOutput = c.getMethod("getOutput");
-            newBuilder = c.getConstructor(VertexFormat.class, List.class);
-            setUvRotation = c.getMethod("setUvRotation", EnumFacing.class, int.class);
-            return true;
+            if (getOutput == null) {
+                Field ft = facadeBuilder.getClass().getDeclaredField("facadeTexture");
+                ft.setAccessible(true);
+                facadeTexture = ft;
+                getOutput = builder.getClass().getMethod("getOutput");
+            }
+            Object frs = ((Map<?, ?>) facades).get(side);
+            if (frs == null) return;
+            if (getSourceBlock == null) {
+                Field tf = frs.getClass().getDeclaredField("textureItem");
+                tf.setAccessible(true);
+                textureItem = tf;
+                resolveTint = frs.getClass().getMethod("resolveTintColor", int.class);
+                getSourceBlock = frs.getClass().getMethod("getSourceBlock");
+            }
+            List<?> out = (List<?>) getOutput.invoke(builder);
+            IBlockState state = (IBlockState) getSourceBlock.invoke(frs);
+            if (out == null || state == null) return;
+            int turn = 0;
+            Object ti = textureItem.get(frs);
+            if (ti instanceof ItemStack) turn = FacadeTurn.turnOf(((ItemStack) ti).getItemDamage());
+            CTX.set(new Object[] {out, out.size(), side, turn, state, frs, facadeTexture.get(facadeBuilder)});
         } catch (Throwable t) {
             broken = true;
-            return false;
         }
     }
 
-    private static int rotationFor(IBakedModel model, IBlockState state, long rand, EnumFacing facing, TextureAtlasSprite sprite) throws Throwable {
-        BakedQuad q = null;
-        for (BakedQuad b : model.getQuads(state, facing, rand)) if (b.getSprite() == sprite) { q = b; break; }
-        if (q == null) for (BakedQuad b : model.getQuads(state, null, rand)) if (b.getFace() == facing && b.getSprite() == sprite) { q = b; break; }
-        if (q == null) return 0;
-        int[] want = signature(q, facing);
-        if (want == null) return 0;
-        int[][] table = table(facing, sprite);
-        int best = 0, bestScore = -1;
-        for (int r = 0; r < 4; r++) {
-            if (table[r] == null) continue;
-            int score = 0;
-            for (int i = 0; i < 4; i++) if (table[r][i] == want[i]) score++;
-            if (score > bestScore) { best = r; bestScore = score; }
-        }
-        return best;
-    }
-
-    private static int[][] table(EnumFacing facing, TextureAtlasSprite sprite) throws Throwable {
-        int[][] t = TABLE[facing.ordinal()];
-        if (t != null) return t;
-        t = new int[4][];
-        for (int r = 0; r < 4; r++) {
-            List<BakedQuad> out = new ArrayList<BakedQuad>();
-            Object b = newBuilder.newInstance(DefaultVertexFormats.ITEM, out);
-            setTexAll.invoke(b, sprite);
-            setUvRotation.invoke(b, facing, r);
-            setDrawFaces.invoke(b, EnumSet.of(facing));
-            addCube.invoke(b, 0F, 0F, 0F, 16F, 16F, 16F);
-            for (BakedQuad q : out) if (q.getFace() == facing) { t[r] = signature(q, facing); break; }
-        }
-        TABLE[facing.ordinal()] = t;
-        return t;
-    }
-
-    /**
-     * Which way u and v run across the face: signs of du/da, du/db, dv/da, dv/db, with a and b the face's two axes
-     * (UP/DOWN: x,z; NORTH/SOUTH: x,y; EAST/WEST: z,y). null if the quad can't be read.
-     */
-    static int[] signature(BakedQuad q, EnumFacing face) {
-        VertexFormat f = q.getFormat();
-        int[] d = q.getVertexData();
-        int stride = f.getIntegerSize();
-        if (d == null || stride <= 0 || d.length < stride * 4 || !f.hasUvOffset(0)) return null;
-        int pos = -1;
-        for (int i = 0; i < f.getElementCount(); i++) {
-            if (f.getElement(i).getUsage() == VertexFormatElement.EnumUsage.POSITION) { pos = f.getOffset(i) / 4; break; }
-        }
-        if (pos < 0) return null;
-        int uv = f.getUvOffsetById(0) / 4;
-        float[] a = new float[4], b = new float[4], u = new float[4], v = new float[4];
-        for (int k = 0; k < 4; k++) {
-            int o = k * stride;
-            float x = Float.intBitsToFloat(d[o + pos]), y = Float.intBitsToFloat(d[o + pos + 1]), z = Float.intBitsToFloat(d[o + pos + 2]);
-            switch (face.getAxis()) {
-                case Y: a[k] = x; b[k] = z; break;
-                case Z: a[k] = x; b[k] = y; break;
-                default: a[k] = z; b[k] = y; break;
+    /** Every return of FacadeBuilder.addFacade. */
+    @SuppressWarnings("unchecked")
+    public static void end() {
+        Object[] c = CTX.get();
+        CTX.remove();
+        if (c == null) return;
+        try {
+            List<Object> out = (List<Object>) c[0];
+            int start = (Integer) c[1];
+            int[][] inv = FacadeTurn.inverse((EnumFacing) c[2], (Integer) c[3]);
+            IBlockState state = (IBlockState) c[4];
+            IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+            for (int i = start; i < out.size(); i++) {
+                Object o = out.get(i);
+                if (!(o instanceof BakedQuad)) continue;
+                BakedQuad q = (BakedQuad) o;
+                if (q.getSprite() == c[6]) continue;   // stilt and AE2's fallback texture
+                BakedQuad n = redo(q, model, state, inv, c[5]);
+                if (n != null) out.set(i, n);
             }
-            u[k] = Float.intBitsToFloat(d[o + uv]);
-            v[k] = Float.intBitsToFloat(d[o + uv + 1]);
+        } catch (Throwable t) {
+            // leave AE2's quads as they are
         }
-        return new int[] {grad(a, u), grad(b, u), grad(a, v), grad(b, v)};
     }
 
-    /** Sign of how t changes from the low to the high side of axis s (0 if it doesn't). */
-    private static int grad(float[] s, float[] t) {
-        float lo = Float.MAX_VALUE, hi = -Float.MAX_VALUE;
-        for (float x : s) { lo = Math.min(lo, x); hi = Math.max(hi, x); }
-        if (hi - lo < 1e-4F) return 0;
-        float mid = (lo + hi) / 2, sumHi = 0, sumLo = 0, tlo = Float.MAX_VALUE, thi = -Float.MAX_VALUE;
-        int nHi = 0, nLo = 0;
+    /** AE2's quad with the sprite, texture coordinates and tint of the model face it should show; null = keep. */
+    static BakedQuad redo(BakedQuad q, IBakedModel model, IBlockState state, int[][] inv, Object frs) throws Throwable {
+        EnumFacing world = q.getFace();
+        if (world == null) return null;
+        EnumFacing src = FacadeTurn.apply(inv, world);
+        BakedQuad m = null;
+        for (BakedQuad b : model.getQuads(state, src, 0L)) { m = b; break; }
+        if (m == null) for (BakedQuad b : model.getQuads(state, null, 0L)) if (b.getFace() == src) { m = b; break; }
+        if (m == null || m.getSprite() == null) return null;
+        float[][] corner = corners(m, src);
+        if (corner == null) return null;
+
+        VertexFormat f = q.getFormat();
+        int[] d = q.getVertexData().clone();
+        int s = f.getIntegerSize(), pos = posOffset(f);
+        if (pos < 0 || !f.hasUvOffset(0) || d.length < s * 4) return null;
+        int uv = f.getUvOffsetById(0) / 4;
+        int col = f.hasColor() ? f.getColorOffset() / 4 : -1;
+        int rgb = 0xFFFFFF;
+        if (m.hasTintIndex() && frs != null) rgb = (Integer) resolveTint.invoke(frs, m.getTintIndex()) & 0xFFFFFF;
         for (int k = 0; k < 4; k++) {
-            if (s[k] > mid) { sumHi += t[k]; nHi++; } else { sumLo += t[k]; nLo++; }
-            tlo = Math.min(tlo, t[k]); thi = Math.max(thi, t[k]);
+            int o = k * s;
+            float[] p = {Float.intBitsToFloat(d[o + pos]) - 0.5F, Float.intBitsToFloat(d[o + pos + 1]) - 0.5F, Float.intBitsToFloat(d[o + pos + 2]) - 0.5F};
+            float[] sp = FacadeTurn.mul(inv, p);
+            float[] ab = inFace(src, new float[] {sp[0] + 0.5F, sp[1] + 0.5F, sp[2] + 0.5F});
+            float a = clamp(ab[0]), b = clamp(ab[1]);
+            float u = (1 - a) * (1 - b) * corner[0][0] + a * (1 - b) * corner[1][0] + (1 - a) * b * corner[2][0] + a * b * corner[3][0];
+            float v = (1 - a) * (1 - b) * corner[0][1] + a * (1 - b) * corner[1][1] + (1 - a) * b * corner[2][1] + a * b * corner[3][1];
+            d[o + uv] = Float.floatToRawIntBits(u);
+            d[o + uv + 1] = Float.floatToRawIntBits(v);
+            if (col >= 0) {
+                int alpha = d[o + col] & 0xFF000000;
+                d[o + col] = alpha | ((rgb & 0xFF) << 16) | (rgb & 0xFF00) | ((rgb >> 16) & 0xFF);
+            }
         }
-        if (nHi == 0 || nLo == 0) return 0;
-        float diff = sumHi / nHi - sumLo / nLo;
-        float eps = (thi - tlo) * 0.25F;
-        return diff > eps ? 1 : diff < -eps ? -1 : 0;
+        return new BakedQuad(d, -1, world, m.getSprite(), q.shouldApplyDiffuseLighting(), f);
+    }
+
+    /** Texture coordinates at the model face's corners, index (a high ? 1 : 0) + (b high ? 2 : 0); null if not a full square. */
+    static float[][] corners(BakedQuad m, EnumFacing src) {
+        VertexFormat mf = m.getFormat();
+        int[] md = m.getVertexData();
+        int ms = mf.getIntegerSize(), mp = posOffset(mf);
+        if (mp < 0 || !mf.hasUvOffset(0) || md == null || md.length < ms * 4) return null;
+        int muv = mf.getUvOffsetById(0) / 4;
+        float[][] corner = new float[4][];
+        for (int k = 0; k < 4; k++) {
+            int o = k * ms;
+            float[] ab = inFace(src, new float[] {Float.intBitsToFloat(md[o + mp]), Float.intBitsToFloat(md[o + mp + 1]), Float.intBitsToFloat(md[o + mp + 2])});
+            if (!edge(ab[0]) || !edge(ab[1])) return null;
+            int idx = (ab[0] > 0.5F ? 1 : 0) + (ab[1] > 0.5F ? 2 : 0);
+            if (corner[idx] != null) return null;
+            corner[idx] = new float[] {Float.intBitsToFloat(md[o + muv]), Float.intBitsToFloat(md[o + muv + 1])};
+        }
+        return corner;
+    }
+
+    private static int posOffset(VertexFormat f) {
+        for (int i = 0; i < f.getElementCount(); i++)
+            if (f.getElement(i).getUsage() == VertexFormatElement.EnumUsage.POSITION) return f.getOffset(i) / 4;
+        return -1;
+    }
+
+    /** The two coordinates across a face (UP/DOWN: x,z; NORTH/SOUTH: x,y; EAST/WEST: z,y). */
+    static float[] inFace(EnumFacing face, float[] p) {
+        switch (face.getAxis()) {
+            case Y: return new float[] {p[0], p[2]};
+            case Z: return new float[] {p[0], p[1]};
+            default: return new float[] {p[2], p[1]};
+        }
+    }
+
+    private static boolean edge(float x) {
+        return Math.abs(x) < 1e-3F || Math.abs(x - 1) < 1e-3F;
+    }
+
+    private static float clamp(float x) {
+        return x < 0 ? 0 : x > 1 ? 1 : x;
     }
 }

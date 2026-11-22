@@ -41,4 +41,4 @@ aoeqol.config.transformerQuartzToCertus.tooltip=The recipe is in Advanced Solar 
 aoeqol.config.ae2=Applied Energistics 2
 aoeqol.config.ae2.tooltip=Applied Energistics 2: facades.
 aoeqol.config.wrenchTurnsFacades=Wrench turns facades
-aoeqol.config.wrenchTurnsFacades.tooltip=Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it: logs go standing, east-west, north-south, then bark on all sides; other blocks with a direction step through theirs. Left-click with anything else works as usual. Needs AoE-QoL on the server too. Off: left-click with those tools works as usual.
+aoeqol.config.wrenchTurnsFacades.tooltip=Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to give the face it shows a quarter turn; sneak + left-click to show the block's next face. Broken or picked facades come back plain, so they stack. Left-click with anything else works as usual. Needs AoE-QoL on the server too. Off: left-click with those tools works as usual.

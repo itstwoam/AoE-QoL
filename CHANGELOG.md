@@ -8,8 +8,8 @@ Releases come out on Fridays and include everything since the previous release.
 - The Golden Lasso (and other Extra Utilities 2 recipes that cost XP) can be crafted in the AE2 crafting terminal and the Wireless Crafting Terminal. The result slot stayed empty because Extra Utilities 2 couldn't find the crafting player there. The player using the terminal is checked and pays the levels.
 
 ### Applied Energistics 2
-- Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it: logs go standing, east-west, north-south, then bark on all sides (e.g. bark on top of a cable); hay bale, bone block, purpur and quartz pillars and pumpkins step through their directions. The facade doesn't break and keeps its direction when picked up. Left-click with anything else works as usual. Needs AoE-QoL on the server too (setting: Wrench turns facades).
-- Facades are drawn with their block's texture direction: AE2 kept only the texture and dropped the model's rotation, so a log lying east-west looked like one lying north-south. A facade swapped for another one (turned) is redrawn right away; AE2 only redrew when a facade was added or removed.
+- Facades are drawn like the real block: AE2 kept only each face's texture and drew it in a fixed direction, so rotated models (a log lying east-west) lost their rotation and three faces came out mirrored.
+- Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to give the face it shows a quarter turn; sneak + left-click shows the block's next face instead (24 looks for any block, e.g. bark on top of a cable). The facade doesn't break, and broken, wrenched or picked facades come back as the plain facade, so they stack. Left-click with anything else works as usual. Needs AoE-QoL on the server too (setting: Wrench turns facades).
 
 ### Applied Energistics 2 / The One Probe
 - The block Interface, ME Drive, ME Chest, IO Port, Security Station, Spatial IO Port and Spatial Pylon show "Device Online", "Device Missing Channel" or "Device Offline" in The One Probe, like AE2 parts. They need a channel but showed nothing.

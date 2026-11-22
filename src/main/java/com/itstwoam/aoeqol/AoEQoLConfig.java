@@ -113,10 +113,10 @@ public final class AoEQoLConfig {
         ae2.setComment("Applied Energistics 2: facades.");
         ae2.setLanguageKey("aoeqol.config.ae2");
         ae2RotateFacades = config.get(AE2, "wrenchTurnsFacades", true,
-                "Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to turn it: logs go standing,\n"
-              + "east-west, north-south, then bark on all sides; other blocks with a direction (hay bale, bone block, pillars)\n"
-              + "step through theirs. The facade keeps its direction when broken and placed again. Left-click with anything\n"
-              + "else works as usual. Needs AoE-QoL on the server too. false: left-click with those tools works as usual.")
+                "Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to give the face it shows a\n"
+              + "quarter turn; sneak + left-click to show the block's next face. Broken or picked facades come back plain, so\n"
+              + "they stack. Left-click with anything else works as usual. Needs AoE-QoL on the server too. false: left-click\n"
+              + "with those tools works as usual (turned facades keep their turn).")
                 .setLanguageKey("aoeqol.config.wrenchTurnsFacades");
         ConfigCategory minecraft = config.getCategory(MINECRAFT);
         minecraft.setComment("Minecraft itself.");

@@ -305,10 +305,23 @@ public class PatchTransformer implements IClassTransformer {
                 "com/itstwoam/aoeqol/ae2/TopChannelState", "addState", "(Ljava/lang/Object;Ljava/lang/Object;)V", "a1,a3", -1,
                 "The One Probe: channel status (online / missing channel) for Interfaces, ME Drives and other channel blocks"));
         add("appeng/items/parts/ItemFacade",
-            new Patch("getTextureBlockState", "(" + ITEMSTACK + ")Lnet/minecraft/block/state/IBlockState;", Kind.FILTER_RETURN,
-                "com/itstwoam/aoeqol/ae2/FacadeRotate", "textureState",
-                "(Lnet/minecraft/block/state/IBlockState;Ljava/lang/Object;)Lnet/minecraft/block/state/IBlockState;", "a1", -1,
-                "AE2 facades turned with a wrench keep their direction (hay bale, bone block, purpur pillar)"));
+            redirect("getTextureBlockState", "(" + ITEMSTACK + ")Lnet/minecraft/block/state/IBlockState;", "net/minecraft/item/Item", "getMetadata",
+                "(" + ITEMSTACK + ")I", "com/itstwoam/aoeqol/ae2/FacadeRotate", "plainMeta", "(Lnet/minecraft/item/Item;" + ITEMSTACK + ")I",
+                "AE2 facades: the block is read without the facade's turn"));
+        String DROP = "(Ljava/lang/Object;)" + ITEMSTACK, FACADE_PART = "appeng/api/parts/IFacadePart";
+        add("appeng/block/networking/BlockCableBus",
+            redirect("getPickBlock", "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/RayTraceResult;Lnet/minecraft/world/World;"
+                    + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/EntityPlayer;)" + ITEMSTACK,
+                FACADE_PART, "getItemStack", "()" + ITEMSTACK, "com/itstwoam/aoeqol/ae2/FacadeRotate", "dropStack", DROP, "AE2 facades: picked as the plain facade"));
+        add("appeng/parts/PartPlacement",
+            redirect("place", "(" + ITEMSTACK + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;Lnet/minecraft/entity/player/EntityPlayer;"
+                    + "Lnet/minecraft/util/EnumHand;Lnet/minecraft/world/World;Lappeng/parts/PartPlacement$PlaceType;I)Lnet/minecraft/util/EnumActionResult;",
+                FACADE_PART, "getItemStack", "()" + ITEMSTACK, "com/itstwoam/aoeqol/ae2/FacadeRotate", "dropStack", DROP, "AE2 facades: wrenched off as the plain facade"));
+        add("appeng/parts/CableBusContainer",
+            redirect("partChanged", "()V", FACADE_PART, "getItemStack", "()" + ITEMSTACK, "com/itstwoam/aoeqol/ae2/FacadeRotate", "dropStack", DROP,
+                "AE2 facades: dropped as the plain facade (cable removed)"),
+            redirect("getDrops", "(Ljava/util/List;)Ljava/util/List;", FACADE_PART, "getItemStack", "()" + ITEMSTACK, "com/itstwoam/aoeqol/ae2/FacadeRotate", "dropStack", DROP,
+                "AE2 facades: dropped as the plain facade (block broken)"));
         add("appeng/facade/FacadeContainer",
             new Patch("readFromStream", "(Lio/netty/buffer/ByteBuf;)Z", Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRotate", "beforeStreamRead", "(Ljava/lang/Object;)V", "a0", -1,
                 "AE2 facades: a facade swapped for another one is redrawn (start)"),
@@ -316,15 +329,11 @@ public class PatchTransformer implements IClassTransformer {
                 "AE2 facades: a facade swapped for another one is redrawn (end)"));
         String ADD_FACADE = "(Lnet/minecraft/util/BlockRenderLayer;Ljava/util/Map;Lnet/minecraft/util/EnumFacing;Lappeng/api/util/AEAxisAlignedBB;ZZJLappeng/client/render/cablebus/CubeBuilder;)V";
         add("appeng/client/render/cablebus/FacadeBuilder",
-            new Patch("getSprite", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/EnumFacing;J)Lappeng/client/render/cablebus/FacadeBuilder$TextureAtlasAndTint;",
-                Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRender", "remember", "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;J)V", "a0,a1,a2,j3", -1,
-                "AE2 facades: texture direction from the block's model (lookup)"),
-            redirect("addFacade", ADD_FACADE, "appeng/client/render/cablebus/CubeBuilder", "setTexture", "(Lnet/minecraft/util/EnumFacing;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
-                "com/itstwoam/aoeqol/ae2/FacadeRender", "setTexture", "(Ljava/lang/Object;Lnet/minecraft/util/EnumFacing;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
-                "AE2 facades: texture direction from the block's model (faces)"),
-            redirect("addFacade", ADD_FACADE, "appeng/client/render/cablebus/CubeBuilder", "setTexture", "(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
-                "com/itstwoam/aoeqol/ae2/FacadeRender", "setTextureAll", "(Ljava/lang/Object;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
-                "AE2 facades: texture direction from the block's model (stilt reset)"));
+            new Patch("addFacade", ADD_FACADE, Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRender", "begin",
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V", "a0,a2,a3,a9", -1,
+                "AE2 facades drawn like the (turned) block (start)"),
+            new Patch("addFacade", ADD_FACADE, Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/ae2/FacadeRender", "end", "()V", "", -1,
+                "AE2 facades drawn like the (turned) block (end)"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
@@ -401,6 +410,9 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("appeng.items.parts.ItemFacade")
                      || transformedName.equals("appeng.facade.FacadeContainer")
                      || transformedName.equals("appeng.client.render.cablebus.FacadeBuilder")
+                     || transformedName.equals("appeng.block.networking.BlockCableBus")
+                     || transformedName.equals("appeng.parts.PartPlacement")
+                     || transformedName.equals("appeng.parts.CableBusContainer")
                      || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
                      || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
                      || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")
