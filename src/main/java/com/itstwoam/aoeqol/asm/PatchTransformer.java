@@ -334,6 +334,14 @@ public class PatchTransformer implements IClassTransformer {
                 "AE2 facades drawn like the (turned) block (start)"),
             new Patch("addFacade", ADD_FACADE, Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/ae2/FacadeRender", "end", "()V", "", -1,
                 "AE2 facades drawn like the (turned) block (end)"));
+        String RENDER_MODEL = "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;"
+            + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/VertexBuffer;ZJ)Z";
+        add("net/minecraft/client/renderer/BlockModelRenderer",
+            new Patch("func_187493_a", RENDER_MODEL, Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRender", "renderState", "(Ljava/lang/Object;)V", "a3", -1,
+                "AE2 facades: smooth lighting (state)"),
+            redirect("func_187493_a", RENDER_MODEL, "net/minecraft/client/renderer/block/model/IBakedModel", "func_177555_b", "()Z",
+                "com/itstwoam/aoeqol/ae2/FacadeRender", "ambientOcclusion", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)Z",
+                "AE2 facades: smooth lighting like a real block"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,
@@ -390,6 +398,7 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("ic2.core.block.TileEntityBlock")
                      || transformedName.equals("ic2.core.energy.grid.Grid")
                      || transformedName.equals("net.minecraft.util.MouseHelper")
+                     || transformedName.equals("net.minecraft.client.renderer.BlockModelRenderer")
                      || transformedName.equals("com.rwtema.extrautils2.items.ItemBagOfHolding")
                      || transformedName.equals("com.teambrmodding.neotech.registries.AbstractRecipeHandler")
                      || transformedName.equals("com.vanhal.progressiveautomation.compat.mods.Vanilla")

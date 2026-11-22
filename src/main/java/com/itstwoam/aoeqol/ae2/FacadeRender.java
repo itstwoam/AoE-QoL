@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 /**
  * Draws AE2 facades as a real (turned) block would look (client only).
@@ -25,6 +27,8 @@ import net.minecraft.util.EnumFacing;
  * whole block were turned. Texture coordinates are read off the model's quad at the same spot of the face, so the
  * facade's thin edges and any cut-outs line up too. Model faces that aren't a full square, AE2's own facade texture
  * and any error: AE2's quad is left as it was.
+ *
+ * Also: cable buses with facades get smooth lighting / ambient occlusion like a real block ({@link #ambientOcclusion}).
  */
 public final class FacadeRender {
     private FacadeRender() {}
@@ -88,6 +92,45 @@ public final class FacadeRender {
             }
         } catch (Throwable t) {
             // leave AE2's quads as they are
+        }
+    }
+
+    private static final ThreadLocal<Object> RENDER_STATE = new ThreadLocal<Object>();
+    private static volatile boolean aoBroken;
+    private static Class<?> cableModel;
+    private static IUnlistedProperty<?> renderStateProp;
+    private static Method getFacades;
+
+    /** Start of BlockModelRenderer.renderModel(world, model, state, pos, buffer, checkSides, rand): the state drawn. */
+    public static void renderState(Object state) {
+        RENDER_STATE.set(state);
+    }
+
+    /**
+     * Replaces model.isAmbientOcclusion() in BlockModelRenderer.renderModel. AE2's cable bus model always says no, so
+     * every cable bus is drawn with flat lighting and facades get none of a real block's smooth lighting and corner
+     * shadows. A cable bus with at least one facade says yes; everything else answers as before.
+     */
+    public static boolean ambientOcclusion(IBakedModel model) {
+        if (model.isAmbientOcclusion()) return true;
+        Object state = RENDER_STATE.get();
+        if (aoBroken || !(state instanceof IExtendedBlockState)) return false;
+        try {
+            if (cableModel == null) {
+                ClassLoader cl = FacadeRender.class.getClassLoader();
+                renderStateProp = (IUnlistedProperty<?>) Class.forName("appeng.block.networking.BlockCableBus", false, cl)
+                        .getField("RENDER_STATE_PROPERTY").get(null);
+                getFacades = Class.forName("appeng.client.render.cablebus.CableBusRenderState", false, cl).getMethod("getFacades");
+                cableModel = Class.forName("appeng.client.render.cablebus.CableBusBakedModel", false, cl);
+            }
+            if (!cableModel.isInstance(model)) return false;
+            Object rs = ((IExtendedBlockState) state).getValue(renderStateProp);
+            if (rs == null) return false;
+            Map<?, ?> facades = (Map<?, ?>) getFacades.invoke(rs);
+            return facades != null && !facades.isEmpty();
+        } catch (Throwable t) {
+            aoBroken = true;
+            return false;
         }
     }
 
