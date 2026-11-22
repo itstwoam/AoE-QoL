@@ -8,7 +8,7 @@ Releases come out on Fridays and include everything since the previous release.
 - The Golden Lasso (and other Extra Utilities 2 recipes that cost XP) can be crafted in the AE2 crafting terminal and the Wireless Crafting Terminal. The result slot stayed empty because Extra Utilities 2 couldn't find the crafting player there. The player using the terminal is checked and pays the levels.
 
 ### Applied Energistics 2
-- Facades are drawn like the real block: AE2 kept only each face's texture and drew it in a fixed direction, so rotated models (a log lying east-west) lost their rotation and three faces came out mirrored. A cable bus with facades also gets smooth lighting and corner shadows like a real block; AE2 drew all cable buses with flat lighting.
+- Facades are drawn like the real block: AE2 kept only each face's texture and drew it in a fixed direction, so rotated models (a log lying east-west) lost their rotation and three faces came out mirrored. Facades also get smooth lighting and corner shadows like a real block (AE2 drew them flat); the cable and parts stay flat as AE2 intends.
 - Left-click a facade with a Certus or Nether Quartz Wrench or a Network Tool to give the face it shows a quarter turn; sneak + left-click shows the block's next face instead (24 looks for any block, e.g. bark on top of a cable). The facade doesn't break, and broken, wrenched or picked facades come back as the plain facade, so they stack. Left-click with anything else works as usual. Needs AoE-QoL on the server too (setting: Wrench turns facades).
 
 ### Applied Energistics 2 / The One Probe

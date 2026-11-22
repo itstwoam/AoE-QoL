@@ -337,11 +337,9 @@ public class PatchTransformer implements IClassTransformer {
         String RENDER_MODEL = "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;"
             + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/VertexBuffer;ZJ)Z";
         add("net/minecraft/client/renderer/BlockModelRenderer",
-            new Patch("func_187493_a", RENDER_MODEL, Kind.PREPEND, "com/itstwoam/aoeqol/ae2/FacadeRender", "renderState", "(Ljava/lang/Object;)V", "a3", -1,
-                "AE2 facades: smooth lighting (state)"),
-            redirect("func_187493_a", RENDER_MODEL, "net/minecraft/client/renderer/block/model/IBakedModel", "func_177555_b", "()Z",
-                "com/itstwoam/aoeqol/ae2/FacadeRender", "ambientOcclusion", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)Z",
-                "AE2 facades: smooth lighting like a real block"));
+            redirect("func_187493_a", RENDER_MODEL, "net/minecraft/client/renderer/BlockModelRenderer", "func_187497_c", RENDER_MODEL,
+                "com/itstwoam/aoeqol/ae2/FacadeRender", "renderFlat", "(Lnet/minecraft/client/renderer/BlockModelRenderer;" + RENDER_MODEL.substring(1),
+                "AE2 facades: smooth lighting like a real block (cable and parts stay flat)"));
         add("com/rwtema/extrautils2/crafting/PlayerSpecificCrafting",
             new Patch("isGoodForCrafting", "(Lnet/minecraft/inventory/InventoryCrafting;)Z", Kind.FILTER_RETURN,
                 TC, "isGoodForCrafting", "(ZLjava/lang/Object;Ljava/lang/Object;)Z", "a0,a1", -1,

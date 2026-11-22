@@ -2,12 +2,20 @@ package com.itstwoam.aoeqol.ae2;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
@@ -28,7 +36,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
  * facade's thin edges and any cut-outs line up too. Model faces that aren't a full square, AE2's own facade texture
  * and any error: AE2's quad is left as it was.
  *
- * Also: cable buses with facades get smooth lighting / ambient occlusion like a real block ({@link #ambientOcclusion}).
+ * Also: facades get smooth lighting / ambient occlusion like a real block, the cable and parts stay flat ({@link #renderFlat}).
  */
 public final class FacadeRender {
     private FacadeRender() {}
@@ -88,33 +96,65 @@ public final class FacadeRender {
                 BakedQuad q = (BakedQuad) o;
                 if (q.getSprite() == c[6]) continue;   // stilt and AE2's fallback texture
                 BakedQuad n = redo(q, model, state, inv, c[5]);
-                if (n != null) out.set(i, n);
+                if (n == null) n = new FacadeQuad(q.getVertexData(), q.getTintIndex(), q.getFace(), q.getSprite(), q.shouldApplyDiffuseLighting(), q.getFormat());
+                out.set(i, n);
             }
         } catch (Throwable t) {
             // leave AE2's quads as they are
         }
     }
 
-    private static final ThreadLocal<Object> RENDER_STATE = new ThreadLocal<Object>();
     private static volatile boolean aoBroken;
     private static Class<?> cableModel;
     private static IUnlistedProperty<?> renderStateProp;
     private static Method getFacades;
 
-    /** Start of BlockModelRenderer.renderModel(world, model, state, pos, buffer, checkSides, rand): the state drawn. */
-    public static void renderState(Object state) {
-        RENDER_STATE.set(state);
+    /** A facade's quad, so the block renderer can light facades apart from the cable and parts. */
+    public static final class FacadeQuad extends BakedQuad {
+        FacadeQuad(int[] data, int tint, EnumFacing face, TextureAtlasSprite sprite, boolean diffuse, VertexFormat format) {
+            super(data, tint, face, sprite, diffuse, format);
+        }
     }
 
     /**
-     * Replaces model.isAmbientOcclusion() in BlockModelRenderer.renderModel. AE2's cable bus model always says no, so
-     * every cable bus is drawn with flat lighting and facades get none of a real block's smooth lighting and corner
-     * shadows. A cable bus with at least one facade says yes; everything else answers as before.
+     * Replaces this.renderModelFlat(...) in BlockModelRenderer.renderModel. AE2's cable bus model turns smooth lighting
+     * off for the whole block (on purpose, for the cable and parts), so facades were drawn flat. For a cable bus with
+     * facades, when smooth lighting would apply to a normal block (option on, block gives off no light), the facade
+     * quads are drawn with smooth lighting and everything else flat as before. Anything else: renderModelFlat as is.
      */
-    public static boolean ambientOcclusion(IBakedModel model) {
-        if (model.isAmbientOcclusion()) return true;
-        Object state = RENDER_STATE.get();
-        if (aoBroken || !(state instanceof IExtendedBlockState)) return false;
+    public static boolean renderFlat(BlockModelRenderer self, IBlockAccess world, IBakedModel model, IBlockState state, BlockPos pos,
+                                     VertexBuffer buffer, boolean checkSides, long rand) {
+        if (!aoBroken && Minecraft.isAmbientOcclusionEnabled() && state.getLightValue() == 0 && hasFacades(model, state)) {
+            try {
+                Map<EnumFacing, List<BakedQuad>> facade = new java.util.EnumMap<EnumFacing, List<BakedQuad>>(EnumFacing.class),
+                        rest = new java.util.EnumMap<EnumFacing, List<BakedQuad>>(EnumFacing.class);
+                List<BakedQuad> facadeAll = new ArrayList<BakedQuad>(), restAll = new ArrayList<BakedQuad>();
+                split(model.getQuads(state, null, rand), facadeAll, restAll);
+                for (EnumFacing f : EnumFacing.values()) {
+                    List<BakedQuad> fq = new ArrayList<BakedQuad>(), rq = new ArrayList<BakedQuad>();
+                    split(model.getQuads(state, f, rand), fq, rq);
+                    facade.put(f, fq);
+                    rest.put(f, rq);
+                }
+                boolean drew = self.renderModelFlat(world, new Part(model, rest, restAll), state, pos, buffer, checkSides, rand);
+                drew |= self.renderModelSmooth(world, new Part(model, facade, facadeAll), state, pos, buffer, checkSides, rand);
+                return drew;
+            } catch (RuntimeException e) {
+                throw e;   // let Minecraft's own crash report name the block
+            } catch (Throwable t) {
+                aoBroken = true;
+            }
+        }
+        return self.renderModelFlat(world, model, state, pos, buffer, checkSides, rand);
+    }
+
+    private static void split(List<BakedQuad> in, List<BakedQuad> facade, List<BakedQuad> rest) {
+        if (in == null) return;
+        for (BakedQuad q : in) (q instanceof FacadeQuad ? facade : rest).add(q);
+    }
+
+    private static boolean hasFacades(IBakedModel model, IBlockState state) {
+        if (!(state instanceof IExtendedBlockState)) return false;
         try {
             if (cableModel == null) {
                 ClassLoader cl = FacadeRender.class.getClassLoader();
@@ -132,6 +172,27 @@ public final class FacadeRender {
             aoBroken = true;
             return false;
         }
+    }
+
+    /** One share of a model's quads (already fetched), otherwise the model itself. */
+    private static final class Part implements IBakedModel {
+        private final IBakedModel model;
+        private final Map<EnumFacing, List<BakedQuad>> sides;
+        private final List<BakedQuad> general;
+
+        Part(IBakedModel model, Map<EnumFacing, List<BakedQuad>> sides, List<BakedQuad> general) {
+            this.model = model; this.sides = sides; this.general = general;
+        }
+
+        @Override public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+            return side == null ? general : sides.get(side);
+        }
+        @Override public boolean isAmbientOcclusion() { return model.isAmbientOcclusion(); }
+        @Override public boolean isGui3d() { return model.isGui3d(); }
+        @Override public boolean isBuiltInRenderer() { return model.isBuiltInRenderer(); }
+        @Override public TextureAtlasSprite getParticleTexture() { return model.getParticleTexture(); }
+        @Override public ItemCameraTransforms getItemCameraTransforms() { return model.getItemCameraTransforms(); }
+        @Override public ItemOverrideList getOverrides() { return model.getOverrides(); }
     }
 
     /** AE2's quad with the sprite, texture coordinates and tint of the model face it should show; null = keep. */
@@ -169,7 +230,7 @@ public final class FacadeRender {
                 d[o + col] = alpha | ((rgb & 0xFF) << 16) | (rgb & 0xFF00) | ((rgb >> 16) & 0xFF);
             }
         }
-        return new BakedQuad(d, -1, world, m.getSprite(), q.shouldApplyDiffuseLighting(), f);
+        return new FacadeQuad(d, -1, world, m.getSprite(), q.shouldApplyDiffuseLighting(), f);
     }
 
     /** Texture coordinates at the model face's corners, index (a high ? 1 : 0) + (b high ? 2 : 0); null if not a full square. */
