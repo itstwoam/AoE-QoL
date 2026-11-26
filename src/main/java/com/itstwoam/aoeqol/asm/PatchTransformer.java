@@ -370,6 +370,10 @@ public class PatchTransformer implements IClassTransformer {
                 "(Ljava/util/Map;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;",
                 JMF, "tileParameter", "(Ljava/lang/Object;Ljava/util/Map;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;",
                 "JourneyMap web map shows tiles west of X=0 (Google Maps wraps tile numbers)"));
+        add("journeymap/client/service/FileService",
+            new Patch("getStream", "(Ljava/lang/String;Lse/rupy/http/Event;)Ljava/io/InputStream;", Kind.FILTER_RETURN,
+                JMF, "webFile", "(Ljava/io/InputStream;Ljava/lang/String;)Ljava/io/InputStream;", "a1", -1,
+                "JourneyMap web map draws waypoints, mobs and other players (page script fix)"));
         String MAPTYPE = "Ljourneymap/client/model/MapType;";
         add("journeymap/client/model/MapState",
             new Patch("getMapType", "()" + MAPTYPE, Kind.PREPEND, JMF, "ensureProperties", "(Ljava/lang/Object;)V", "a0", -1,
@@ -446,7 +450,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer")
                      || transformedName.equals("journeymap.client.io.FileHandler")
                      || transformedName.equals("journeymap.client.model.MapState")
-                     || transformedName.equals("journeymap.client.service.TileService"))) {
+                     || transformedName.equals("journeymap.client.service.TileService")
+                     || transformedName.equals("journeymap.client.service.FileService"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));

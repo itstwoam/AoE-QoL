@@ -1,6 +1,10 @@
 package com.itstwoam.aoeqol.journeymap;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -24,6 +28,14 @@ import org.apache.logging.log4j.LogManager;
  * Maps script wraps tile numbers around the globe (360 tiles at zoom 0, 360 * 2^zoom at higher zooms) before asking
  * for them, so tile -1 is requested as 359. The script JourneyMap was written for passed negative numbers through.
  * {@link #tileParameter} turns a wrapped x back into the negative one (a tile past 180 degrees can't exist).
+ *
+ * Web map waypoints, mobs and other players never drawn: the page's refresh sets a "drawing" flag, draws mobs and
+ * players, then waypoints, then clears the flag. The waypoint step asks Google Maps for the visible area, which
+ * today's script leaves undefined until the map has settled, so the first refresh throws there and the flag stays
+ * set: every later refresh is skipped as "already drawing". Once the area is known, it is upside down (JourneyMap's
+ * projection runs north-south the other way to what Google Maps expects), so "is this waypoint on screen" is false for
+ * every waypoint. {@link #webFile} patches journeymap.js as it is served: every waypoint is drawn (Google Maps skips
+ * off-screen markers itself), and an error in the waypoint step no longer leaves the flag set.
  */
 public final class JourneyMapFix {
     private JourneyMapFix() {}
@@ -109,5 +121,33 @@ public final class JourneyMapFix {
         } catch (Throwable ignored) {
         }
         return value;
+    }
+
+    private static final Charset LATIN1 = Charset.forName("ISO-8859-1");
+    private static final String[][] JS_FIXES = {
+        {"if(e.getBounds().contains(A))", "if(!0)"},
+        {"U(),Q(),J=!1", "function(){try{U()}catch(x){console.error(x)}}(),Q(),J=!1"},
+    };
+
+    /** FILTER_RETURN on FileService.getStream(String, Event): patches the web map's journeymap.js. */
+    public static InputStream webFile(InputStream in, String path) {
+        if (in == null || path == null || !path.endsWith("/js/journeymap.js")) return in;
+        byte[] bytes;
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+            in.close();
+            bytes = out.toByteArray();
+        } catch (Throwable t) {
+            LogManager.getLogger("AoE-QoL").warn("JourneyMap web map script not patched: " + t);
+            return null;
+        }
+        String js = new String(bytes, LATIN1);
+        for (String[] fix : JS_FIXES) {
+            if (js.contains(fix[0])) js = js.replace(fix[0], fix[1]);
+        }
+        return new ByteArrayInputStream(js.getBytes(LATIN1));
     }
 }
