@@ -365,6 +365,11 @@ public class PatchTransformer implements IClassTransformer {
                 JMF, "path", "(Ljava/net/URL;)Ljava/lang/String;", "JourneyMap icon copy: decoded jar path"),
             redirect("copyResources", COPY_RES, "java/net/URL", "getFile", "()Ljava/lang/String;",
                 JMF, "file", "(Ljava/net/URL;)Ljava/lang/String;", "JourneyMap icon copy: decoded folder path"));
+        add("journeymap/client/service/TileService",
+            redirect("filter", "(Lse/rupy/http/Event;)V", "journeymap/client/service/TileService", "getParameter",
+                "(Ljava/util/Map;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;",
+                JMF, "tileParameter", "(Ljava/lang/Object;Ljava/util/Map;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;",
+                "JourneyMap web map shows tiles west of X=0 (Google Maps wraps tile numbers)"));
         String MAPTYPE = "Ljourneymap/client/model/MapType;";
         add("journeymap/client/model/MapState",
             new Patch("getMapType", "()" + MAPTYPE, Kind.PREPEND, JMF, "ensureProperties", "(Ljava/lang/Object;)V", "a0", -1,
@@ -440,7 +445,8 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")
                      || transformedName.equals("net.minecraft.server.integrated.IntegratedServer")
                      || transformedName.equals("journeymap.client.io.FileHandler")
-                     || transformedName.equals("journeymap.client.model.MapState"))) {
+                     || transformedName.equals("journeymap.client.model.MapState")
+                     || transformedName.equals("journeymap.client.service.TileService"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));

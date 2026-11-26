@@ -16,6 +16,7 @@ Releases come out on Fridays and include everything since the previous release.
 
 ### JourneyMap
 - The web map shows its images (buttons, map type and player icons) when the game folder has a space in its name, like the pack's default "Age of Engineering". JourneyMap couldn't find its own jar there, so it never copied its icons out and every image in the web map was broken.
+- The web map shows the world west of X=0; it was a grey void. Google Maps now wraps tile numbers around the globe, so the web map asked for the far-east tile 359 instead of tile -1.
 - The web map's Auto-Map button works before the full-screen map has been opened in game ("Couldn't Auto-Map: null" before).
 
 ## 1.2.1 (Sunday 2026-11-15)

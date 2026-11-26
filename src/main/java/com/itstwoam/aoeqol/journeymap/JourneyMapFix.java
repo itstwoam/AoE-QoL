@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -18,6 +19,11 @@ import org.apache.logging.log4j.LogManager;
  * Web map Auto-Map: the map state reads the full-screen map's settings, which JourneyMap only hands it once the
  * full-screen map has been opened; before that, Auto-Map from the web map fails with a NullPointerException.
  * {@link #ensureProperties} gives the state the full-screen map's settings when it has none yet.
+ *
+ * Web map west of X=0 blank: the web map draws each 512-block tile as one degree of longitude, and today's Google
+ * Maps script wraps tile numbers around the globe (360 tiles at zoom 0, 360 * 2^zoom at higher zooms) before asking
+ * for them, so tile -1 is requested as 359. The script JourneyMap was written for passed negative numbers through.
+ * {@link #tileParameter} turns a wrapped x back into the negative one (a tile past 180 degrees can't exist).
  */
 public final class JourneyMapFix {
     private JourneyMapFix() {}
@@ -79,5 +85,29 @@ public final class JourneyMapFix {
             broken = true;
             LogManager.getLogger("AoE-QoL").warn("JourneyMap map state fix disabled: " + t);
         }
+    }
+
+    private static Method getParameter;
+
+    /** Replaces TileService's getParameter(Map, String, Integer) calls in filter(): unwraps the tile "x". */
+    public static Integer tileParameter(Object service, Map map, String key, Integer def) throws Exception {
+        if (getParameter == null) {
+            Method m = Class.forName("journeymap.client.service.BaseService")
+                .getDeclaredMethod("getParameter", Map.class, String.class, Integer.class);
+            m.setAccessible(true);
+            getParameter = m;
+        }
+        Integer value = (Integer) getParameter.invoke(service, map, key, def);
+        if (value == null || !"x".equals(key)) return value;
+        try {
+            Integer zoom = (Integer) getParameter.invoke(service, map, "zoom", 0);
+            int z = zoom == null ? 0 : zoom;
+            if (z < 0 || z > 20) return value;
+            int wrap = 360 << z;
+            int x = value;
+            if (x >= wrap / 2 && x < wrap) return x - wrap;
+        } catch (Throwable ignored) {
+        }
+        return value;
     }
 }

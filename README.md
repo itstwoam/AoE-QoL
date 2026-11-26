@@ -23,7 +23,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [NeoTech](#neotech) | NeoTech 3.3.0 | No server crash from recipe files left over from another mod setup: they reset themselves to NeoTech's defaults |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
 | [Mekanism](#mekanism) | Mekanism 1.10.2-9.2.4.103 (+ Mekanism Generators) | No crash in single player right after a world loads (Mekanism rewrote the shared recipe list while machines looked up recipes) |
-| [JourneyMap](#journeymap) | JourneyMap 1.10.2-5.5.2 | Web map shows its images when the game folder has a space in its name; web map Auto-Map works before the full-screen map has been opened |
+| [JourneyMap](#journeymap) | JourneyMap 1.10.2-5.5.2 | Web map shows everything west of X=0 and its images when the game folder has a space in its name; web map Auto-Map works before the full-screen map has been opened |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
@@ -183,6 +183,7 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 ## JourneyMap
 
 * **Broken images in the web map.** At startup JourneyMap copies its theme and entity icons out of its jar into `journeymap/icon/`, and the web map (browser, port 8076) loads its buttons and icons from there. JourneyMap checks for its own jar with the path still written as a web address, so a game folder with a space in its name (such as `Age of Engineering`) becomes `Age%20of%20Engineering`, the jar "doesn't exist", nothing is copied and every image in the web map shows as broken. AoE-QoL reads the real path; the icons are copied the next time the game starts.
+* **Web map blank west of X=0.** The web map draws each 512-block tile as one degree of longitude on a Google map. Today's Google Maps script wraps tile numbers around the globe before asking for them, so the tile just west of X=0 is requested as tile 359 (far east, nothing mapped there) and the whole western half of the world shows as a grey void. The script JourneyMap 5.5.2 was written for passed negative numbers through. AoE-QoL turns a wrapped number back into the real (negative) tile.
 * **"Couldn't Auto-Map: null" from the web map.** The web map's Auto-Map button reads the full-screen map's settings, which JourneyMap only hands over once the full-screen map has been opened in game; before that it failed. Now it uses the full-screen map's settings straight away.
 
 ---
