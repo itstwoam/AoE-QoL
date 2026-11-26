@@ -23,6 +23,7 @@ New versions come out on **Fridays** and bundle everything since the previous on
 | [NeoTech](#neotech) | NeoTech 3.3.0 | No server crash from recipe files left over from another mod setup: they reset themselves to NeoTech's defaults |
 | [Ender IO](#ender-io) | Ender IO 1.10.2-3.1.193 | Item filters do what their mode says (an empty whitelist passes nothing); no crash when another mod tries to charge a creative capacitor bank |
 | [Mekanism](#mekanism) | Mekanism 1.10.2-9.2.4.103 (+ Mekanism Generators) | No crash in single player right after a world loads (Mekanism rewrote the shared recipe list while machines looked up recipes) |
+| [JourneyMap](#journeymap) | JourneyMap 1.10.2-5.5.2 | Web map shows its images when the game folder has a space in its name; web map Auto-Map works before the full-screen map has been opened |
 | [Minecraft](#minecraft) | — | No crash on startup on Turkish/Azerbaijani systems; no freeze on "Save and Quit to Title"; no view spin when a screen closes |
 | [BetterFPS](#betterfps) | BetterFPS 1.4.5 | Switches the crash-prone "Async" creative search to "On" (still fast) |
 
@@ -176,6 +177,13 @@ Like AE2's "JEI synchronized" search: while the Storage Scanner is open, typing 
 ## Mekanism
 
 * **Crash in single player right after a world loads.** When you join a world, Mekanism sends its config from the server to the game, and the game then removes and re-adds Mekanism's machine recipes in Minecraft's crafting recipe list. In single player the game and the built-in server share that one list, and the game did this on a network thread while the server was already ticking machines that look up recipes (Ender IO machines like the Killer Joe, the Mechanical Crafter and others). The game crashed ("Ticking block entity", ConcurrentModificationException in `CraftingManager`), most often on the second world opened in a session. Now, while a built-in server runs, the game leaves the list alone: the server already set up the same recipes from the same config. Connected to another server, the rewrite still happens, on the game's main thread. Machine on/off changes made in Mekanism's in-game config screen during single player apply after a restart.
+
+---
+
+## JourneyMap
+
+* **Broken images in the web map.** At startup JourneyMap copies its theme and entity icons out of its jar into `journeymap/icon/`, and the web map (browser, port 8076) loads its buttons and icons from there. JourneyMap checks for its own jar with the path still written as a web address, so a game folder with a space in its name (such as `Age of Engineering`) becomes `Age%20of%20Engineering`, the jar "doesn't exist", nothing is copied and every image in the web map shows as broken. AoE-QoL reads the real path; the icons are copied the next time the game starts.
+* **"Couldn't Auto-Map: null" from the web map.** The web map's Auto-Map button reads the full-screen map's settings, which JourneyMap only hands over once the full-screen map has been opened in game; before that it failed. Now it uses the full-screen map's settings straight away.
 
 ---
 

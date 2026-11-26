@@ -14,6 +14,10 @@ Releases come out on Fridays and include everything since the previous release.
 ### Applied Energistics 2 / The One Probe
 - The block Interface, ME Drive, ME Chest, IO Port, Security Station, Spatial IO Port and Spatial Pylon show "Device Online", "Device Missing Channel" or "Device Offline" in The One Probe, like AE2 parts. They need a channel but showed nothing.
 
+### JourneyMap
+- The web map shows its images (buttons, map type and player icons) when the game folder has a space in its name, like the pack's default "Age of Engineering". JourneyMap couldn't find its own jar there, so it never copied its icons out and every image in the web map was broken.
+- The web map's Auto-Map button works before the full-screen map has been opened in game ("Couldn't Auto-Map: null" before).
+
 ## 1.2.1 (Sunday 2026-11-15)
 
 ### Mekanism

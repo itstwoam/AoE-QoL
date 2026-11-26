@@ -356,6 +356,21 @@ public class PatchTransformer implements IClassTransformer {
                 "com/google/common/util/concurrent/Futures", "getUnchecked", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
                 "com/itstwoam/aoeqol/misc/QuitFix", "await", "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
                 "quit to title no longer freezes waiting for a server that already stopped"));
+        String JMF = "com/itstwoam/aoeqol/journeymap/JourneyMapFix";
+        String COPY_RES = "(Ljava/io/File;Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;Z)Z";
+        add("journeymap/client/io/FileHandler",
+            new Patch("isInJar", "(Ljava/net/URL;)Z", Kind.REPLACE, JMF, "isInJar", "(Ljava/net/URL;)Z", "a0", -1,
+                "JourneyMap finds its jar in a folder with spaces (web map images)"),
+            redirect("copyResources", COPY_RES, "java/net/URL", "getPath", "()Ljava/lang/String;",
+                JMF, "path", "(Ljava/net/URL;)Ljava/lang/String;", "JourneyMap icon copy: decoded jar path"),
+            redirect("copyResources", COPY_RES, "java/net/URL", "getFile", "()Ljava/lang/String;",
+                JMF, "file", "(Ljava/net/URL;)Ljava/lang/String;", "JourneyMap icon copy: decoded folder path"));
+        String MAPTYPE = "Ljourneymap/client/model/MapType;";
+        add("journeymap/client/model/MapState",
+            new Patch("getMapType", "()" + MAPTYPE, Kind.PREPEND, JMF, "ensureProperties", "(Ljava/lang/Object;)V", "a0", -1,
+                "JourneyMap map state has settings before the full-screen map is opened"),
+            new Patch("setMapType", "(" + MAPTYPE + ")" + MAPTYPE, Kind.PREPEND, JMF, "ensureProperties", "(Ljava/lang/Object;)V", "a0", -1,
+                "JourneyMap web map Auto-Map works before the full-screen map is opened"));
         for (String gui : new String[] {"GuiCalculator", "GuiPicker", "GuiOreDict"}) {
             add(JEC + "gui/guis/" + gui,
                 new Patch("init", "()V", Kind.BEFORE_RETURN, "com/itstwoam/aoeqol/client/JecPageArrows", "afterInit",
@@ -423,7 +438,9 @@ public class PatchTransformer implements IClassTransformer {
                      || transformedName.equals("p455w0rd.wct.container.ContainerWCT")
                      || transformedName.equals("com.rwtema.extrautils2.crafting.PlayerSpecificCrafting")
                      || transformedName.equals("appeng.integration.modules.theoneprobe.tile.PowerStateInfoProvider")
-                     || transformedName.equals("net.minecraft.server.integrated.IntegratedServer"))) {
+                     || transformedName.equals("net.minecraft.server.integrated.IntegratedServer")
+                     || transformedName.equals("journeymap.client.io.FileHandler")
+                     || transformedName.equals("journeymap.client.model.MapState"))) {
             return basicClass;
         }
         List<Patch> patches = PATCHES.get(transformedName.replace('.', '/'));
